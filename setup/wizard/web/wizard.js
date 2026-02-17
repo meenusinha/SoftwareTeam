@@ -377,6 +377,8 @@ function selectProvider(id) {
   const provider = PROVIDERS.find(p => p.id === id);
   document.querySelectorAll('.radio-option').forEach(el => {
     el.classList.toggle('selected', el.dataset.provider === id);
+    const radio = el.querySelector('input[type="radio"]');
+    if (radio) radio.checked = (el.dataset.provider === id);
   });
 
   const detail = document.getElementById('provider-detail');
@@ -583,6 +585,8 @@ function selectWorkflow(mode) {
   state.workflowMode = mode;
   document.querySelectorAll('#screen-1 .radio-option').forEach(el => {
     el.classList.toggle('selected', el.dataset.mode === mode);
+    const radio = el.querySelector('input[type="radio"]');
+    if (radio) radio.checked = (el.dataset.mode === mode);
   });
   document.getElementById('workflow-next').disabled = false;
 
