@@ -2,13 +2,82 @@
 
 A **provider-agnostic template** for AI-assisted multi-agent development workflows.
 
+## One-Command Setup (Recommended)
+
+Paste ONE command to launch a browser-based setup wizard that handles everything:
+
+**Mac / Linux:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.ps1 | iex
+```
+
+**New here? See [QUICK-START.md](QUICK-START.md)** for a simple 5-step guide.
+
 ---
 
-## Fork This Template
+## What is this?
 
-To use this template for your own project:
+A structured approach to software development using specialized AI agents:
 
-### Option 1: GitHub Fork (Recommended)
+- **Product Owner**: Customer-facing, gathers requirements, creates user stories
+- **Architect**: Designs systems and creates technical specifications
+- **Developer**: Implements features and writes code
+- **Tester**: Tests and validates implementations
+- **IT**: Manages infrastructure and releases
+- **Cost Analyst**: Estimates token costs, warns before expensive operations
+
+## Who is this for?
+
+- **Non-programmers** who want AI help building software
+- **Teams** wanting structured AI-assisted workflows
+- **Projects** needing consistent development processes
+
+## Works With Any AI
+
+| Provider | Models | Recommended Tools |
+|----------|--------|-------------------|
+| **Anthropic** | Claude 3.5, Opus 4 | Claude Code (recommended) |
+| **Google** | Gemini 1.5 Pro, Flash | Aider, Cursor, Windsurf |
+| **OpenAI** | GPT-4o, GPT-4 Turbo | Aider, Cursor, Windsurf |
+| **Azure** | GPT-4, GPT-3.5 | Aider, Cursor, Windsurf |
+| **GitHub** | Copilot | GitHub Copilot (VS Code) |
+| **Ollama** | Local models | Aider, Continue |
+
+---
+
+## Quick Start (For Developers)
+
+```bash
+# 1. Clone this template
+git clone <repo-url> my-project
+cd my-project
+
+# 2. Set up your AI provider
+cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
+
+# Linux/macOS:
+export ANTHROPIC_API_KEY="your-api-key"  # or GOOGLE_API_KEY or OPENAI_API_KEY
+# Windows (PowerShell): $env:ANTHROPIC_API_KEY = "your-api-key"
+# Windows (CMD): set ANTHROPIC_API_KEY=your-api-key
+
+# 3. Start your AI tool and describe what you want to build
+claude           # For Claude Code (recommended)
+aider            # For Aider (Gemini/OpenAI)
+cursor .         # For Cursor IDE
+# Or: Windsurf, Continue (VS Code), GitHub Copilot
+```
+
+## Alternative Setup Methods
+
+<details>
+<summary>Click to expand manual setup options</summary>
+
+### Option 1: GitHub Fork
 
 1. Click the **Fork** button at the top right of this repository
 2. Select your account/organization
@@ -41,88 +110,14 @@ git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
 git push -u origin main
 ```
 
-### After Forking
+### After Setup
 
 1. Update `README.md` with your project details
 2. Configure your AI provider (see [Setup by Provider](#setup-by-provider))
 3. Customize agent roles in `ai-assistants/agents/` if needed
 4. Start describing what you want to build!
 
----
-
-## Works With Any AI
-
-| Provider | Models | Recommended Tools |
-|----------|--------|-------------------|
-| **Anthropic** | Claude 3.5, Opus 4 | Claude Code (recommended) |
-| **Google** | Gemini 1.5 Pro, Flash | Aider, Cursor, Windsurf |
-| **OpenAI** | GPT-4o, GPT-4 Turbo | Aider, Cursor, Windsurf |
-| **Azure** | GPT-4, GPT-3.5 | Aider, Cursor, Windsurf |
-| **GitHub** | Copilot | GitHub Copilot (VS Code) |
-| **Ollama** | Local models | Aider, Continue |
-
-## What is this?
-
-A structured approach to software development using specialized AI agents:
-
-- **Product Owner**: Customer-facing, gathers requirements, creates user stories
-- **Architect**: Designs systems and creates technical specifications
-- **Developer**: Implements features and writes code
-- **Tester**: Tests and validates implementations
-- **IT**: Manages infrastructure and releases
-- **Cost Analyst**: Estimates token costs, warns before expensive operations
-
-## Who is this for?
-
-- **Non-programmers** who want AI help building software
-- **Teams** wanting structured AI-assisted workflows
-- **Projects** needing consistent development processes
-
----
-
-## One-Command Setup (Recommended)
-
-Paste ONE command to launch a browser-based setup wizard that handles everything:
-
-**Mac / Linux:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.sh | bash
-```
-
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.ps1 | iex
-```
-
----
-
-## **New here? Start with [QUICK-START.md](QUICK-START.md)**
-
-A simple 5-step guide for non-programmers to get up and running.
-
----
-
-## Quick Start (For Developers)
-
-```bash
-# 1. Clone this template
-git clone <repo-url> my-project
-cd my-project
-
-# 2. Set up your AI provider
-cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
-
-# Linux/macOS:
-export ANTHROPIC_API_KEY="your-api-key"  # or GOOGLE_API_KEY or OPENAI_API_KEY
-# Windows (PowerShell): $env:ANTHROPIC_API_KEY = "your-api-key"
-# Windows (CMD): set ANTHROPIC_API_KEY=your-api-key
-
-# 3. Start your AI tool and describe what you want to build
-claude           # For Claude Code (recommended)
-aider            # For Aider (Gemini/OpenAI)
-cursor .         # For Cursor IDE
-# Or: Windsurf, Continue (VS Code), GitHub Copilot
-```
+</details>
 
 ## Features
 

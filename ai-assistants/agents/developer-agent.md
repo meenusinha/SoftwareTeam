@@ -318,6 +318,11 @@ Before proceeding to Tester, you MUST complete ALL of the following. If any item
 - [ ] Commit messages are clear and reference the task
 
 ### Handover
+- [ ] **Provide the run command** — Tell the user the ONE simple command to run the application, appropriate for the current platform:
+  - **Mac/Linux**: `bash scripts/run.sh` (or the project-specific command, e.g., `npm start`, `python app.py`)
+  - **Windows**: `scripts\run.ps1` or the project-specific command (e.g., `npm start`, `python app.py`)
+  - If no run script exists yet, provide the direct command (e.g., `node modules/my-app/src/index.js`)
+  - **Keep it to ONE command.** The user should be able to copy-paste and see the app running.
 - [ ] **Ask user**: "My work as Developer is complete. Would you like me to create a PR for review, or continue directly to Tester?"
 - [ ] **Wait for user response** — do NOT assume the answer
 - [ ] If PR requested: create it using `gh pr create` targeting the task master branch

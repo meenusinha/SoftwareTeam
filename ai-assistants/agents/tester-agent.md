@@ -509,6 +509,10 @@ Before proceeding to Product Owner (Acceptance), you MUST complete ALL of the fo
 - [ ] Branch pushed to remote
 
 ### Handover
+- [ ] **Provide the test command** — Tell the user the ONE simple command to run the tests, appropriate for the current platform:
+  - **Mac/Linux**: `bash scripts/test.sh` (or the project-specific command, e.g., `npm test`, `pytest`)
+  - **Windows**: `scripts\test.ps1` or the project-specific command (e.g., `npm test`, `pytest`)
+  - **Keep it to ONE command.** The user should be able to copy-paste and see all tests run.
 - [ ] **Ask user**: "My work as Tester is complete. Would you like me to create a PR for review, or continue directly to Product Owner for acceptance?"
 - [ ] **Wait for user response** — do NOT assume the answer
 - [ ] If PR requested: create it using `gh pr create` targeting the task master branch

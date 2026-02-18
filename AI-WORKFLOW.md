@@ -434,6 +434,7 @@ When an agent finishes their work and is ready to hand over to the next agent:
    - Key decisions made and why
    - Any open questions or known issues
    - What the next agent needs to know
+   - **The ONE simple command to run/test the project** (if applicable — Developer, Tester, and Product Owner MUST provide this)
 5. **Ask the user**:
    > "My work as [Agent Name] is complete. Before handing over to [Next Agent]:
    > - Would you like me to **create a PR** for review? (Recommended)
@@ -460,6 +461,23 @@ When an agent finishes their work and is ready to hand over to the next agent:
 **NEVER silently skip this step.** The user MUST be consulted at every handover.
 
 **Why this matters**: Without this gate, agents skip PR creation entirely, breaking the review workflow. This was the #1 observed failure mode during testing.
+
+#### Run Command at Handover (MANDATORY for Developer, Tester, Product Owner)
+
+**Developer, Tester, and Product Owner** MUST give the user a **one-line command** to run or test the project at their handover. The command must be **platform-appropriate** — detect the current OS and give the right command:
+
+| Platform | Run the app | Run the tests |
+|----------|------------|---------------|
+| **Mac/Linux** | `bash scripts/run.sh` | `bash scripts/test.sh` |
+| **Windows** | `scripts\run.ps1` | `scripts\test.ps1` |
+
+If the project uses a standard tool, prefer the direct command (e.g., `npm start`, `python app.py`, `npm test`, `pytest`) since these work cross-platform.
+
+**Rules:**
+- **ONE command** — the user should copy-paste it and see results immediately
+- **Platform-native** — do NOT assume WSL or Git Bash on Windows; use `.ps1` or cross-platform commands
+- **IT Agent creates the scripts** — `scripts/run.sh` + `scripts/run.ps1` (and test equivalents) should be created during IT setup phase
+- **Developer** provides the run command, **Tester** provides the test command, **Product Owner** provides both at acceptance
 
 #### Handover Points in the Workflow
 

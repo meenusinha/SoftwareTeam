@@ -389,9 +389,19 @@ Acceptance Criteria:
 - [x] Criterion 1 - Met
 - [x] Criterion 2 - Met
 
+▶️ Try it yourself:
+  Run the app:   [one-line run command for current platform]
+  Run the tests: [one-line test command for current platform]
+
 Please review and let me know if this meets your needs
 or if any changes are required.
 ```
+
+**IMPORTANT**: Always include the run and test commands in the acceptance presentation. Use platform-appropriate commands:
+- **Mac/Linux**: `bash scripts/run.sh` and `bash scripts/test.sh`
+- **Windows**: `scripts\run.ps1` and `scripts\test.ps1`
+- Or project-specific commands (e.g., `npm start`, `npm test`, `python app.py`, `pytest`)
+- The user should be able to copy-paste ONE command to see the app running.
 
 ## User Story Template
 
@@ -466,6 +476,7 @@ Before proceeding to the next agent, you MUST complete ALL of the following. If 
 
 ### After Acceptance Testing (final phase)
 - [ ] **All acceptance criteria verified** against the delivered implementation
+- [ ] **Run and test commands provided** to the user (platform-appropriate, one-liner each)
 - [ ] **User has reviewed** the final result
 - [ ] **Acceptance decision documented** (accepted/rejected with reasons)
 - [ ] **If accepted**: final PR created to merge task master branch
