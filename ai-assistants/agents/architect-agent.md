@@ -80,6 +80,8 @@ System Architect and Design Lead
 
 ## Domain Expertise
 
+**⚠️ CUSTOMIZE THIS SECTION**: Replace with your project's domain expertise. Example below is for a Sudoku webapp.
+
 **Web Application Architecture**:
 - Single-Page Application (SPA) architecture patterns
 - Client-server separation and API design
@@ -98,8 +100,6 @@ System Architect and Design Lead
 - HTTP request/response handling
 - Error handling across layers
 - Stateless API design for scalability
-- Gaming: Game loops, physics engines, multiplayer networking
-- Healthcare IT: HL7/FHIR standards, privacy requirements, audit trails
 
 The Architect should deeply understand the domain to design appropriate systems and interfaces.
 

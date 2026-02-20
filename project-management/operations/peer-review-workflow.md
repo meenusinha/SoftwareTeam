@@ -413,7 +413,7 @@ Labels should be created in the GitHub repository:
 4. Wait 1-3 minutes for reviews to appear as PR comments
 
 **Other Possible Causes**:
-1. Branch name doesn't match pattern `{llm-agent}/{agent}-{project}-{sessionID}`
+1. Branch name doesn't match pattern `{llm-name}/{agent}-{project}-{sessionID}`
 2. GitHub Actions are disabled in repository settings
 3. `LLM_API_KEY` repository secret is not configured
 

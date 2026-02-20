@@ -438,7 +438,7 @@ After 2+ approvals:
 4. Wait 1-3 minutes for reviews to appear
 
 **Other Possible Causes**:
-1. Branch name doesn't match pattern `{llm-agent}/{agent}-{project}-{sessionID}`
+1. Branch name doesn't match pattern `{llm-name}/{agent}-{project}-{sessionID}`
 2. GitHub Actions disabled in repository settings
 3. `LLM_API_KEY` secret not configured
 

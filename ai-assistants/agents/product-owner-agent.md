@@ -91,6 +91,8 @@ Technical decisions are made by **Architect** and **Developer** agents.
 
 ## Domain Expertise
 
+**⚠️ CUSTOMIZE THIS SECTION**: Replace with your project's domain expertise. Example below is for a Sudoku webapp.
+
 **Web Application Projects**:
 - Interactive web applications and user experience
 - Game mechanics and user engagement patterns
@@ -109,6 +111,7 @@ Technical decisions are made by **Architect** and **Developer** agents.
 
 ### Step-by-Step Process:
 1. **Read each agent file** in `ai-assistants/agents/` folder:
+   - `product-owner-agent.md` (your own file)
    - `architect-agent.md`
    - `developer-agent.md`
    - `tester-agent.md`
@@ -144,8 +147,8 @@ Technical decisions are made by **Architect** and **Developer** agents.
 ```bash
 git add project-management/tasks/backlog/[task].md
 git commit -m "[Product Owner] Acceptance of [task] - all criteria met"
-git push -u origin {llm-agent}/product-owner-acceptance-[task]-[sessionID]
-gh pr create --base master_[task] --head {llm-agent}/product-owner-acceptance-[task]-[sessionID] \
+git push -u origin {llm-name}/product-owner-acceptance-[task]-[sessionID]
+gh pr create --base master_[task] --head {llm-name}/product-owner-acceptance-[task]-[sessionID] \
   --title "[Product Owner] Acceptance - [task]" \
   --body "## User Story
 [Link to user story]

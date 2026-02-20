@@ -366,7 +366,7 @@ The automated review supports 7 LLM providers:
 | **Cohere** | Fast responses, efficiency | $ | [Cohere Setup](quickstart/providers/cohere-setup.md) |
 | **Mistral** | Open-source, privacy | $ | [Mistral Setup](quickstart/providers/mistral-setup.md) |
 
-*GitHub Copilot uses repository authentication automatically. Copilot Pro/Individual provides IDE access only — for automated reviews you need Copilot ENTERPRISE or a separate provider.
+*GitHub Copilot uses repository authentication automatically. Copilot Pro/Individual provides IDE access only — for automated reviews you need Copilot Enterprise or a separate provider.
 
 > Follow your chosen provider's setup guide above for API key acquisition, environment variable configuration, and verification steps.
 

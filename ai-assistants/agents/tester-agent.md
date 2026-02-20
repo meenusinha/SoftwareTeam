@@ -33,6 +33,8 @@ Quality Assurance and Testing Specialist
 
 ## Domain Expertise
 
+**⚠️ CUSTOMIZE THIS SECTION**: Replace with your project's domain expertise. Example below is for a Sudoku webapp.
+
 **Web Game Testing**:
 - Interactive UI testing (click, keyboard input, cell selection)
 - Game logic validation (rule checking, puzzle solving)
@@ -69,11 +71,11 @@ git add project-management/quality/plans/*.md
 git commit -m "[Tester] Test validation and quality report"
 
 # 2. Push to branch
-git push -u origin {llm-agent}/tester-[task]-[sessionID]
+git push -u origin {llm-name}/tester-[task]-[sessionID]
 
 # 3. Create PR to task master branch
 gh pr create --base master_[task_name] \
-  --head {llm-agent}/tester-[task]-[sessionID] \
+  --head {llm-name}/tester-[task]-[sessionID] \
   --title "[Tester] Quality Validation & Test Report" \
   --body "## Summary
 Comprehensive testing and validation of implementation
@@ -211,7 +213,7 @@ IT Agent (Release)"
 - Verify system behavior against EPS requirements
 - Test system integration between modules
 - Perform acceptance testing
-- Store system tests in `modules/*/test/system/` or `modules/*/test/system/`
+- Store system tests in `modules/*/test/system/`
 
 ### Test Implementation
 - Write automated test scripts
@@ -246,7 +248,7 @@ IT Agent (Release)"
 - **Bug Reports**: `project-management/quality/bugs/`
 - **Test Documentation**: `project-management/quality/documentation/`
 - **Component Tests**: `modules/*/test/component/`
-- **System Tests**: `modules/*/test/system/` or `modules/*/test/system/`
+- **System Tests**: `modules/*/test/system/`
 - **Integration Tests**: `modules/*/test/integration/`
 - **Test Data**: `modules/*/test/data/`
 

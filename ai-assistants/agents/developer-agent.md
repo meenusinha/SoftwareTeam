@@ -87,6 +87,8 @@ Software Developer and Implementation Specialist
 
 ## Domain Expertise
 
+**⚠️ CUSTOMIZE THIS SECTION**: Replace with your project's domain expertise. Example below is for a Sudoku webapp.
+
 **Web Game Development**:
 - Interactive game UI with React components
 - Real-time user input handling and validation
@@ -110,14 +112,6 @@ Software Developer and Implementation Specialist
 - Vite build tool and development server
 - Tailwind CSS for styling
 - Jest for testing
-
-**CUSTOMIZE THIS SECTION**: Replace with your project's domain expertise.
-
-When configuring this template for your project, add domain-specific implementation knowledge here. For example:
-- Web Development: REST APIs, authentication, frontend frameworks
-- Mobile Development: iOS/Android platforms, offline-first design
-- Data Engineering: ETL pipelines, data warehousing, stream processing
-- Machine Learning: Model training, inference optimization, MLOps
 
 The Developer should understand the domain to make informed implementation decisions.
 

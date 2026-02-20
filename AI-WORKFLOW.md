@@ -428,7 +428,7 @@ When an agent finishes their work and is ready to hand over to the next agent:
 
 1. **STOP** - Do not proceed to the next agent role yet
 2. **Commit all work** to your branch: `git add -A && git commit -m "[Agent Name] Description"`
-3. **Push to remote**: `git push -u origin {llm-agent}/{agent}-{task_name}-{sessionID}`
+3. **Push to remote**: `git push -u origin {llm-name}/{agent}-{task_name}-{sessionID}`
 4. **Provide handover context** — the outgoing agent MUST document:
    - What was completed
    - Key decisions made and why
@@ -515,7 +515,7 @@ git push -u origin master_{task_name}
 | Branch Type | Pattern | Example |
 |-------------|---------|---------|
 | Task Master | `master_{task_name}` | `master_joke-website` |
-| Agent Branch | `{llm-agent}/{agent}-{task_name}-{sessionID}` | `copilot/developer-joke-website-abc123` |
+| Agent Branch | `{llm-name}/{agent}-{task_name}-{sessionID}` | `copilot/developer-joke-website-abc123` |
 
 ### Git Worktree Workflow
 
@@ -529,8 +529,8 @@ git push -u origin master_{task_name}
 
 # Then creates worktrees for agents (branching from task master)
 git checkout master_{task_name}
-git worktree add ../worktree-architect {llm-agent}/architect-{task_name}-{sessionID}
-git worktree add ../worktree-developer {llm-agent}/developer-{task_name}-{sessionID}
+git worktree add ../worktree-architect {llm-name}/architect-{task_name}-{sessionID}
+git worktree add ../worktree-developer {llm-name}/developer-{task_name}-{sessionID}
 
 # Each agent works independently in their worktree
 # When done, create PR to master_{task_name} (the task's main branch)
@@ -546,12 +546,12 @@ git add -A
 git commit -m "[Agent Name] Description of completed work"
 
 # Step 2: Push to remote
-git push -u origin {llm-agent}/{agent}-{task_name}-{sessionID}
+git push -u origin {llm-name}/{agent}-{task_name}-{sessionID}
 
 # Step 3: Create PR to task master branch (NOT main/master)
 gh pr create \
   --base master_{task_name} \
-  --head {llm-agent}/{agent}-{task_name}-{sessionID} \
+  --head {llm-name}/{agent}-{task_name}-{sessionID} \
   --title "[Agent Name] Work description" \
   --body "## Summary
 [What was accomplished]
@@ -698,7 +698,7 @@ pending → in-progress → completed → archived
 ### Git Workflow
 - **Base branch**: `template/agentic-workflow`
 - **Task branch**: `master_{task_name}` (created per task, see [Task-Based Branching Strategy](#task-based-branching-strategy))
-- **Agent branches**: `{llm-agent}/{agent}-{task_name}-{sessionID}` (created per agent from task branch)
+- **Agent branches**: `{llm-name}/{agent}-{task_name}-{sessionID}` (created per agent from task branch)
 - Always test before committing
 
 ### Testing Strategy
@@ -960,11 +960,11 @@ Before creating a PR, validate your branch name:
 CURRENT_BRANCH=$(git branch --show-current)
 echo "Current branch: $CURRENT_BRANCH"
 
-# Branch should match: {llm-agent}/{agent}-{task_name}-{sessionID}
+# Branch should match: {llm-name}/{agent}-{task_name}-{sessionID}
 # Examples: copilot/architect-login-page-abc123, claude/developer-api-xyz789
 ```
 
-**Why this matters**: Automated peer review requires agent-specific branch names matching `{llm-agent}/{agent}-{task_name}-{sessionID}`. Generic branch names will cause peer review automation to skip the PR.
+**Why this matters**: Automated peer review requires agent-specific branch names matching `{llm-name}/{agent}-{task_name}-{sessionID}`. Generic branch names will cause peer review automation to skip the PR.
 
 ---
 
