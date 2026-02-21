@@ -24,7 +24,7 @@ project-management/
 ### designs/
 - System architecture diagrams
 - Engineering Design Specifications (EDS)
-- Engineering Problem Specifications (EPS)
+- External Product Specifications (EPS)
 - Interface definitions
 - Design decisions and rationale
 
