@@ -25,6 +25,7 @@
       <div class="progress-step"></div>
       <div class="progress-step"></div>
     </div>
+    <p class="progress-label" id="progress-label">Step 1 of 9</p>
 
     <!-- ===== Screen 0: Welcome ===== -->
     <div class="screen active" id="screen-0">
@@ -127,7 +128,7 @@
       </div>
       <div id="gh-account-alerts"></div>
 
-      <div style="margin:20px 0; display:flex; gap:12px; flex-wrap:wrap;">
+      <div id="gh-login-actions" style="margin:20px 0; display:flex; gap:12px; flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="githubLogin()">Sign In with GitHub</button>
         <a href="https://github.com/signup" target="_blank" class="btn btn-outline">Create Free Account &rarr;</a>
         <button class="btn btn-secondary" onclick="initGitHubAccount()">Refresh Status</button>
@@ -152,8 +153,8 @@
 
     <!-- ===== Screen 4: GitHub Token ===== -->
     <div class="screen" id="screen-4">
-      <h2>GitHub Token</h2>
-      <p class="description">Create a personal access token so the AI agents can create Pull Requests for you.</p>
+      <h2>GitHub Token <span class="badge-optional">Optional</span></h2>
+      <p class="description">You're already signed in — AI agents can create Pull Requests using that login. A personal access token adds extra automation for scripts. You can skip this step.</p>
 
       <div id="token-alerts"></div>
 
@@ -333,7 +334,7 @@
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="prevScreen()">&larr; Back</button>
         <div style="display:flex; gap:8px">
-          <button class="btn btn-secondary" onclick="nextScreen()">Skip &rarr;</button>
+          <button class="btn btn-skip" onclick="nextScreen()">Skip this step &rarr;</button>
           <button class="btn btn-primary" id="llm-next" onclick="nextScreen()" disabled>Next &rarr;</button>
         </div>
       </div>

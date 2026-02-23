@@ -249,13 +249,15 @@ def api_github_token(body):
     import subprocess
     from setup.wizard.utils.shell import _get_env
     try:
+        env = _get_env()
+        env.pop('GITHUB_TOKEN', None)
         proc = subprocess.run(
             ["gh", "auth", "login", "--with-token"],
             input=token,
             capture_output=True,
             text=True,
             timeout=30,
-            env=_get_env(),
+            env=env,
         )
         if proc.returncode != 0:
             stderr = (proc.stderr or "").strip()

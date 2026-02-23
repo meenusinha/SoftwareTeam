@@ -72,11 +72,26 @@ function prevScreen() {
 }
 
 function updateProgress() {
+  const skipScreens = state.workflowMode === 'local' ? [2, 3, 4, 6] : [];
   document.querySelectorAll('.progress-step').forEach((el, i) => {
-    el.classList.remove('active', 'completed');
-    if (i < state.currentScreen) el.classList.add('completed');
-    if (i === state.currentScreen) el.classList.add('active');
+    el.classList.remove('active', 'completed', 'skipped');
+    if (skipScreens.includes(i)) {
+      el.classList.add('skipped');
+    } else if (i < state.currentScreen) {
+      el.classList.add('completed');
+    } else if (i === state.currentScreen) {
+      el.classList.add('active');
+    }
   });
+
+  // Update step label
+  const label = document.getElementById('progress-label');
+  if (label) {
+    const totalSteps = state.totalScreens - skipScreens.length;
+    const activeSteps = Array.from({ length: state.currentScreen + 1 }, (_, i) => i)
+      .filter(i => !skipScreens.includes(i)).length;
+    label.textContent = `Step ${activeSteps} of ${totalSteps}`;
+  }
 }
 
 // --- Screen initializers ---
@@ -167,6 +182,7 @@ async function installPrerequisite(tool) {
 async function initGitHubAccount() {
   const status = await api('/api/github/auth-status');
   const el = document.getElementById('gh-auth-info');
+  const loginActions = document.getElementById('gh-login-actions');
 
   if (status.authenticated) {
     el.innerHTML = `
@@ -174,10 +190,12 @@ async function initGitHubAccount() {
         Signed in as <strong>${status.username || 'GitHub user'}</strong>
       </div>`;
     document.getElementById('gh-account-next').disabled = false;
+    if (loginActions) loginActions.style.display = 'none';
   } else {
     el.innerHTML = `
       <div class="alert alert-warning">Not signed in to GitHub</div>`;
     document.getElementById('gh-account-next').disabled = true;
+    if (loginActions) loginActions.style.display = '';
   }
 }
 
@@ -260,12 +278,12 @@ async function saveGitHubToken() {
   if (result.success) {
     showAlert('token-alerts', 'Token saved and authenticated!', 'success');
     document.getElementById('token-next').disabled = false;
+    btn.textContent = '✓ Saved';
   } else {
     showAlert('token-alerts', result.message, 'danger');
+    btn.textContent = 'Save Token';
+    btn.disabled = false;
   }
-
-  btn.textContent = 'Save Token';
-  btn.disabled = false;
 }
 
 // Screen 5: Fork & Clone / Local Copy
@@ -316,12 +334,12 @@ async function forkAndClone() {
     state.projectPath = result.project_path;
     showAlert('clone-alerts', `${result.message}<br><small style="color:var(--text-muted)">Repository context configured for PR creation.</small>`, 'success');
     document.getElementById('clone-next').disabled = false;
+    btn.textContent = '✓ Forked & Cloned';
   } else {
     showAlert('clone-alerts', result.message, 'danger');
+    btn.textContent = 'Fork & Clone';
+    btn.disabled = false;
   }
-
-  btn.textContent = 'Fork & Clone';
-  btn.disabled = false;
 }
 
 // Screen 5 (local): Copy files
@@ -340,12 +358,12 @@ async function copyLocal() {
     state.projectPath = result.project_path;
     showAlert('local-alerts', result.message, 'success');
     document.getElementById('local-next').disabled = false;
+    btn.textContent = '✓ Copied';
   } else {
     showAlert('local-alerts', result.message, 'danger');
+    btn.textContent = 'Copy Project Files';
+    btn.disabled = false;
   }
-
-  btn.textContent = 'Copy Project Files';
-  btn.disabled = false;
 }
 
 // Screen 6: LLM Provider
@@ -432,12 +450,12 @@ async function saveLLMConfig() {
   if (result.success) {
     showAlert('llm-alerts', `${providerInfo.name} configured!`, 'success');
     document.getElementById('llm-next').disabled = false;
+    btn.textContent = '✓ Saved';
   } else {
     showAlert('llm-alerts', result.message, 'danger');
+    btn.textContent = 'Save Configuration';
+    btn.disabled = false;
   }
-
-  btn.textContent = 'Save Configuration';
-  btn.disabled = false;
 }
 
 // Screen 7: AI Tool Selection
@@ -504,12 +522,12 @@ async function installTool() {
     showAlert('tool-alerts', result.message, 'success');
     document.getElementById('launch-tool-btn').style.display = '';
     document.getElementById('tool-next').disabled = false;
+    btn.textContent = '✓ Installed';
   } else {
     showAlert('tool-alerts', result.message, 'danger');
+    btn.textContent = 'Install';
+    btn.disabled = false;
   }
-
-  btn.textContent = 'Install';
-  btn.disabled = false;
 }
 
 async function launchTool() {
