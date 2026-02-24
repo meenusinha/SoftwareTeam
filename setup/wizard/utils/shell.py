@@ -49,6 +49,40 @@ def run(cmd, capture=True, timeout=120, cwd=None):
         }
 
 
+def launch(cmd, cwd=None):
+    """Launch a command as a detached background process (fire-and-forget).
+
+    Used for launching GUI applications where we don't need to wait for
+    exit or capture output.  Returns immediately.
+    """
+    try:
+        subprocess.Popen(
+            cmd,
+            shell=isinstance(cmd, str),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            start_new_session=True,
+            env=_get_env(),
+            cwd=cwd,
+        )
+        return {"success": True, "stdout": "", "stderr": "", "returncode": 0}
+    except FileNotFoundError:
+        return {
+            "success": False,
+            "stdout": "",
+            "stderr": f"Command not found: {cmd}",
+            "returncode": -1,
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "stdout": "",
+            "stderr": str(e),
+            "returncode": -1,
+        }
+
+
 def is_installed(name):
     """Check if a command-line tool is installed.
 

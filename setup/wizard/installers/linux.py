@@ -2,7 +2,7 @@
 
 import os
 
-from setup.wizard.utils.shell import run, is_installed
+from setup.wizard.utils.shell import run, launch, is_installed
 from setup.wizard.utils.os_detect import get_os_info
 
 
@@ -302,14 +302,22 @@ def _install_aider():
 
 
 def launch_ai_tool(tool, project_path):
-    """Launch an AI tool pointed at the project directory."""
+    """Launch an AI tool pointed at the project directory.
+
+    Uses launch() (fire-and-forget via subprocess.Popen) so the API call
+    returns immediately and the launched tool window appears on top.
+    """
     if tool == "cursor":
-        result = run(f'~/cursor.AppImage "{project_path}" &')
-        return {"success": True, "message": "Cursor launched"}
+        result = launch(f'~/cursor.AppImage "{project_path}"')
+        if result["success"]:
+            return {"success": True, "message": "Cursor launched"}
+        return {"success": False, "message": f"Failed to launch Cursor: {result['stderr']}"}
 
     if tool == "windsurf":
-        result = run(f'windsurf "{project_path}" &')
-        return {"success": True, "message": "Windsurf launched"}
+        result = launch(f'windsurf "{project_path}"')
+        if result["success"]:
+            return {"success": True, "message": "Windsurf launched"}
+        return {"success": False, "message": f"Failed to launch Windsurf: {result['stderr']}"}
 
     if tool == "claude-code":
         # Open a terminal with claude
@@ -319,7 +327,7 @@ def launch_ai_tool(tool, project_path):
                     cmd = f'{terminal} -- bash -c "cd \\"{project_path}\\" && claude; exec bash"'
                 else:
                     cmd = f'{terminal} -e "bash -c \\"cd \\"{project_path}\\" && claude; exec bash\\""'
-                run(cmd)
+                launch(cmd)
                 return {"success": True, "message": "Claude Code launched in terminal"}
         return {"success": False, "message": "No supported terminal emulator found"}
 
@@ -328,17 +336,10 @@ def launch_ai_tool(tool, project_path):
         if not vscode_cmd:
             return {"success": False, "message": "VS Code not found. Try restarting your terminal or reinstalling."}
         label = "VS Code + GitHub Copilot" if tool == "copilot" else "VS Code"
-        result = run(f'{vscode_cmd} "{project_path}"')
+        result = launch(f'{vscode_cmd} "{project_path}"')
         if result["success"]:
             return {"success": True, "message": f"{label} launched"}
-        # If bare command failed, try resolving via login shell
-        if "not found" in result["stderr"]:
-            full_path = run("bash -lc 'which code 2>/dev/null'")
-            if full_path["success"] and full_path["stdout"]:
-                result = run(f'{full_path["stdout"]} "{project_path}"')
-                if result["success"]:
-                    return {"success": True, "message": f"{label} launched"}
-        return {"success": False, "message": f"Failed to launch ({vscode_cmd}): {result['stderr']}"}
+        return {"success": False, "message": f"Failed to launch {label}: {result['stderr']}"}
 
     if tool == "aider":
         for terminal in ["gnome-terminal", "xterm", "konsole", "xfce4-terminal"]:
@@ -347,7 +348,7 @@ def launch_ai_tool(tool, project_path):
                     cmd = f'{terminal} -- bash -c "cd \\"{project_path}\\" && aider; exec bash"'
                 else:
                     cmd = f'{terminal} -e "bash -c \\"cd \\"{project_path}\\" && aider; exec bash\\""'
-                run(cmd)
+                launch(cmd)
                 return {"success": True, "message": "Aider launched in terminal"}
         return {"success": False, "message": "No supported terminal emulator found"}
 

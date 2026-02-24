@@ -2,7 +2,7 @@
 
 import os
 
-from setup.wizard.utils.shell import run, is_installed
+from setup.wizard.utils.shell import run, launch, is_installed
 
 
 def _find_vscode_cmd():
@@ -197,7 +197,11 @@ def _install_aider():
 
 
 def launch_ai_tool(tool, project_path):
-    """Launch an AI tool pointed at the project directory."""
+    """Launch an AI tool pointed at the project directory.
+
+    Uses launch() (fire-and-forget via subprocess.Popen) so the API call
+    returns immediately and the launched tool window appears on top.
+    """
     launchers = {
         "cursor": f'open -a Cursor "{project_path}"',
         "windsurf": f'open -a Windsurf "{project_path}"',
@@ -208,21 +212,20 @@ def launch_ai_tool(tool, project_path):
     }
 
     if tool == "claude-code":
-        # Open Terminal at project path and run claude
         script = f'''osascript -e 'tell application "Terminal" to do script "cd \\"{project_path}\\" && claude"' '''
-        result = run(script)
+        launch(script)
         return {"success": True, "message": "Claude Code launched in Terminal"}
 
     if tool == "aider":
         script = f'''osascript -e 'tell application "Terminal" to do script "cd \\"{project_path}\\" && aider"' '''
-        result = run(script)
+        launch(script)
         return {"success": True, "message": "Aider launched in Terminal"}
 
     cmd = launchers.get(tool)
     if not cmd:
         return {"success": False, "message": f"Cannot launch {tool}"}
 
-    result = run(cmd)
+    result = launch(cmd)
     if result["success"]:
         return {"success": True, "message": f"{tool} launched at {project_path}"}
     return {"success": False, "message": f"Failed to launch {tool}: {result['stderr']}"}

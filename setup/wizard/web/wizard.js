@@ -557,11 +557,9 @@ async function launchTool() {
   });
 
   if (result.success) {
-    showAlert('tool-alerts', `${result.message}<br><small>The wizard will minimize so you can see the tool. Click the wizard in your taskbar to come back.</small>`, 'success');
+    showAlert('tool-alerts', `${result.message}<br><small>If you don't see it, check your taskbar.</small>`, 'success');
     btn.textContent = '✓ Launched';
     btn.disabled = true;
-    // Minimize the wizard so the launched tool is visible
-    setTimeout(() => { window.blur(); }, 1500);
   } else {
     showAlert('tool-alerts', result.message, 'danger');
     btn.textContent = 'Launch';

@@ -3,7 +3,7 @@
 import os
 import shutil
 
-from setup.wizard.utils.shell import run, is_installed
+from setup.wizard.utils.shell import run, launch, is_installed
 
 
 def _is_vscode_installed():
@@ -222,17 +222,21 @@ def _install_aider():
 
 
 def launch_ai_tool(tool, project_path):
-    """Launch an AI tool pointed at the project directory."""
+    """Launch an AI tool pointed at the project directory.
+
+    Uses launch() (fire-and-forget via subprocess.Popen) so the API call
+    returns immediately and the launched tool window appears on top.
+    """
     if tool == "cursor":
-        result = run(f'start "" cursor "{project_path}"')
+        launch(f'start "" cursor "{project_path}"')
         return {"success": True, "message": "Cursor launched"}
 
     if tool == "windsurf":
-        result = run(f'start "" windsurf "{project_path}"')
+        launch(f'start "" windsurf "{project_path}"')
         return {"success": True, "message": "Windsurf launched"}
 
     if tool == "claude-code":
-        result = run(f'start cmd /k "cd /d "{project_path}" && claude"')
+        launch(f'start cmd /k "cd /d "{project_path}" && claude"')
         return {"success": True, "message": "Claude Code launched in Command Prompt"}
 
     if tool == "vscode" or tool == "copilot":
@@ -240,13 +244,13 @@ def launch_ai_tool(tool, project_path):
         if not vscode_cmd:
             return {"success": False, "message": "VS Code not found. Please reinstall."}
         label = "VS Code + GitHub Copilot" if tool == "copilot" else "VS Code"
-        result = run([vscode_cmd, project_path])
+        result = launch(f'"{vscode_cmd}" "{project_path}"')
         if result["success"]:
             return {"success": True, "message": f"{label} launched"}
-        return {"success": False, "message": f"Failed to launch: {result['stderr']}"}
+        return {"success": False, "message": f"Failed to launch {label}: {result['stderr']}"}
 
     if tool == "aider":
-        result = run(f'start cmd /k "cd /d "{project_path}" && aider"')
+        launch(f'start cmd /k "cd /d "{project_path}" && aider"')
         return {"success": True, "message": "Aider launched in Command Prompt"}
 
     return {"success": False, "message": f"Unknown tool: {tool}"}
