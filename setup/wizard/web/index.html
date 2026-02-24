@@ -106,7 +106,7 @@
         </div>
       </div>
 
-      <div class="alert alert-info">
+      <div class="alert alert-info" id="prereq-install-alert" style="display:none">
         If the "Install" button doesn't work, you may need to install these manually.
         Check the <a href="https://git-scm.com" target="_blank">Git website</a> and
         <a href="https://cli.github.com" target="_blank">GitHub CLI website</a>.
@@ -134,7 +134,7 @@
         <button class="btn btn-secondary" onclick="initGitHubAccount()">Refresh Status</button>
       </div>
 
-      <div class="instructions">
+      <div class="instructions" id="gh-login-instructions">
         <strong>How it works:</strong>
         <ol>
           <li>Click "Sign In with GitHub" above</li>
@@ -154,7 +154,7 @@
     <!-- ===== Screen 4: GitHub Token ===== -->
     <div class="screen" id="screen-4">
       <h2>GitHub Token <span class="badge-optional">Optional</span></h2>
-      <p class="description">You're already signed in — AI agents can create Pull Requests using that login. A personal access token adds extra automation for scripts. You can skip this step.</p>
+      <p class="description">You're already signed in — AI agents can create Pull Requests using that login. A personal access token adds extra automation for scripts (e.g., CI/CD pipelines that automatically create PRs, or scripts that push changes without browser interaction). You can skip this step.</p>
 
       <div id="token-alerts"></div>
 
@@ -185,7 +185,10 @@
         <div class="input-hint">Your token starts with "ghp_" and is kept private on your computer.</div>
       </div>
 
-      <button class="btn btn-primary" id="save-token-btn" onclick="saveGitHubToken()">Save Token</button>
+      <div style="margin:16px 0; display:flex; gap:12px">
+        <button class="btn btn-primary" id="save-token-btn" onclick="saveGitHubToken()">Save Token</button>
+        <button class="btn btn-skip" onclick="nextScreen()">Skip this step &rarr;</button>
+      </div>
 
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="prevScreen()">&larr; Back</button>
@@ -383,6 +386,18 @@
         <strong>Expected answer:</strong> It should mention <strong id="verify-expected-agent">"IT Agent"</strong> as the first role.
       </div>
 
+      <!-- GitHub mode: Enable Actions reminder -->
+      <div id="verify-github-actions" class="alert alert-warning" style="display:none; margin:16px 0">
+        <strong>Important: Enable GitHub Actions on your fork</strong><br>
+        GitHub disables Actions on forked repos by default. To enable automated peer reviews:
+        <ol style="margin:8px 0 0 0; padding-left:20px">
+          <li>Go to your forked repo on GitHub</li>
+          <li>Click the <strong>"Actions"</strong> tab</li>
+          <li>Click <strong>"I understand my workflows, go ahead and enable them"</strong></li>
+        </ol>
+        <p style="margin:8px 0 0 0"><em>Without this, the "Automated Multi-Agent Peer Review" workflow won't be available.</em></p>
+      </div>
+
       <div class="instructions" style="margin-top:20px">
         <strong>If it did NOT mention <span id="verify-expected-agent-2">IT Agent</span>:</strong>
         <ol>
@@ -421,18 +436,6 @@
         <li><span class="check-icon">&#10003;</span> AI tool installed and launched</li>
         <li><span class="check-icon">&#10003;</span> Workflow connected</li>
       </ul>
-
-      <!-- GitHub mode: Enable Actions reminder -->
-      <div id="done-github-actions" class="alert alert-warning" style="display:none">
-        <strong>Important: Enable GitHub Actions on your fork</strong><br>
-        GitHub disables Actions on forked repos by default. To enable automated peer reviews:
-        <ol style="margin:8px 0 0 0; padding-left:20px">
-          <li>Go to your forked repo on GitHub</li>
-          <li>Click the <strong>"Actions"</strong> tab</li>
-          <li>Click <strong>"I understand my workflows, go ahead and enable them"</strong></li>
-        </ol>
-        <p style="margin:8px 0 0 0"><em>Without this, the "Automated Multi-Agent Peer Review" workflow won't be available.</em></p>
-      </div>
 
       <div class="alert alert-success">
         <strong>What to do next:</strong><br>

@@ -110,11 +110,7 @@ async function initScreen(index) {
 
 // Screen 9: Done
 function initDone() {
-  // Show GitHub Actions enablement note only for GitHub mode
-  const actionsNote = document.getElementById('done-github-actions');
-  if (actionsNote) {
-    actionsNote.style.display = state.workflowMode === 'github' ? '' : 'none';
-  }
+  // GitHub Actions note moved to verification screen (Issue 9)
 }
 
 // Screen 0: Welcome
@@ -140,6 +136,12 @@ async function refreshPrerequisites() {
   const allInstalled = status.git.installed && status.gh.installed;
   const nextBtn = document.getElementById('prereq-next');
   if (nextBtn) nextBtn.disabled = !allInstalled;
+
+  // Issue 1: Hide alert when both prerequisites are installed
+  const alertDiv = document.getElementById('prereq-install-alert');
+  if (alertDiv) {
+    alertDiv.style.display = allInstalled ? 'none' : '';
+  }
 }
 
 function updateStatusItem(id, info) {
@@ -183,6 +185,7 @@ async function initGitHubAccount() {
   const status = await api('/api/github/auth-status');
   const el = document.getElementById('gh-auth-info');
   const loginActions = document.getElementById('gh-login-actions');
+  const instructions = document.getElementById('gh-login-instructions');
 
   if (status.authenticated) {
     el.innerHTML = `
@@ -191,11 +194,15 @@ async function initGitHubAccount() {
       </div>`;
     document.getElementById('gh-account-next').disabled = false;
     if (loginActions) loginActions.style.display = 'none';
+    // Issue 2: Hide instructions when authenticated
+    if (instructions) instructions.style.display = 'none';
   } else {
     el.innerHTML = `
       <div class="alert alert-warning">Not signed in to GitHub</div>`;
     document.getElementById('gh-account-next').disabled = true;
     if (loginActions) loginActions.style.display = '';
+    // Issue 2: Show instructions when NOT authenticated
+    if (instructions) instructions.style.display = '';
   }
 }
 
@@ -250,13 +257,10 @@ async function githubLogin() {
 async function initToken() {
   const status = await api('/api/github/auth-status');
   if (status.authenticated) {
+    // Issue 3: Remove duplicate alert - description is already shown on the page
     // Already signed in via browser — gh CLI auth is sufficient for PR creation
-    showAlert('token-alerts', `
-      <div>
-        You're already signed in as <strong>${status.username || 'GitHub user'}</strong> via browser login.
-        <strong>AI agents can create Pull Requests</strong> using this login.<br><br>
-        A token adds extra automation (e.g. environment variable for scripts). You can skip this step or add one now.
-      </div>`, 'success');
+    const container = document.getElementById('token-alerts');
+    if (container) container.innerHTML = '';
     document.getElementById('token-next').disabled = false;
   }
 }
@@ -322,7 +326,8 @@ async function browsePath(targetInputId) {
 async function forkAndClone() {
   const btn = document.getElementById('fork-clone-btn');
   const projectName = document.getElementById('project-name-input').value.trim() || 'BigProjPOC';
-  btn.textContent = 'Forking & Cloning...';
+  // Issue 6: Add spinner while forking/cloning
+  btn.innerHTML = '<span class="spinner"></span> Forking & Cloning...';
   btn.disabled = true;
 
   const result = await api('/api/github/fork-clone', {
@@ -346,7 +351,8 @@ async function forkAndClone() {
 async function copyLocal() {
   const btn = document.getElementById('local-copy-btn');
   const projectName = document.getElementById('local-project-name').value.trim() || 'BigProjPOC';
-  btn.textContent = 'Copying files...';
+  // Issue 6: Add spinner while copying
+  btn.innerHTML = '<span class="spinner"></span> Copying files...';
   btn.disabled = true;
 
   const result = await api('/api/local/copy', {
@@ -451,6 +457,11 @@ async function saveLLMConfig() {
     showAlert('llm-alerts', `${providerInfo.name} configured!`, 'success');
     document.getElementById('llm-next').disabled = false;
     btn.textContent = '✓ Saved';
+    // Issue 7: Disable radio buttons after save
+    document.querySelectorAll('.radio-option').forEach(el => {
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '0.6';
+    });
   } else {
     showAlert('llm-alerts', result.message, 'danger');
     btn.textContent = 'Save Configuration';
@@ -547,12 +558,15 @@ async function launchTool() {
 
   if (result.success) {
     showAlert('tool-alerts', result.message, 'success');
+    // Issue 8: Focus the window after launch and disable the button
+    window.focus();
+    btn.textContent = '✓ Launched';
+    btn.disabled = true;
   } else {
     showAlert('tool-alerts', result.message, 'danger');
+    btn.textContent = 'Launch';
+    btn.disabled = false;
   }
-
-  btn.textContent = 'Launch';
-  btn.disabled = false;
 }
 
 // Screen 8: Verification
@@ -579,6 +593,12 @@ function initVerification() {
 
   const fallbackPrompt = `Please read the file ${tool.file} in the project root and follow the workflow guide defined there. Start as the ${firstRole}.`;
   document.getElementById('fallback-prompt').textContent = fallbackPrompt;
+
+  // Issue 9: Show GitHub Actions enablement note only for GitHub mode
+  const actionsNote = document.getElementById('verify-github-actions');
+  if (actionsNote) {
+    actionsNote.style.display = state.workflowMode === 'github' ? '' : 'none';
+  }
 }
 
 // --- Utility functions ---
