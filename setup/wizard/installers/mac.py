@@ -238,10 +238,17 @@ def launch_ai_tool(tool, project_path):
 
 
 def minimize_wizard_window():
-    """Minimize the wizard browser window on macOS."""
-    # Use osascript to minimize the frontmost window (the browser)
-    script = '''osascript -e 'tell application "System Events" to keystroke "m" using {option down, command down}' '''
-    result = run(script)
-    if result["success"]:
-        return {"success": True, "message": "Wizard minimized"}
-    return {"success": True, "message": "Wizard window minimization may not be available"}
+    """Minimize the wizard browser window on macOS.
+
+    Targets browsers by name directly so focus doesn't matter — avoids
+    the race condition where the launched tool grabs focus and the old
+    keystroke approach minimized the wrong window.
+    """
+    for browser in ["Google Chrome", "Chromium", "Microsoft Edge", "Firefox", "Safari"]:
+        r = run(
+            f"osascript -e 'tell application \"{browser}\" to set miniaturized of front window to true'",
+            timeout=5,
+        )
+        if r["success"]:
+            return {"success": True, "message": "Wizard minimized"}
+    return {"success": True, "message": "Wizard window minimization not available on this system"}

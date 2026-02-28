@@ -269,20 +269,19 @@ def launch_ai_tool(tool, project_path):
 
 
 def minimize_wizard_window():
-    """Minimize the wizard browser window on Windows."""
-    script = (
-        'powershell -NoProfile -Command "'
-        "$browsers = @('firefox','chrome','msedge');"
-        "foreach ($b in $browsers) {"
-        "  $p = Get-Process $b -ErrorAction SilentlyContinue;"
-        "  if ($p) {"
-        "    Add-Type -Name W -Namespace W -MemberDefinition '[DllImport(\\\"user32.dll\\\")]public static extern bool ShowWindow(IntPtr h,int c);';"
-        "    [W.W]::ShowWindow($p[0].MainWindowHandle, 6);"
-        "    break"
-        "  }"
-        '}"'
+    """Minimize the wizard browser window on Windows.
+
+    Uses a list-based call so no shell-escaping issues.
+    Add-Type is wrapped in try/catch so re-calls don't fail.
+    $p is forced to array with @() so .MainWindowHandle works on single results.
+    """
+    ps_code = (
+        "$ErrorActionPreference='SilentlyContinue';"
+        "try{Add-Type -MemberDefinition '[DllImport(\"user32.dll\")]public static extern bool ShowWindow(IntPtr h,int c);'"
+        " -Name WzW -Namespace Wz}catch{};"
+        "foreach($b in 'chrome','msedge','firefox'){"
+        "$procs=@(Get-Process $b|Where-Object{$_.MainWindowHandle -ne 0});"
+        "if($procs.Count -gt 0){[Wz.WzW]::ShowWindow($procs[0].MainWindowHandle,6);break}}"
     )
-    result = run(script)
-    if result["success"]:
-        return {"success": True, "message": "Wizard minimized"}
-    return {"success": True, "message": "Wizard window minimization not available on this system"}
+    run(["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_code], timeout=10)
+    return {"success": True, "message": "Wizard minimized"}
