@@ -75,12 +75,13 @@ def _pkg_install(packages):
     elif mgr == "zypper":
         cmd = f"sudo zypper install -y {packages.get('zypper', '')}"
     else:
-        return {"success": False, "message": "No supported package manager found"}
+        return {"success": False, "message": "No supported package manager found", "error_log": f"Detected package manager: {mgr}"}
 
     result = run(cmd, timeout=300)
     return {
         "success": result["success"],
-        "message": result["stdout"] if result["success"] else result["stderr"],
+        "message": result["stdout"] if result["success"] else "Installation failed.",
+        "error_log": result["stderr"] or result["stdout"] if not result["success"] else "",
     }
 
 
@@ -123,11 +124,11 @@ def install_gh():
     elif mgr == "pacman":
         result = run("sudo pacman -S --noconfirm github-cli", timeout=120)
     else:
-        return {"success": False, "message": f"Cannot auto-install gh with {mgr}. Please install manually."}
+        return {"success": False, "message": f"Cannot auto-install gh: package manager '{mgr}' is not yet supported.", "error_log": f"Detected pkg manager: {mgr}"}
 
     if result["success"]:
         return {"success": True, "message": "GitHub CLI installed successfully"}
-    return {"success": False, "message": f"Failed to install gh: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install GitHub CLI.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def check_ai_tool(tool):
@@ -196,26 +197,35 @@ def _install_cursor():
         if result["success"]:
             return {"success": True, "message": "Cursor AppImage downloaded to ~/cursor.AppImage"}
 
-    return {"success": False, "message": "Failed to download Cursor. Visit https://cursor.sh to download manually."}
+    return {"success": False, "message": "Failed to download Cursor AppImage.", "error_log": "curl download failed — check network connection"}
 
 
 def _install_windsurf():
+    # Windsurf has no official Linux package manager support yet; try direct download
+    result = run(
+        'curl -fsSL "https://windsurf-stable.codeiumdata.com/linux-x64/stable/Windsurf-linux-x64-latest.tar.gz" -o /tmp/windsurf.tar.gz '
+        '&& mkdir -p ~/windsurf && tar -xzf /tmp/windsurf.tar.gz -C ~/windsurf --strip-components=1',
+        timeout=300,
+    )
+    if result["success"]:
+        return {"success": True, "message": "Windsurf extracted to ~/windsurf"}
     return {
         "success": False,
-        "message": "Windsurf for Linux: visit https://codeium.com/windsurf to download. Auto-install not available.",
+        "message": "Could not download Windsurf automatically.",
+        "error_log": result["stderr"] or result["stdout"],
     }
 
 
 def _install_claude_code():
     if not is_installed("npm"):
-        # Try installing Node.js
         result = _pkg_install({
             "apt": "nodejs npm",
             "dnf": "nodejs npm",
             "pacman": "nodejs npm",
         })
         if not result["success"]:
-            return {"success": False, "message": "Failed to install Node.js (required for Claude Code)"}
+            return {"success": False, "message": "Failed to install Node.js (required for Claude Code).",
+                    "error_log": result.get("error_log", "")}
 
     result = run("npm install -g @anthropic-ai/claude-code", timeout=120)
     if result["success"]:
@@ -224,7 +234,7 @@ def _install_claude_code():
     result = run("sudo npm install -g @anthropic-ai/claude-code", timeout=120)
     if result["success"]:
         return {"success": True, "message": "Claude Code installed successfully"}
-    return {"success": False, "message": f"Failed to install Claude Code: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Claude Code via npm.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def _install_vscode():
@@ -251,7 +261,7 @@ def _install_vscode():
         vscode_cmd = _find_vscode_cmd() or "code"
         run(f'{vscode_cmd} --install-extension continue.continue', timeout=60)
         return {"success": True, "message": "VS Code + Continue extension installed"}
-    return {"success": False, "message": f"Failed to install VS Code: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install VS Code.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def _install_copilot():
@@ -288,7 +298,8 @@ def _install_vscode_only():
     else:
         return {"success": False, "message": "Please install VS Code manually from https://code.visualstudio.com"}
 
-    return {"success": result["success"], "message": "VS Code installed" if result["success"] else result["stderr"]}
+    return {"success": result["success"], "message": "VS Code installed" if result["success"] else "Failed to install VS Code.",
+            "error_log": "" if result["success"] else (result["stderr"] or result["stdout"])}
 
 
 def _install_aider():
@@ -298,7 +309,7 @@ def _install_aider():
     result = run(f"{pip} install aider-chat", timeout=120)
     if result["success"]:
         return {"success": True, "message": "Aider installed successfully"}
-    return {"success": False, "message": f"Failed to install Aider: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Aider via pip.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def launch_ai_tool(tool, project_path):

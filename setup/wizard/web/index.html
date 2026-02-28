@@ -82,8 +82,8 @@
 
     <!-- ===== Screen 2: Prerequisites ===== -->
     <div class="screen" id="screen-2">
-      <h2>Installing Prerequisites</h2>
-      <p class="description">We need a couple of tools installed on your computer.</p>
+      <h2>Prerequisites</h2>
+      <p class="description" id="prereq-description">Checking your system...</p>
 
       <div id="prereq-alerts"></div>
 
@@ -106,10 +106,11 @@
         </div>
       </div>
 
-      <div class="alert alert-info" id="prereq-install-alert" style="display:none">
-        If the "Install" button doesn't work, you may need to install these manually.
-        Check the <a href="https://git-scm.com" target="_blank">Git website</a> and
-        <a href="https://cli.github.com" target="_blank">GitHub CLI website</a>.
+      <div id="prereq-error-log" style="display:none; margin-top:12px">
+        <details>
+          <summary style="cursor:pointer; color:var(--text-muted); font-size:13px; padding:4px 0">&#9660; Show error details</summary>
+          <pre id="prereq-error-content" class="error-log"></pre>
+        </details>
       </div>
 
       <div class="btn-row">

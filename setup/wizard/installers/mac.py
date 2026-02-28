@@ -31,7 +31,7 @@ def install_homebrew():
     )
     if result["success"]:
         return {"success": True, "message": "Homebrew installed successfully"}
-    return {"success": False, "message": f"Failed to install Homebrew: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Homebrew.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def install_git():
@@ -50,7 +50,7 @@ def install_git():
         if result["success"]:
             return {"success": True, "message": "Git installed via Homebrew"}
 
-    return {"success": False, "message": "Failed to install git. Please install manually."}
+    return {"success": False, "message": "Failed to install git automatically."}
 
 
 def install_gh():
@@ -66,7 +66,7 @@ def install_gh():
     result = run("brew install gh", timeout=120)
     if result["success"]:
         return {"success": True, "message": "GitHub CLI installed via Homebrew"}
-    return {"success": False, "message": f"Failed to install gh: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install GitHub CLI via Homebrew.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def check_ai_tool(tool):
@@ -125,62 +125,67 @@ def install_ai_tool(tool):
 
 def _install_cursor():
     if not is_installed("brew"):
-        return {"success": False, "message": "Homebrew is required to install Cursor"}
+        brew = install_homebrew()
+        if not brew["success"]:
+            return {"success": False, "message": "Homebrew is required for Cursor and could not be installed.", "error_log": brew.get("error_log", "")}
     result = run("brew install --cask cursor", timeout=300)
     if result["success"]:
         return {"success": True, "message": "Cursor installed successfully"}
-    return {"success": False, "message": f"Failed to install Cursor: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Cursor via Homebrew.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def _install_windsurf():
     if not is_installed("brew"):
-        return {"success": False, "message": "Homebrew is required to install Windsurf"}
+        brew = install_homebrew()
+        if not brew["success"]:
+            return {"success": False, "message": "Homebrew is required for Windsurf and could not be installed.", "error_log": brew.get("error_log", "")}
     result = run("brew install --cask windsurf", timeout=300)
     if result["success"]:
         return {"success": True, "message": "Windsurf installed successfully"}
-    return {"success": False, "message": f"Failed to install Windsurf: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Windsurf via Homebrew.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def _install_claude_code():
-    # Claude Code is an npm package
     if not is_installed("npm"):
-        # Install Node.js first
         if is_installed("brew"):
             node_result = run("brew install node", timeout=120)
             if not node_result["success"]:
-                return {"success": False, "message": "Failed to install Node.js (required for Claude Code)"}
+                return {"success": False, "message": "Failed to install Node.js (required for Claude Code).",
+                        "error_log": node_result["stderr"] or node_result["stdout"]}
         else:
-            return {"success": False, "message": "npm is required. Install Node.js first."}
+            return {"success": False, "message": "Homebrew not found — cannot install Node.js for Claude Code.",
+                    "error_log": "brew not in PATH"}
 
     result = run("npm install -g @anthropic-ai/claude-code", timeout=120)
     if result["success"]:
         return {"success": True, "message": "Claude Code installed successfully"}
-    return {"success": False, "message": f"Failed to install Claude Code: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Claude Code via npm.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def _install_vscode():
     if not is_installed("brew"):
-        return {"success": False, "message": "Homebrew is required to install VS Code"}
+        brew = install_homebrew()
+        if not brew["success"]:
+            return {"success": False, "message": "Homebrew is required for VS Code and could not be installed.", "error_log": brew.get("error_log", "")}
     result = run("brew install --cask visual-studio-code", timeout=300)
     if result["success"]:
-        # Install Continue extension
         vscode_cmd = _find_vscode_cmd() or "code"
         run(f'"{vscode_cmd}" --install-extension continue.continue', timeout=60)
         return {"success": True, "message": "VS Code + Continue extension installed"}
-    return {"success": False, "message": f"Failed to install VS Code: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install VS Code via Homebrew.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def _install_copilot():
     if not is_installed("brew"):
-        return {"success": False, "message": "Homebrew is required to install VS Code"}
-    # Install VS Code if not present
+        brew = install_homebrew()
+        if not brew["success"]:
+            return {"success": False, "message": "Homebrew is required for VS Code and could not be installed.", "error_log": brew.get("error_log", "")}
     vscode_cmd = _find_vscode_cmd()
     if not vscode_cmd:
         result = run("brew install --cask visual-studio-code", timeout=300)
         if not result["success"]:
-            return {"success": False, "message": f"Failed to install VS Code: {result['stderr']}"}
+            return {"success": False, "message": "Failed to install VS Code via Homebrew.", "error_log": result["stderr"] or result["stdout"]}
         vscode_cmd = _find_vscode_cmd() or "code"
-    # Install GitHub Copilot extension
     run(f'"{vscode_cmd}" --install-extension GitHub.copilot', timeout=60)
     run(f'"{vscode_cmd}" --install-extension GitHub.copilot-chat', timeout=60)
     return {"success": True, "message": "VS Code + GitHub Copilot extension installed"}
@@ -188,12 +193,13 @@ def _install_copilot():
 
 def _install_aider():
     if not is_installed("pip3") and not is_installed("pip"):
-        return {"success": False, "message": "pip is required to install Aider"}
+        return {"success": False, "message": "pip is required to install Aider. Python may not be installed.",
+                "error_log": "pip and pip3 not found in PATH"}
     pip = "pip3" if is_installed("pip3") else "pip"
     result = run(f"{pip} install aider-chat", timeout=120)
     if result["success"]:
         return {"success": True, "message": "Aider installed successfully"}
-    return {"success": False, "message": f"Failed to install Aider: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Aider via pip.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def launch_ai_tool(tool, project_path):

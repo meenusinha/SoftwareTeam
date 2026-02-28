@@ -27,6 +27,25 @@ async function api(path, body) {
   return res.json();
 }
 
+async function apiWithTimeout(path, body, timeoutSecs) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutSecs * 1000);
+  try {
+    const opts = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    };
+    const res = await fetch(path, opts);
+    return res.json();
+  } catch (e) {
+    return { success: false, message: 'Request timed out — the installer may still be running in the background. Please wait a moment and try again.', error_log: e.message };
+  } finally {
+    clearTimeout(id);
+  }
+}
+
 // --- Screen navigation ---
 
 function showScreen(index) {
@@ -132,15 +151,20 @@ async function refreshPrerequisites() {
   updateStatusItem('git-status', status.git);
   updateStatusItem('gh-status', status.gh);
 
-  // Enable next only if both installed
   const allInstalled = status.git.installed && status.gh.installed;
   const nextBtn = document.getElementById('prereq-next');
   if (nextBtn) nextBtn.disabled = !allInstalled;
 
-  // Issue 1: Hide alert when both prerequisites are installed
-  const alertDiv = document.getElementById('prereq-install-alert');
-  if (alertDiv) {
-    alertDiv.style.display = allInstalled ? 'none' : '';
+  // Update description based on actual status
+  const desc = document.getElementById('prereq-description');
+  if (desc) {
+    if (allInstalled) {
+      desc.textContent = 'All prerequisites are ready!';
+    } else if (!status.git.installed && !status.gh.installed) {
+      desc.textContent = "We'll automatically install the tools you need.";
+    } else {
+      desc.textContent = "Almost there — installing the remaining tool.";
+    }
   }
 }
 
@@ -165,15 +189,41 @@ function updateStatusItem(id, info) {
 async function installPrerequisite(tool) {
   const btn = event.target;
   const origText = btn.textContent;
-  btn.textContent = 'Installing...';
   btn.disabled = true;
 
-  const result = await api('/api/prerequisites/install', { tool });
+  // Show elapsed time so user knows it's working
+  let elapsed = 0;
+  const timer = setInterval(() => {
+    elapsed++;
+    btn.textContent = `Installing... (${elapsed}s)`;
+  }, 1000);
+  btn.textContent = 'Installing...';
+
+  // Clear previous error log
+  const logDiv = document.getElementById('prereq-error-log');
+  if (logDiv) logDiv.style.display = 'none';
+
+  let result;
+  try {
+    // 6-minute client-side timeout (backend is 3min, this covers network lag)
+    result = await apiWithTimeout('/api/prerequisites/install', { tool }, 380);
+  } catch (e) {
+    result = { success: false, message: 'Request timed out.', error_log: String(e) };
+  }
+
+  clearInterval(timer);
 
   if (result.success) {
     await refreshPrerequisites();
+    showAlert('prereq-alerts', `${tool === 'git' ? 'Git' : 'GitHub CLI'} installed successfully!`, 'success');
   } else {
     showAlert('prereq-alerts', result.message, 'danger');
+    // Show error log if available
+    const logContent = document.getElementById('prereq-error-content');
+    if (logDiv && logContent && result.error_log) {
+      logContent.textContent = result.error_log;
+      logDiv.style.display = '';
+    }
   }
 
   btn.textContent = origText;
@@ -524,10 +574,24 @@ async function installTool() {
   if (!state.selectedTool) return;
 
   const btn = document.getElementById('install-tool-btn');
-  btn.innerHTML = '<span class="spinner"></span> Installing...';
   btn.disabled = true;
 
-  const result = await api('/api/tools/install', { tool: state.selectedTool });
+  // Show elapsed time
+  let elapsed = 0;
+  const timer = setInterval(() => {
+    elapsed++;
+    btn.innerHTML = `<span class="spinner"></span> Installing... (${elapsed}s)`;
+  }, 1000);
+  btn.innerHTML = '<span class="spinner"></span> Installing...';
+
+  let result;
+  try {
+    result = await apiWithTimeout('/api/tools/install', { tool: state.selectedTool }, 380);
+  } catch (e) {
+    result = { success: false, message: 'Request timed out.', error_log: String(e) };
+  }
+
+  clearInterval(timer);
 
   if (result.success) {
     showAlert('tool-alerts', result.message, 'success');
@@ -535,8 +599,12 @@ async function installTool() {
     document.getElementById('tool-next').disabled = false;
     btn.textContent = '✓ Installed';
   } else {
-    showAlert('tool-alerts', result.message, 'danger');
-    btn.textContent = 'Install';
+    let msg = result.message;
+    if (result.error_log) {
+      msg += `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px">Show error details</summary><pre class="error-log" style="margin-top:6px">${result.error_log}</pre></details>`;
+    }
+    showAlert('tool-alerts', msg, 'danger');
+    btn.textContent = 'Retry';
     btn.disabled = false;
   }
 }

@@ -42,22 +42,30 @@ def install_git():
     if is_installed("git"):
         return {"success": True, "message": "Git is already installed", "skipped": True}
 
+    errors = []
+
     if is_installed("winget"):
         result = run(
             "winget install Git.Git --accept-package-agreements --accept-source-agreements",
-            timeout=300,
+            timeout=180,
         )
         if result["success"]:
             return {"success": True, "message": "Git installed via winget"}
+        errors.append(f"[winget] {result['stderr'] or result['stdout']}")
 
     if is_installed("choco"):
-        result = run("choco install git -y", timeout=300)
+        result = run("choco install git -y", timeout=180)
         if result["success"]:
             return {"success": True, "message": "Git installed via Chocolatey"}
+        errors.append(f"[choco] {result['stderr'] or result['stdout']}")
+
+    if not errors:
+        errors.append("No package manager found (winget or Chocolatey). Try running PowerShell as Administrator.")
 
     return {
         "success": False,
-        "message": "Could not install git automatically. Download from https://git-scm.com/download/win",
+        "message": "Automatic installation failed. Try running as Administrator or check your network.",
+        "error_log": "\n".join(errors),
     }
 
 
@@ -66,22 +74,30 @@ def install_gh():
     if is_installed("gh"):
         return {"success": True, "message": "GitHub CLI is already installed", "skipped": True}
 
+    errors = []
+
     if is_installed("winget"):
         result = run(
             "winget install GitHub.cli --accept-package-agreements --accept-source-agreements",
-            timeout=300,
+            timeout=180,
         )
         if result["success"]:
             return {"success": True, "message": "GitHub CLI installed via winget"}
+        errors.append(f"[winget] {result['stderr'] or result['stdout']}")
 
     if is_installed("choco"):
-        result = run("choco install gh -y", timeout=300)
+        result = run("choco install gh -y", timeout=180)
         if result["success"]:
             return {"success": True, "message": "GitHub CLI installed via Chocolatey"}
+        errors.append(f"[choco] {result['stderr'] or result['stdout']}")
+
+    if not errors:
+        errors.append("No package manager found (winget or Chocolatey). Try running PowerShell as Administrator.")
 
     return {
         "success": False,
-        "message": "Could not install gh automatically. Download from https://cli.github.com/",
+        "message": "Automatic installation failed. Try running as Administrator or check your network.",
+        "error_log": "\n".join(errors),
     }
 
 
@@ -137,10 +153,8 @@ def _install_cursor():
         )
         if result["success"]:
             return {"success": True, "message": "Cursor installed via winget"}
-    return {
-        "success": False,
-        "message": "Please download Cursor from https://cursor.sh",
-    }
+        return {"success": False, "message": "Failed to install Cursor via winget.", "error_log": result["stderr"] or result["stdout"]}
+    return {"success": False, "message": "winget is required to install Cursor automatically.", "error_log": "winget not found in PATH"}
 
 
 def _install_windsurf():
@@ -151,29 +165,29 @@ def _install_windsurf():
         )
         if result["success"]:
             return {"success": True, "message": "Windsurf installed via winget"}
-    return {
-        "success": False,
-        "message": "Please download Windsurf from https://codeium.com/windsurf",
-    }
+        return {"success": False, "message": "Failed to install Windsurf via winget.", "error_log": result["stderr"] or result["stdout"]}
+    return {"success": False, "message": "winget is required to install Windsurf automatically.", "error_log": "winget not found in PATH"}
 
 
 def _install_claude_code():
     if not is_installed("npm"):
-        # Try installing Node.js
+        # Try installing Node.js first
         if is_installed("winget"):
             node_result = run(
                 "winget install OpenJS.NodeJS --accept-package-agreements --accept-source-agreements",
                 timeout=300,
             )
             if not node_result["success"]:
-                return {"success": False, "message": "Failed to install Node.js (required for Claude Code)"}
+                return {"success": False, "message": "Failed to install Node.js (required for Claude Code).",
+                        "error_log": node_result["stderr"] or node_result["stdout"]}
         else:
-            return {"success": False, "message": "npm is required. Install Node.js from https://nodejs.org"}
+            return {"success": False, "message": "Node.js/npm is required for Claude Code. winget not found.",
+                    "error_log": "winget not found — cannot auto-install Node.js"}
 
     result = run("npm install -g @anthropic-ai/claude-code", timeout=120)
     if result["success"]:
         return {"success": True, "message": "Claude Code installed successfully"}
-    return {"success": False, "message": f"Failed to install Claude Code: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Claude Code via npm.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def _install_vscode():
@@ -186,14 +200,11 @@ def _install_vscode():
             vscode_cmd = _find_vscode_cmd() or "code"
             run([vscode_cmd, "--install-extension", "continue.continue"], timeout=60)
             return {"success": True, "message": "VS Code + Continue extension installed"}
-    return {
-        "success": False,
-        "message": "Please download VS Code from https://code.visualstudio.com",
-    }
+        return {"success": False, "message": "Failed to install VS Code via winget.", "error_log": result["stderr"] or result["stdout"]}
+    return {"success": False, "message": "winget is required to install VS Code automatically.", "error_log": "winget not found in PATH"}
 
 
 def _install_copilot():
-    # Install VS Code if not present, then add Copilot extension
     vscode_cmd = _find_vscode_cmd()
     if not vscode_cmd:
         if is_installed("winget"):
@@ -202,10 +213,10 @@ def _install_copilot():
                 timeout=300,
             )
             if not result["success"]:
-                return {"success": False, "message": "Please download VS Code from https://code.visualstudio.com"}
+                return {"success": False, "message": "Failed to install VS Code via winget.", "error_log": result["stderr"] or result["stdout"]}
             vscode_cmd = _find_vscode_cmd() or "code"
         else:
-            return {"success": False, "message": "Please download VS Code from https://code.visualstudio.com"}
+            return {"success": False, "message": "winget is required to install VS Code automatically.", "error_log": "winget not found in PATH"}
     run([vscode_cmd, "--install-extension", "GitHub.copilot"], timeout=60)
     run([vscode_cmd, "--install-extension", "GitHub.copilot-chat"], timeout=60)
     return {"success": True, "message": "VS Code + GitHub Copilot extension installed"}
@@ -213,12 +224,13 @@ def _install_copilot():
 
 def _install_aider():
     if not is_installed("pip") and not is_installed("pip3"):
-        return {"success": False, "message": "pip is required. Install Python from https://python.org"}
+        return {"success": False, "message": "Python/pip is required for Aider. Trying to install via winget...",
+                "error_log": "pip not found in PATH"}
     pip = "pip3" if is_installed("pip3") else "pip"
     result = run(f"{pip} install aider-chat", timeout=120)
     if result["success"]:
         return {"success": True, "message": "Aider installed successfully"}
-    return {"success": False, "message": f"Failed to install Aider: {result['stderr']}"}
+    return {"success": False, "message": "Failed to install Aider via pip.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def launch_ai_tool(tool, project_path):
