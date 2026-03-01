@@ -1,12 +1,42 @@
 # Workflow Guide
 
-**This file is your WORKFLOW GUIDE.** After completing each step in an agent file, you will be directed back here for the next step.
+**This file is your WORKFLOW GUIDE.** 
+
+** What is the WORKFLOW used?
+Workflow used here is about completing user's "task or new feature request or any new project" using a structured approach to software development using specialized AI agents who each follow the " WORKFLOW GUIDE as well as their role specific agent files" in `ai-assistants/agents/` folder.  The Specialied agents with their agent files as well as their main tasks are as follows:
+
+'Product Owner agent' with agent file `ai-assistants/agents/product-owner-agent.md`: Customer-facing, gathers requirements, creates user stories
+'Architect agent' with agent file `ai-assistants/agents/architect-agent.md`: Designs systems, creates technical specifications and interfaces, etc
+'Developer agent' with agent file `ai-assistants/agents/developer-agent.md`: Implements features and writes code
+'Tester agent' with agent file `ai-assistants/agents/tester-agent.md`: Tests and validates implementations
+'IT agent' with agent file `ai-assistants/agents/it-agent.md`: Manages infrastructure and releases
+'Cost Analyst agent with agent file `ai-assistants/agents/cost-analyst-agent.md`: Estimates token costs, warns before expensive operations
+
+You will act as these specialied agents. These agents must work sequentially as instructed in the "WORKFLOW GUIDE as well as their respective agent's file", one after another in MANDATORY 9 STEPS as defined in this WORKFLOW GUIDE in section [Steps followed by agents for executing the workflow](#steps-followed-by-agents-for-executing-the-workflow). 
+
+When acting as any agent, for execution of any step, you will be directed to your respective agent file.After completing each step in an agent file, you will be directed back here for the next step.
 
 CRITICAL: For ANY user task, follow these steps IN ORDER. Do NOT skip steps.
 
 **BEFORE ANY STEP**: Read `ai-assistants/memory.md` first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior, PR creation, or any other workflow aspect, follow the preference instead of the default instruction.
 
+**Using Git**: If WORKFLOW steps execution requires you to use git then use as per the instructions in the [Git Workflow](#git-workflow) section in this file.
+
 ---
+
+## Auto-Continuation/Handover Rule
+
+   **NEVER auto-continue to the next agent step without explicit user confirmation.**
+
+   When at any step, if you ask user for PR or 'handover to next agent', then user saying "hand over" or "yes" or "continue" or "skip" or anything similar in that one step does NOT authorize skipping confirmation in subsequent steps. It applies to the CURRENT handover only.
+
+   The ONLY exception is when a preference is explicitly saved in
+   `ai-assistants/memory/user-preferences.md`. If that file has no such entry, the
+   agent MUST stop and ask in all the subsequent steps.
+
+---
+
+Please understand the below git workflow completely before starting to execute the WORKFLOW steps in section [Steps followed by agents for executing the workflow](#steps-followed-by-agents-for-executing-the-workflow). 
 
 ## Git Workflow
 
@@ -91,7 +121,9 @@ If you skip this step, the next agent will branch from an outdated task branch a
 
 ---
 
-## Step 1: IT Agent — Verify Tools
+## Steps followed by agents for executing the workflow
+
+### Step 1: IT Agent — Verify Tools
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -106,7 +138,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ---
 
-## Step 2: Product Owner — Requirements
+### Step 2: Product Owner — Requirements
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -136,7 +168,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ---
 
-## Step 3: Cost Analyst — Cost Estimate
+### Step 3: Cost Analyst — Cost Estimate
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -162,7 +194,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ---
 
-## Step 4: Architect — Design
+### Step 4: Architect — Design
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -187,7 +219,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ---
 
-## Step 5: IT Agent — Project Setup
+### Step 5: IT Agent — Project Setup
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -212,7 +244,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ---
 
-## Step 6: Developer — Implementation
+### Step 6: Developer — Implementation
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -240,7 +272,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ---
 
-## Step 7: Tester — Validation
+### Step 7: Tester — Validation
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -268,7 +300,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ---
 
-## Step 8: IT Agent — Release
+### Step 8: IT Agent — Release
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
@@ -293,7 +325,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 ---
 
-## Step 9: Product Owner — Acceptance
+### Step 9: Product Owner — Acceptance
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 

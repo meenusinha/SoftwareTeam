@@ -18,6 +18,16 @@ If a user has expressed a preference (stored in `ai-assistants/memory/user-prefe
 
 ---
 
+  ## Standing Rule: Handover Confirmation
+
+  Before handing off to the next agent, ALWAYS check `ai-assistants/memory/user-preferences.md`.
+  - If a "skip handover confirmation" preference exists → hand over directly
+  - If no such preference exists → STOP and ask the user
+  A single "yes" or "hand over" or "continue" or similar response does NOT create a preference.
+  Only an entry in user-preferences.md does.
+
+---
+
 ## Memory Files
 
 | File | Purpose | When to Read | When to Write |
