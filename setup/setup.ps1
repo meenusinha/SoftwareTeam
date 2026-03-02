@@ -124,7 +124,7 @@ function Ensure-Python {
         Write-Host -NoNewline "  $label"
         while (-not $proc.WaitForExit($interval * 1000)) {
             $elapsed += $interval
-            Write-Host -NoNewline " ${elapsed}s..."
+            Write-Host -NoNewline " ${elapsed}s/${timeoutSec}s..."
             if ($elapsed -ge $timeoutSec) {
                 Write-Host " [timed out after ${timeoutSec}s]"
                 try { $proc.Kill() } catch { }
@@ -167,7 +167,7 @@ function Ensure-Python {
             $proc1 = Start-Process -FilePath $installerPath `
                 -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1 /log `"$pyInstallLog`"" `
                 -PassThru
-            if (Show-InstallerProgress $proc1 300 "Installing") {
+            if (Show-InstallerProgress $proc1 120 "Installing") {
                 $pyInstalled = $true
                 Write-Ok "Python installed (user-level)."
             } else {
@@ -187,7 +187,7 @@ function Ensure-Python {
                     $proc2 = Start-Process -FilePath $installerPath `
                         -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 /log `"$pyInstallLog`"" `
                         -Verb RunAs -PassThru -ErrorAction Stop
-                    if (Show-InstallerProgress $proc2 300 "Installing (elevated)") {
+                    if (Show-InstallerProgress $proc2 120 "Installing (elevated)") {
                         $pyInstalled = $true
                         Write-Ok "Python installed (system-level)."
                     } else {

@@ -58,6 +58,49 @@ detect_os() {
     esac
 }
 
+# --- Timeout command detection (macOS has no built-in 'timeout') ---
+_TIMEOUT_CMD=""
+if command -v timeout &>/dev/null; then
+    _TIMEOUT_CMD="timeout"
+elif command -v gtimeout &>/dev/null; then
+    _TIMEOUT_CMD="gtimeout"
+fi
+
+# Run a command with a timeout, streaming its output live and capturing to a log.
+# Usage: run_timed LABEL TIMEOUT_SECS CMD [ARGS...]
+# Shows "LABEL (timeout: Xs)..." before running.
+# On failure or timeout, prints the last 15 lines of the output log.
+# Returns 0 on success, non-zero on failure or timeout.
+run_timed() {
+    local label="$1"
+    local timeout_sec="$2"
+    shift 2
+    local logfile
+    logfile=$(mktemp)
+
+    info "$label (timeout: ${timeout_sec}s)..."
+    if [ -n "$_TIMEOUT_CMD" ]; then
+        $_TIMEOUT_CMD "$timeout_sec" "$@" 2>&1 | tee "$logfile"
+        local exit_code=${PIPESTATUS[0]}
+    else
+        "$@" 2>&1 | tee "$logfile"
+        local exit_code=${PIPESTATUS[0]}
+    fi
+
+    if [ "$exit_code" -eq 0 ]; then
+        rm -f "$logfile"
+        return 0
+    elif [ "$exit_code" -eq 124 ]; then
+        warn "Timed out after ${timeout_sec}s. Output log (last 15 lines):"
+        tail -15 "$logfile"
+    else
+        warn "Failed (exit code: $exit_code). Output log (last 15 lines):"
+        tail -15 "$logfile"
+    fi
+    rm -f "$logfile"
+    return 1
+}
+
 # --- Check/Install Python 3 ---
 ensure_python() {
     # Check for python3
@@ -77,40 +120,75 @@ ensure_python() {
         fi
     fi
 
-    # Need to install Python 3
-    warn "Python 3 not found. Installing..."
+    warn "Python 3 not found. Installing automatically..."
+    local py_installed=false
 
     if [ "$OS" = "mac" ]; then
-        # macOS: try brew, then xcode python
+        # --- Method 1: Homebrew (if already installed) ---
         if command -v brew &>/dev/null; then
-            info "Installing Python 3 via Homebrew..."
-            brew install python3
-        else
-            info "Installing Homebrew first..."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            if run_timed "Installing Python 3 via Homebrew" 120 brew install python3; then
+                py_installed=true
+            fi
+        fi
+
+        # --- Method 2: Install Homebrew first, then Python ---
+        if [ "$py_installed" = false ]; then
+            info "Homebrew not found. Installing Homebrew first..."
+            NONINTERACTIVE=1 /bin/bash -c \
+                "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             # Add brew to PATH for this session
             if [ -f /opt/homebrew/bin/brew ]; then
                 eval "$(/opt/homebrew/bin/brew shellenv)"
+            elif [ -f /usr/local/bin/brew ]; then
+                eval "$(/usr/local/bin/brew shellenv)"
             fi
-            brew install python3
+            if run_timed "Installing Python 3 via Homebrew" 120 brew install python3; then
+                py_installed=true
+            fi
         fi
+
     elif [ "$OS" = "linux" ]; then
         if command -v apt &>/dev/null; then
-            info "Installing Python 3 via apt..."
-            sudo apt update && sudo apt install -y python3
+            run_timed "Updating package lists" 60 sudo apt update -qq || true
+            if run_timed "Installing Python 3 via apt" 120 sudo apt install -y python3; then
+                py_installed=true
+            fi
         elif command -v dnf &>/dev/null; then
-            info "Installing Python 3 via dnf..."
-            sudo dnf install -y python3
+            if run_timed "Installing Python 3 via dnf" 120 sudo dnf install -y python3; then
+                py_installed=true
+            fi
         elif command -v pacman &>/dev/null; then
-            info "Installing Python 3 via pacman..."
-            sudo pacman -S --noconfirm python
+            if run_timed "Installing Python 3 via pacman" 120 sudo pacman -S --noconfirm python; then
+                py_installed=true
+            fi
         elif command -v zypper &>/dev/null; then
-            info "Installing Python 3 via zypper..."
-            sudo zypper install -y python3
-        else
-            error "No supported package manager found. Please install Python 3 manually."
-            exit 1
+            if run_timed "Installing Python 3 via zypper" 120 sudo zypper install -y python3; then
+                py_installed=true
+            fi
         fi
+    fi
+
+    # --- Fallback: pyenv (works on both mac and linux, compiles from source) ---
+    if [ "$py_installed" = false ]; then
+        info "Trying pyenv as fallback (may take a few minutes — compiles Python from source)..."
+        if ! command -v pyenv &>/dev/null; then
+            run_timed "Installing pyenv" 120 bash -c \
+                "curl -fsSL https://pyenv.run | bash" || true
+            export PYENV_ROOT="$HOME/.pyenv"
+            export PATH="$PYENV_ROOT/bin:$PATH"
+            eval "$(pyenv init - 2>/dev/null)" || true
+        fi
+        if command -v pyenv &>/dev/null; then
+            if run_timed "Installing Python 3.12 via pyenv" 600 pyenv install -s 3.12.0; then
+                pyenv global 3.12.0 2>/dev/null || true
+                PYTHON="$(pyenv which python 2>/dev/null || echo python3)"
+                ok "Python 3 installed via pyenv."
+                return
+            fi
+        fi
+        error "All automatic Python installation methods failed."
+        error "Check your internet connection and try running this script again."
+        exit 1
     fi
 
     # Verify installation
@@ -118,7 +196,7 @@ ensure_python() {
         PYTHON="python3"
         ok "Python 3 installed: $(python3 --version)"
     else
-        error "Failed to install Python 3. Please install it manually."
+        error "Python 3 installation could not be verified. Check your internet connection and try again."
         exit 1
     fi
 }
