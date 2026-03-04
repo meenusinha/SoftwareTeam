@@ -3,7 +3,7 @@
 **This file is your WORKFLOW GUIDE.** 
 
 ** What is the WORKFLOW used?
-Workflow used here is about completing user's "task or new feature request or any new project" using a structured approach to software development using specialized AI agents who each follow the " WORKFLOW GUIDE as well as their role specific agent files" in `ai-assistants/agents/` folder.  The Specialied agents with their agent files as well as their main tasks are as follows:
+Workflow used here is about completing user's "task or new feature request or any new project" using a structured approach to software development using specialized AI agents. Each of the AI agents MUST follow the " WORKFLOW GUIDE as well as their role specific agent files" in `ai-assistants/agents/` folder.  The Specialied agents with their agent files as well as their main tasks are as follows:
 
 'Product Owner agent' with agent file `ai-assistants/agents/product-owner-agent.md`: Customer-facing, gathers requirements, creates user stories
 'Architect agent' with agent file `ai-assistants/agents/architect-agent.md`: Designs systems, creates technical specifications and interfaces, etc
@@ -20,7 +20,7 @@ CRITICAL: For ANY user task, follow these 9 steps IN ORDER. Do NOT skip steps.
 
 **BEFORE ANY STEP**: Read `ai-assistants/memory.md` first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior, PR creation, or any other workflow aspect, follow the preference instead of the default instruction.
 
-**Using Git**: If WORKFLOW steps execution requires you to use git then use as per the instructions in the [Git Workflow](#git-workflow) section in this file.
+**Using Git**: If WORKFLOW steps execution requires you to use git then you MUST use as per the instructions in the [Git Workflow](#git-workflow) section in this file.
 
 ---
 
@@ -36,7 +36,7 @@ CRITICAL: For ANY user task, follow these 9 steps IN ORDER. Do NOT skip steps.
 
 ---
 
-Please understand the below git workflow completely before starting to execute the WORKFLOW steps in section [Steps followed by agents for executing the workflow](#steps-followed-by-agents-for-executing-the-workflow). 
+Please understand the below section about git workflow completely before starting to execute the WORKFLOW steps in section [Steps followed by agents for executing the workflow](#steps-followed-by-agents-for-executing-the-workflow). 
 
 ## Git Workflow
 
