@@ -194,7 +194,7 @@ pkg_install() {
 - [ ] **Required tools installed** and working (package manager detected)
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 2.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 2.**
 
 ---
 
@@ -305,7 +305,7 @@ scripts/
 - [ ] **Environment documented** — setup steps recorded in `project-management/operations/environment/`
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 6.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 6.**
 
 ---
 
@@ -334,4 +334,4 @@ scripts/
 - [ ] **All artifacts verified** — release package is complete and functional
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 9.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 9.**

@@ -59,7 +59,7 @@ Customer-Facing Requirements Lead and Backlog Manager
 
 ### First-Time Setup for New Projects
 
-When starting the FIRST task in a NEW project, you MUST update domain expertise across all agent files:
+When starting the FIRST task in a NEW project, you MUST update "## Domain Expertise" section across all agent files as instructed below:
 
 1. **Read each agent file** in `ai-assistants/agents/`:
    - `product-owner-agent.md` (your own file)
@@ -69,7 +69,7 @@ When starting the FIRST task in a NEW project, you MUST update domain expertise 
    - `it-agent.md`
    - `cost-analyst-agent.md`
 
-2. **Find sections marked "CUSTOMIZE THIS SECTION"** and update with project-specific knowledge
+2. **Find sections marked "CUSTOMIZE THIS SECTION"** in each of the above files and update with project-specific knowledge
 
 3. **Commit and push changes**:
    ```bash
@@ -94,9 +94,9 @@ When starting the FIRST task in a NEW project, you MUST update domain expertise 
 
 **Do NOT skip this step. Misunderstood requirements waste everyone's time.**
 
-### Create Branches
+### NOW You MUST Create master task branch
 
-Create the task branch, then your agent branch (your workflow guide specifies the exact branch prefix):
+Create the task branch (as instructed below), then your agent branch (your workflow guide specifies the exact agent branch prefix):
 
 ```bash
 git checkout template/agentic-workflow-gui
@@ -147,7 +147,7 @@ Save in `project-management/tasks/backlog/{task-name}.md`:
 - [ ] **User has confirmed** the requirements are correct
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 3.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 3.**
 
 ---
 

@@ -209,4 +209,4 @@ Other tasks or components
 - [ ] Branch pushed to remote
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 5.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 5.**

@@ -129,4 +129,4 @@ The Developer should understand the domain to make informed implementation decis
 - [ ] Error handling implemented for edge cases
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 7.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 7.**

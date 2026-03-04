@@ -125,7 +125,7 @@ Save in `project-management/tasks/backlog/{task-name}.md`:
 - [ ] **User has confirmed** the requirements are correct
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 3.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 3.**
 
 ---
 

@@ -162,4 +162,4 @@ Create in `project-management/quality/reports/`:
 - [ ] Regression tests pass
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 8.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 8.**

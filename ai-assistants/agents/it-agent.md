@@ -281,7 +281,7 @@ done
 - [ ] **gh repo default set** — `gh repo set-default` configured
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 2.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 2.**
 
 ---
 
@@ -376,7 +376,7 @@ Create or update scripts in the `scripts/` folder:
 scripts/
 ├── build.sh   # Build commands for the tech stack
 ├── test.sh    # Test commands for the test framework
-├── run.sh     # Start/run the application
+├── run.sh     # Single command script to start and run the application
 └── clean.sh   # Clean build artifacts
 ```
 
@@ -394,7 +394,7 @@ scripts/
 - [ ] Branch pushed to remote
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 6.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 6.**
 
 ---
 
@@ -427,4 +427,4 @@ scripts/
 - [ ] Branch pushed to remote
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 9.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 9.**

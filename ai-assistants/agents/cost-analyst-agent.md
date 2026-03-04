@@ -143,4 +143,4 @@ Save in `project-management/operations/cost-logs/`:
 - [ ] Assumptions documented clearly
 - [ ] **Memory updated** — record any user preferences, project decisions, or mistakes in `ai-assistants/memory/`
 
-**Go back to your WORKFLOW GUIDE for Step 4.**
+**Go back to your WORKFLOW GUIDE for MANDATORY HANDOVER before Step 4.**
