@@ -5,12 +5,12 @@
 ** What is the WORKFLOW used?
 Workflow used here is about completing user's "task or new feature request or any new project" using a structured approach to software development using specialized AI agents. Each of the AI agents MUST follow the " WORKFLOW GUIDE as well as their role specific agent files" in `ai-assistants/agents/` folder.  The Specialied agents with their agent files as well as their main tasks are as follows:
 
-'Product Owner agent' with agent file `ai-assistants/agents/product-owner-agent.md`: Customer-facing, gathers requirements, creates user stories
-'Architect agent' with agent file `ai-assistants/agents/architect-agent.md`: Designs systems, creates technical specifications and interfaces, etc
-'Developer agent' with agent file `ai-assistants/agents/developer-agent.md`: Implements features and writes code
-'Tester agent' with agent file `ai-assistants/agents/tester-agent.md`: Tests and validates implementations
-'IT agent' with agent file `ai-assistants/agents/it-agent.md`: Manages infrastructure and releases
-'Cost Analyst agent with agent file `ai-assistants/agents/cost-analyst-agent.md`: Estimates token costs, warns before expensive operations
+'Product Owner agent' with agent file [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md): Customer-facing, gathers requirements, creates user stories
+'Architect agent' with agent file [`ai-assistants/agents/architect-agent.md`](./ai-assistants/agents/architect-agent.md): Designs systems, creates technical specifications and interfaces, etc
+'Developer agent' with agent file [`ai-assistants/agents/developer-agent.md`](./ai-assistants/agents/developer-agent.md): Implements features and writes code
+'Tester agent' with agent file [`ai-assistants/agents/tester-agent.md`](./ai-assistants/agents/tester-agent.md): Tests and validates implementations
+'IT agent' with agent file [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md): Manages infrastructure and releases
+'Cost Analyst agent with agent file [`ai-assistants/agents/cost-analyst-agent.md`](./ai-assistants/agents/cost-analyst-agent.md): Estimates token costs, warns before expensive operations
 
 You will act as these specialied agents. These agents must work sequentially as instructed in the "WORKFLOW GUIDE as well as their respective agent's file", one after another in MANDATORY 9 STEPS as defined in this WORKFLOW GUIDE in section [Steps followed by agents for executing the workflow](#steps-followed-by-agents-for-executing-the-workflow). 
 
@@ -18,7 +18,7 @@ When acting as any agent, for execution of any step, you will be directed to you
 
 CRITICAL: For ANY user task, follow these 9 steps IN ORDER. Do NOT skip steps.
 
-**BEFORE ANY STEP**: Read `ai-assistants/memory.md` first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior, PR creation, or any other workflow aspect, follow the preference instead of the default instruction.
+**BEFORE ANY STEP**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior, PR creation, or any other workflow aspect, follow the preference instead of the default instruction.
 
 **Using Git**: If WORKFLOW steps execution requires you to use git then you MUST use as per the instructions in the [Git Workflow](#git-workflow) section in this file.
 
@@ -31,7 +31,7 @@ CRITICAL: For ANY user task, follow these 9 steps IN ORDER. Do NOT skip steps.
    When at any step, if you ask user for PR or 'handover to next agent', then user saying "hand over" or "yes" or "continue" or "skip" or anything similar in that one step does NOT authorize skipping confirmation in subsequent steps. It applies to the CURRENT handover only.
 
    The ONLY exception is when a preference is explicitly saved in
-   `ai-assistants/memory/user-preferences.md`. If that file has no such entry, the
+   [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md). If that file has no such entry, the
    agent MUST stop and ask in all the subsequent steps.
 
 ---
@@ -127,7 +127,7 @@ If you skip this step, the next agent will branch from an outdated task branch a
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 1: Verify Tools](./ai-assistants/agents/it-agent.md#step-1-verify-tools) in that file.
+Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 1: Verify Tools](./ai-assistants/agents/it-agent.md#step-1-verify-tools) in that file.
 
 Verify that git and gh CLI are installed and authenticated.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
@@ -144,7 +144,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/product-owner-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 2: Requirements](./ai-assistants/agents/product-owner-agent.md#step-2-requirements)" in that file.
+Read [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 2: Requirements](./ai-assistants/agents/product-owner-agent.md#step-2-requirements)" in that file.
 
 Create your agent branch as shown below:
 ```bash
@@ -155,7 +155,7 @@ git checkout -b claude/product-owner-{task_name}-{sessionID}
 Clarify requirements with the user and create a user story.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
 2. Present the user story to the user for confirmation
 3. Check user preferences for handover behavior. If no preference exists:
@@ -171,7 +171,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/cost-analyst-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 3: Cost Estimate](./ai-assistants/agents/cost-analyst-agent.md#step-3-cost-estimate).
+Read [`ai-assistants/agents/cost-analyst-agent.md`](./ai-assistants/agents/cost-analyst-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 3: Cost Estimate](./ai-assistants/agents/cost-analyst-agent.md#step-3-cost-estimate).
 
 Create your agent branch:
 ```bash
@@ -182,7 +182,7 @@ git checkout -b claude/cost-analyst-{task_name}-{sessionID}
 Estimate total task cost and warn the user if expensive.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
 2. Report the cost estimate to the user
 3. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, create a PR for review, or would you like to adjust the scope?"
@@ -198,7 +198,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/architect-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 4: Design](./ai-assistants/agents/architect-agent.md#step-4-design).
+Read [`ai-assistants/agents/architect-agent.md`](./ai-assistants/agents/architect-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 4: Design](./ai-assistants/agents/architect-agent.md#step-4-design).
 
 Create your agent branch:
 ```bash
@@ -209,7 +209,7 @@ git checkout -b claude/architect-{task_name}-{sessionID}
 Create the technical design and choose the tech stack.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to IT Agent for Project Setup?"
@@ -224,7 +224,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 5: Project Setup](./ai-assistants/agents/it-agent.md#step-5-project-setup).
+Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 5: Project Setup](./ai-assistants/agents/it-agent.md#step-5-project-setup).
 
 Create your agent branch:
 ```bash
@@ -235,7 +235,7 @@ git checkout -b claude/it-{task_name}-{sessionID}
 Install project dependencies and create build/test/run scripts.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Developer Agent for Implementation?"
@@ -250,7 +250,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/developer-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 6: Implementation".
+Read [`ai-assistants/agents/developer-agent.md`](./ai-assistants/agents/developer-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 6: Implementation".
 
 Create your agent branch:
 ```bash
@@ -261,7 +261,7 @@ git checkout -b claude/developer-{task_name}-{sessionID}
 Implement the feature according to Architect's design.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
 2. Provide the one-line command to run the app:
    - Mac/Linux: `bash scripts/run.sh`
@@ -279,7 +279,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/tester-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 7: Validation](./ai-assistants/agents/tester-agent.md#step-7-validation).
+Read [`ai-assistants/agents/tester-agent.md`](./ai-assistants/agents/tester-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 7: Validation](./ai-assistants/agents/tester-agent.md#step-7-validation).
 
 Create your agent branch:
 ```bash
@@ -290,7 +290,7 @@ git checkout -b claude/tester-{task_name}-{sessionID}
 Validate the implementation with tests.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
 2. Provide the one-line command to run the tests:
    - Mac/Linux: `bash scripts/test.sh`
@@ -308,7 +308,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 8: Release".
+Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 8: Release".
 
 Create your agent branch:
 ```bash
@@ -319,7 +319,7 @@ git checkout -b claude/it-release-{task_name}-{sessionID}
 Build release artifacts.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like me to create a PR for review, or should I hand over to Product Owner Agent for Acceptance?"
@@ -334,7 +334,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/product-owner-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 9: Acceptance](./ai-assistants/agents/product-owner-agent.md#step-9-acceptance).
+Read [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 9: Acceptance](./ai-assistants/agents/product-owner-agent.md#step-9-acceptance).
 
 Review the completed work and present to the user.
 
@@ -358,6 +358,6 @@ Review the completed work and present to the user.
 ## Updating Memory
 
 After completing any step, update memory if any of these happened:
-- **User expressed a preference** → save to `ai-assistants/memory/user-preferences.md`
+- **User expressed a preference** → save to [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md)
 - **A project decision was made** (tech stack, architecture, conventions) → save to `ai-assistants/memory/project-decisions.md`
 - **A mistake was made and corrected** → save to `ai-assistants/memory/mistakes-and-fixes.md` under the appropriate agent section

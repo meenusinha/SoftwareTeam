@@ -83,7 +83,7 @@ Quality Assurance and Testing Specialist
 
 ## Step 7: Validation
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 **When you receive a handover from the Developer, you MUST:**
 

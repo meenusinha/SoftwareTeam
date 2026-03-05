@@ -1,18 +1,34 @@
 # Workflow Guide (Local Mode)
 
-**This file is your WORKFLOW GUIDE.** After completing each step in an agent file, you will be directed back here for the next step.
+**This file is your WORKFLOW GUIDE.** 
+
+** What is the WORKFLOW used?
+Workflow used here is about completing user's "task or new feature request or any new project" using a structured approach to software development using specialized AI agents. Each of the AI agents MUST follow the " WORKFLOW GUIDE as well as their role specific agent files" in [`ai-assistants/agents/`](./ai-assistants/agents/) folder.  The Specialied agents with their agent files as well as their main tasks are as follows:
+
+'Product Owner agent' with agent file [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md): Customer-facing, gathers requirements, creates user stories
+'Architect agent' with agent file [`ai-assistants/agents/architect-agent.md`](./ai-assistants/agents/architect-agent.md): Designs systems, creates technical specifications and interfaces, etc
+'Developer agent' with agent file [`ai-assistants/agents/developer-agent.md`](./ai-assistants/agents/developer-agent.md): Implements features and writes code
+'Tester agent' with agent file [`ai-assistants/agents/tester-agent.md`](./ai-assistants/agents/tester-agent.md): Tests and validates implementations
+'IT agent' with agent file [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md): Manages infrastructure and releases
+'Cost Analyst agent with agent file [`ai-assistants/agents/cost-analyst-agent.md`](./ai-assistants/agents/cost-analyst-agent.md): Estimates token costs, warns before expensive operations
+
+You will act as these specialied agents. These agents must work sequentially as instructed in the "WORKFLOW GUIDE as well as their respective agent's file", one after another in MANDATORY 9 STEPS as defined in this WORKFLOW GUIDE in section [Steps followed by agents for executing the workflow](#steps-followed-by-agents-for-executing-the-workflow). 
+
+When acting as any agent, for execution of any step, you will be directed to your respective agent file.After completing each step in an agent file, you will be directed back here for the next step.
 
 CRITICAL: For ANY user task, follow these steps IN ORDER. Do NOT skip steps.
 
-**BEFORE ANY STEP**: Read `ai-assistants/memory.md` first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior or any other workflow aspect, follow the preference instead of the default instruction.
+**BEFORE ANY STEP**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior or any other workflow aspect, follow the preference instead of the default instruction.
 
 ---
+
+# Steps followed by agents for executing the workflow
 
 ## Step 1: IT Agent — Verify Tools
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 1: Verify Tools](./ai-assistants/agents/it-agent.md#step-1-verify-tools) in that file.
+Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 1: Verify Tools](./ai-assistants/agents/it-agent.md#step-1-verify-tools) in that file.
 
 Verify that required tools are installed.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
@@ -28,12 +44,12 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/product-owner-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 2: Requirements](./ai-assistants/agents/product-owner-agent.md#step-2-requirements) in that file.
+Read [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 2: Requirements](./ai-assistants/agents/product-owner-agent.md#step-2-requirements) in that file.
 
 Clarify requirements with the user and create a user story.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Present the user story to the user for confirmation
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review the user story before I hand over to Cost Analyst Agent for Cost Estimate?"
@@ -46,12 +62,12 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/cost-analyst-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 3: Cost Estimate](./ai-assistants/agents/cost-analyst-agent.md#step-3-cost-estimate).
+Read [`ai-assistants/agents/cost-analyst-agent.md`](./ai-assistants/agents/cost-analyst-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 3: Cost Estimate](./ai-assistants/agents/cost-analyst-agent.md#step-3-cost-estimate).
 
 Estimate total task cost and warn the user if expensive.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Report the cost estimate to the user
 2. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, or would you like to adjust the scope?"
    Wait for the user's response — do NOT skip this step
@@ -64,12 +80,12 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/architect-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 4: Design](./ai-assistants/agents/architect-agent.md#step-4-design).
+Read [`ai-assistants/agents/architect-agent.md`](./ai-assistants/agents/architect-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 4: Design](./ai-assistants/agents/architect-agent.md#step-4-design).
 
 Create the technical design and choose the tech stack.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to IT Agent for Project Setup?"
    Wait for the user's response — do NOT skip this step
@@ -81,12 +97,12 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 5: Project Setup](./ai-assistants/agents/it-agent.md#step-5-project-setup).
+Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 5: Project Setup](./ai-assistants/agents/it-agent.md#step-5-project-setup).
 
 Install project dependencies and create build/test/run scripts.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to Developer Agent for Implementation?"
    Wait for the user's response — do NOT skip this step
@@ -98,11 +114,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/developer-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 6: Implementation".
+Read [`ai-assistants/agents/developer-agent.md`](./ai-assistants/agents/developer-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 6: Implementation".
 Implement the feature according to Architect's design.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Provide the one-line command to run the app:
    - Mac/Linux: `bash scripts/run.sh`
    - Windows: `scripts\run.ps1`
@@ -117,12 +133,12 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/tester-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 7: Validation](./ai-assistants/agents/tester-agent.md#step-7-validation).
+Read [`ai-assistants/agents/tester-agent.md`](./ai-assistants/agents/tester-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 7: Validation](./ai-assistants/agents/tester-agent.md#step-7-validation).
 
 Validate the implementation with tests.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Provide the one-line command to run the tests:
    - Mac/Linux: `bash scripts/test.sh`
    - Windows: `scripts\test.ps1`
@@ -137,12 +153,12 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/it-agent.md` in full — understand your role, expertise, and domain knowledge — then execute "Step 8: Release".
+Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 8: Release".
 
 Build release artifacts.
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
-**MANDATORY HANDOVER step before moving on** (check `ai-assistants/memory/user-preferences.md` for overrides):
+**MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to Product Owner Agent for Acceptance?"
    Wait for the user's response — do NOT skip this step
@@ -154,7 +170,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-Read `ai-assistants/agents/product-owner-agent.md` in full — understand your role, expertise, and domain knowledge — then execute [Step 9: Acceptance](./ai-assistants/agents/product-owner-agent.md#step-9-acceptance).
+Read [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 9: Acceptance](./ai-assistants/agents/product-owner-agent.md#step-9-acceptance).
 
 Review the completed work and present to the user.
 
@@ -178,6 +194,6 @@ Review the completed work and present to the user.
 ## Updating Memory
 
 After completing any step, update memory if any of these happened:
-- **User expressed a preference** → save to `ai-assistants/memory/user-preferences.md`
+- **User expressed a preference** → save to [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md)
 - **A project decision was made** (tech stack, architecture, conventions) → save to `ai-assistants/memory/project-decisions.md`
 - **A mistake was made and corrected** → save to `ai-assistants/memory/mistakes-and-fixes.md` under the appropriate agent section

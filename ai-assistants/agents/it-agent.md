@@ -85,7 +85,7 @@ The IT Agent should understand the domain to design appropriate build and deploy
 
 ## Step 1: Verify Tools
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 **CRITICAL: Before anything else, verify and install the tools needed for the workflow. Never assume tools are pre-installed on the user's machine.**
 
@@ -287,7 +287,7 @@ done
 
 ## Step 5: Project Setup
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 **When you receive a handover from the Architect, you MUST:**
 
@@ -400,7 +400,7 @@ scripts/
 
 ## Step 8: Release
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 **When you receive a handover from the Tester, you MUST:**
 

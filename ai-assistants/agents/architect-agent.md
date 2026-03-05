@@ -92,7 +92,7 @@ The Architect should deeply understand the domain to design appropriate systems 
 
 ## Step 4: Design
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 **When you receive a handover from the Product Owner, you MUST:**
 

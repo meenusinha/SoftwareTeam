@@ -82,7 +82,7 @@ The Developer should understand the domain to make informed implementation decis
 
 ## Step 6: Implementation
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 **When you receive a handover from IT Agent (project setup), you MUST:**
 

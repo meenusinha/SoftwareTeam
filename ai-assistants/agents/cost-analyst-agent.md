@@ -43,7 +43,7 @@ Resource Analyst and Cost Optimization Specialist
 
 ## Step 3: Cost Estimate
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 ### Create Agent Branch
 

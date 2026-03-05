@@ -55,7 +55,7 @@ Customer-Facing Requirements Lead and Backlog Manager
 
 ## Step 2: Requirements
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 ### First-Time Setup for New Projects
 
@@ -131,7 +131,7 @@ Save in `project-management/tasks/backlog/{task-name}.md`:
 
 ## Step 9: Acceptance
 
-**Before starting**: Read `ai-assistants/memory.md` for user preferences, past decisions, and known issues.
+**Before starting**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) for user preferences, past decisions, and known issues.
 
 **When you receive a handover from IT Agent (release), you MUST:**
 
