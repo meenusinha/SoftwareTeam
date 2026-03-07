@@ -57,22 +57,23 @@ jobs:
             console.log(`Branch: ${branchName}`);
             console.log(`Author: ${prAuthor}`);
 
-            // Extract agent type from branch name pattern: agent/{agent}-{project}-{sessionID}
-            const branchPattern = /^agent\/([a-z-]+)-([a-z-]+)-([a-zA-Z0-9]+)$/;
+            // Extract agent type from branch name pattern: {llm-name}/{agent-type}-{project}-{sessionID}
+            // Examples: copilot/developer-sudoku-webapp-abc123, claude/architect-app-pbCFa
+            const branchPattern = /^([a-z-]+)\/(developer|architect|tester|it|product-owner)-(.+)-([a-zA-Z0-9_-]+)$/;
             const match = branchName.match(branchPattern);
 
             if (!match) {
-              console.log('Branch does not match expected pattern. Skipping review assignment.');
+              console.log(`Branch "${branchName}" does not match expected pattern. Expected: {llm-name}/{agent-type}-{project}-{sessionID}`);
+              console.log(`Valid agent types: developer, architect, tester, it, product-owner`);
               return;
             }
 
-            const agentType = match[1]; // e.g., "developer", "architect", "tester", "it", "product-owner"
-            const projectName = match[2]; // e.g., "rtdcs"
-            const sessionId = match[3]; // e.g., "pbCFa"
+            const llmAgentName = match[1]; // e.g., "copilot", "claude", "gemini"
+            const agentType = match[2]; // e.g., "developer", "architect", "tester", "it", "product-owner"
+            const projectName = match[3]; // e.g., "rtdcs", "sudoku-webapp"
+            const sessionId = match[4]; // e.g., "pbCFa", "1769889815", "abc-123"
 
-            console.log(`Detected agent: ${agentType}`);
-            console.log(`Project: ${projectName}`);
-            console.log(`Session ID: ${sessionId}`);
+            console.log(`LLM Agent: ${llmAgentName}, Agent Type: ${agentType}, Project: ${projectName}, Session: ${sessionId}`);
 
             // Define review assignment rules (reduced reviewers to save API costs)
             const reviewRules = {

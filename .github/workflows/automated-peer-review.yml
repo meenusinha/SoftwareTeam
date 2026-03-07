@@ -71,8 +71,8 @@ jobs:
             // Generic pattern: {llm-agent-name}/{agent-type}-{project}-{sessionID}
             // Examples: copilot/developer-sudoku-webapp-123, claude/architect-app-456, gemini/tester-web-789
             // Agent types are known: developer, architect, tester, it, product-owner
-            // Project name can contain hyphens, sessionID is numeric at the end
-            const branchPattern = /^([a-z-]+)\/(developer|architect|tester|it|product-owner)-(.+)-(\d+)$/;
+            // Project name can contain hyphens, sessionID can be any alphanumeric string
+            const branchPattern = /^([a-z-]+)\/(developer|architect|tester|it|product-owner)-(.+)-([a-zA-Z0-9_-]+)$/;
             const match = branchName.match(branchPattern);
 
             if (!match) {
@@ -85,7 +85,7 @@ jobs:
             const llmAgentName = match[1];  // e.g., "copilot", "claude", "gemini"
             const agentType = match[2];     // e.g., "developer", "architect", "tester"
             const projectName = match[3];   // e.g., "sudoku-webapp", "app"
-            const sessionId = match[4];     // e.g., "1769889815"
+            const sessionId = match[4];     // e.g., "1769889815", "abc123", "pbCFa"
             
             console.log(`LLM Agent: ${llmAgentName}, Agent Type: ${agentType}, Project: ${projectName}, Session: ${sessionId}`);
 
