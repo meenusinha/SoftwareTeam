@@ -71,8 +71,8 @@ jobs:
             // Generic pattern: {llm-agent-name}/{agent-type}-{project}-{sessionID}
             // Examples: copilot/developer-sudoku-webapp-123, claude/architect-app-456, gemini/tester-web-789
             // Agent types are known: developer, architect, tester, it, product-owner
-            // Project name can contain hyphens, sessionID can be any alphanumeric string
-            const branchPattern = /^([a-z-]+)\/(developer|architect|tester|it|product-owner)-(.+)-([a-zA-Z0-9_-]+)$/;
+            // Project name can contain hyphens, sessionID can be any string
+            const branchPattern = /^([a-z-]+)\/(developer|architect|tester|it|product-owner)-(.+)-(.+)$/;
             const match = branchName.match(branchPattern);
 
             if (!match) {

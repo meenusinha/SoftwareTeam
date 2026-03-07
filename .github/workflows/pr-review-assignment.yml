@@ -59,7 +59,7 @@ jobs:
 
             // Extract agent type from branch name pattern: {llm-name}/{agent-type}-{project}-{sessionID}
             // Examples: copilot/developer-sudoku-webapp-abc123, claude/architect-app-pbCFa
-            const branchPattern = /^([a-z-]+)\/(developer|architect|tester|it|product-owner)-(.+)-([a-zA-Z0-9_-]+)$/;
+            const branchPattern = /^([a-z-]+)\/(developer|architect|tester|it|product-owner)-(.+)-(.+)$/;
             const match = branchName.match(branchPattern);
 
             if (!match) {
