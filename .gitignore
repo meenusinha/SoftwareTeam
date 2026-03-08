@@ -205,3 +205,4 @@ htmlcov/
 # Test outputs
 test-results/
 .pytest_cache/
+pr_details.json
