@@ -74,6 +74,21 @@ jobs:
             });
 
             const branchName = pr.data.head.ref;
+
+            // Skip if the latest commit is a rework commit (prevents infinite review loop).
+            const commits = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 1
+            });
+            const latestMsg = commits.data[0]?.commit?.message || '';
+            if (latestMsg.startsWith('[rework]')) {
+              console.log('Latest commit is a rework commit — skipping re-review.');
+              core.setOutput('skip', 'true');
+              return;
+            }
+
             // Generic pattern: {llm-agent-name}/{agent-type}-{project}-{sessionID}
             // Examples: copilot/developer-sudoku-webapp-123, claude/architect-app-456, gemini/tester-web-789
             // Agent types are known: developer, architect, tester, it, product-owner
@@ -111,6 +126,7 @@ jobs:
             core.setOutput('reviewers', JSON.stringify(reviewers));
             core.setOutput('skip', 'false');
             core.setOutput('pr_number', prNumber);
+            core.setOutput('pr_head_ref', branchName);
 
       - name: Get PR Details
         id: pr_details
@@ -311,7 +327,17 @@ jobs:
                 labels: ['peer-review:changes-requested']
               });
 
-              console.log('🔴 Changes requested by reviewers');
+              // Inform the user that the author agent will now work on the feedback.
+              const reviewersList = reviewers.map(r => r.charAt(0).toUpperCase() + r.slice(1)).join(', ');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: `## 🔄 Author Agent Rework Starting\n\n**${changesRequested}** reviewer(s) requested changes (${reviewersList}).\n\nThe author agent is now addressing the review feedback and will push a rework commit shortly. No further review will be triggered after the rework.\n\n---\n*Automated peer review by multi-agent system*`
+              });
+
+              core.setOutput('changes_requested', 'true');
+              console.log('🔴 Changes requested by reviewers — author rework queued.');
 
             } else {
               console.log(`⏳ Waiting for approvals: ${approvals}/${requiredApprovals}`);
@@ -322,6 +348,43 @@ jobs:
               changesRequested,
               approved: approvals >= requiredApprovals && changesRequested === 0
             };
+
+      - name: Author Rework
+        id: author_rework
+        if: steps.approval_status.outputs.changes_requested == 'true'
+        env:
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'openai' }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_HEAD_REF='${{ steps.reviewers.outputs.pr_head_ref }}'
+          AGENT_TYPE='${{ steps.reviewers.outputs.agent_type }}'
+          PR_NUMBER='${{ inputs.pr_number || github.event.pull_request.number }}'
+
+          echo "Switching to PR branch: $PR_HEAD_REF"
+          git fetch origin "$PR_HEAD_REF"
+          git checkout "$PR_HEAD_REF"
+
+          echo "Running author revision as: $AGENT_TYPE"
+          node .github/scripts/author-revision.js \
+            --agent "$AGENT_TYPE" \
+            --pr-number "$PR_NUMBER" \
+            --repo "${{ github.repository }}" \
+            --pr-details-file "pr_details.json"
+
+          # If any tracked files changed, commit and push.
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No file changes produced by author revision."
+          else
+            git add -A
+            git commit -m "[rework] Address peer review feedback"
+            git push origin "$PR_HEAD_REF"
+            echo "✅ Rework commit pushed."
+          fi
 
       - name: Summary
         if: steps.reviewers.outputs.skip != 'true'
