@@ -394,6 +394,22 @@ jobs:
             echo "✅ Rework commit pushed."
           fi
 
+      - name: Notify Rework Complete
+        if: steps.author_rework.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ inputs.pr_number || github.event.pull_request.number }};
+            const agentType = '${{ steps.reviewers.outputs.agent_type }}';
+            const agentLabel = agentType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `## ✏️ Author Rework Complete\n\n**${agentLabel} Agent** has addressed the reviewer feedback and pushed a \`[rework]\` commit.\n\n⏳ A new review run will now be triggered automatically (rework mode — reviewers will be forced to approve).\n\n---\n*Automated peer review by multi-agent system*`
+            });
+
       - name: Summary
         if: steps.reviewers.outputs.skip != 'true'
         run: |
