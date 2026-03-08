@@ -245,29 +245,33 @@ jobs:
               issue_number: prNumber
             });
 
-            // Count approvals from this workflow run
-            let approvals = 0;
-            let changesRequested = 0;
-
-            // Generic marker for any agent review
+            // For each agent, only count their LATEST review decision.
+            // This ensures that after a rework, a previous "CHANGES REQUESTED"
+            // from that agent is replaced by their new "APPROVED".
             const agentReviewPattern = /\*\*(.+?) Agent Review\*\*/;
 
+            // Map: agentName -> latest decision ('approved' | 'changes_requested')
+            const latestDecision = {};
+
+            // comments.data is oldest-first; iterate in order so later entries overwrite.
             for (const comment of comments.data) {
               const body = comment.body;
+              const match = body.match(agentReviewPattern);
+              if (!match) continue;
 
-              // Check if this is an agent review comment (generic pattern)
-              const isAgentReview = agentReviewPattern.test(body);
-
-              if (isAgentReview) {
-                // Match with or without ** bold markers — LLMs don't always include them.
-                if (/✅\s+\*{0,2}APPROVED\*{0,2}/.test(body)) {
-                  approvals++;
-                } else if (/🔴\s+\*{0,2}CHANGES REQUESTED\*{0,2}/.test(body)) {
-                  changesRequested++;
-                }
+              const agentName = match[1].toLowerCase(); // e.g. "architect", "tester"
+              if (/✅\s+\*{0,2}APPROVED\*{0,2}/.test(body)) {
+                latestDecision[agentName] = 'approved';
+              } else if (/🔴\s+\*{0,2}CHANGES REQUESTED\*{0,2}/.test(body)) {
+                latestDecision[agentName] = 'changes_requested';
               }
             }
 
+            const decisions = Object.values(latestDecision);
+            let approvals = decisions.filter(d => d === 'approved').length;
+            let changesRequested = decisions.filter(d => d === 'changes_requested').length;
+
+            console.log(`Latest decisions per agent: ${JSON.stringify(latestDecision)}`);
             console.log(`Approvals: ${approvals}, Changes Requested: ${changesRequested}`);
 
             // Get number of reviewers assigned to determine required approvals
