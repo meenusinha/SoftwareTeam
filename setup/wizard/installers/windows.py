@@ -285,3 +285,27 @@ def minimize_wizard_window():
     )
     run(["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_code], timeout=10)
     return {"success": True, "message": "Wizard minimized"}
+
+
+def install_tkinter():
+    """Verify tkinter is available on Windows (bundled with standard Python installer)."""
+    import subprocess
+    import sys
+
+    check = subprocess.run(
+        [sys.executable, "-c", "import tkinter"],
+        capture_output=True,
+    )
+    if check.returncode == 0:
+        return {
+            "success": True,
+            "message": "python-tk is already available (bundled with Python)",
+            "skipped": True,
+        }
+    return {
+        "success": False,
+        "message": (
+            "tkinter not found. Please reinstall Python from python.org "
+            "and ensure the 'tcl/tk and IDLE' option is checked during installation."
+        ),
+    }

@@ -255,3 +255,35 @@ def minimize_wizard_window():
         if r["success"]:
             return {"success": True, "message": "Wizard minimized"}
     return {"success": True, "message": "Wizard window minimization not available on this system"}
+
+
+def install_tkinter():
+    """Install python-tk via Homebrew (required for agent animation window)."""
+    try:
+        import importlib
+        if importlib.util.find_spec("tkinter") is not None:
+            return {"success": True, "message": "python-tk is already available", "skipped": True}
+    except Exception:
+        pass
+
+    if not is_installed("brew"):
+        brew_result = install_homebrew()
+        if not brew_result["success"]:
+            return {"success": False, "message": "Cannot install python-tk: Homebrew is required"}
+
+    import sys
+    py_ver = f"{sys.version_info.major}.{sys.version_info.minor}"
+    result = run(f"brew install python-tk@{py_ver}", timeout=120)
+    if result["success"]:
+        return {"success": True, "message": f"python-tk@{py_ver} installed via Homebrew"}
+
+    # Fallback: try without version suffix
+    result = run("brew install python-tk", timeout=120)
+    if result["success"]:
+        return {"success": True, "message": "python-tk installed via Homebrew"}
+
+    return {
+        "success": False,
+        "message": "Failed to install python-tk. Try: brew install python-tk",
+        "error_log": result.get("stderr") or result.get("stdout", ""),
+    }

@@ -385,3 +385,24 @@ def minimize_wizard_window():
             return {"success": True, "message": "Wizard minimized"}
 
     return {"success": True, "message": "Wizard window minimization not available on this system"}
+
+
+def install_tkinter():
+    """Install python3-tk (required for agent animation window)."""
+    try:
+        import importlib
+        if importlib.util.find_spec("tkinter") is not None:
+            return {"success": True, "message": "python-tk is already available", "skipped": True}
+    except Exception:
+        pass
+
+    result = _pkg_install({
+        "apt":    "python3-tk",
+        "dnf":    "python3-tkinter",
+        "yum":    "python3-tkinter",
+        "pacman": "tk",
+        "zypper": "python3-tk",
+    })
+    if result.get("success"):
+        return {"success": True, "message": "python3-tk installed successfully"}
+    return result
