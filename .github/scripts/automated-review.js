@@ -219,7 +219,7 @@ async function getPreviousReview(octokit, repo, prNumber, agentType) {
 }
 
 // Construct review prompt for LLM
-function constructReviewPrompt(agentType, prDetails, previousReview = null) {
+function constructReviewPrompt(agentType, prDetails, previousReview = null, isRework = false) {
   const agent = AGENT_PROMPTS[agentType];
   const agentContext = loadAgentContext(agentType);
 
@@ -357,9 +357,14 @@ INLINE_COMMENT: path/to/file.ext:123
 - [What was done well]
 
 ### Decision
-[Write EXACTLY one of these two options:]
+${isRework ? `
+**REWORK REVIEW — MANDATORY APPROVAL**
+This PR had changes requested and the author has already reworked it once. No further rework is allowed.
+You MUST output the APPROVED line below. You may still leave inline comments as remarks, but your decision MUST be approval.
+✅ **APPROVED** - Rework reviewed. Remarks left as inline comments where applicable.
+` : `[Write EXACTLY one of these two options:]
 ✅ **APPROVED** - This PR meets all quality standards for ${agent.role}.
-🔴 **CHANGES REQUESTED** - This PR requires changes before approval.
+🔴 **CHANGES REQUESTED** - This PR requires changes before approval.`}
 
 **IMPORTANT**:
 - Be strict but fair
@@ -378,9 +383,9 @@ INLINE_COMMENT: path/to/file.ext:123
 }
 
 // Call LLM API for review
-async function callLLMForReview(agentType, prDetails, previousReview = null) {
+async function callLLMForReview(agentType, prDetails, previousReview = null, isRework = false) {
   const provider = (process.env.LLM_PROVIDER || 'openai').toLowerCase();
-  const prompt = constructReviewPrompt(agentType, prDetails, previousReview);
+  const prompt = constructReviewPrompt(agentType, prDetails, previousReview, isRework);
 
   console.log(`\nUsing LLM Provider: ${provider}`);
   console.log(`Calling ${provider} API as ${agentType}...`);
@@ -643,6 +648,7 @@ async function main() {
   const prNumber = parseInt(args['pr-number']);
   const repo = args.repo;
   const prDetailsFile = args['pr-details-file'];
+  const isRework = args['rework'] === 'true';
 
   console.log(`\n========================================`);
   console.log(`Automated Peer Review`);
@@ -650,6 +656,7 @@ async function main() {
   console.log(`Agent: ${agentType}`);
   console.log(`PR: #${prNumber}`);
   console.log(`Repo: ${repo}`);
+  console.log(`Rework review: ${isRework}`);
   console.log(`========================================\n`);
 
   // Load PR details
@@ -672,7 +679,7 @@ async function main() {
   }
 
   // Call LLM API for review
-  const reviewText = await callLLMForReview(agentType, prDetails, previousReview);
+  const reviewText = await callLLMForReview(agentType, prDetails, previousReview, isRework);
 
   // Parse decision
   const decision = parseReviewDecision(reviewText);

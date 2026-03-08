@@ -75,7 +75,7 @@ jobs:
 
             const branchName = pr.data.head.ref;
 
-            // Skip if the latest commit is a rework commit (prevents infinite review loop).
+            // Detect if this is a rework run (latest commit is a rework commit).
             const commits = await github.rest.pulls.listCommits({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -83,11 +83,11 @@ jobs:
               per_page: 1
             });
             const latestMsg = commits.data[0]?.commit?.message || '';
-            if (latestMsg.startsWith('[rework]')) {
-              console.log('Latest commit is a rework commit — skipping re-review.');
-              core.setOutput('skip', 'true');
-              return;
+            const isRework = latestMsg.startsWith('[rework]');
+            if (isRework) {
+              console.log('Latest commit is a rework commit — running rework review (forced approve mode).');
             }
+            core.setOutput('is_rework', isRework ? 'true' : 'false');
 
             // Generic pattern: {llm-agent-name}/{agent-type}-{project}-{sessionID}
             // Examples: copilot/developer-sudoku-webapp-123, claude/architect-app-456, gemini/tester-web-789
@@ -127,6 +127,7 @@ jobs:
             core.setOutput('skip', 'false');
             core.setOutput('pr_number', prNumber);
             core.setOutput('pr_head_ref', branchName);
+            core.setOutput('is_rework', isRework ? 'true' : 'false');
 
       - name: Get PR Details
         id: pr_details
@@ -204,11 +205,17 @@ jobs:
             echo "Running review as: $agent"
             echo "================================================"
             
+            REWORK_FLAG=''
+            if [ '${{ steps.reviewers.outputs.is_rework }}' = 'true' ]; then
+              REWORK_FLAG='--rework true'
+            fi
+
             node .github/scripts/automated-review.js \
               --agent "$agent" \
               --pr-number "${{ inputs.pr_number || github.event.pull_request.number }}" \
               --repo "${{ github.repository }}" \
-              --pr-details-file "pr_details.json"
+              --pr-details-file "pr_details.json" \
+              $REWORK_FLAG
             
             review_exit_code=$?
             
@@ -351,7 +358,7 @@ jobs:
 
       - name: Author Rework
         id: author_rework
-        if: steps.approval_status.outputs.changes_requested == 'true'
+        if: steps.approval_status.outputs.changes_requested == 'true' && steps.reviewers.outputs.is_rework != 'true'
         env:
           LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'openai' }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
