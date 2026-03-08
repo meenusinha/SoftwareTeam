@@ -1,0 +1,82 @@
+name: Merge on /merge Command
+
+# Triggered when a user comments "/merge" on a PR that has been peer-review approved.
+# The comment must be the exact word "/merge" (trimmed) on its own line.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  pull-requests: write
+  contents: write
+  issues: write
+
+jobs:
+  merge:
+    name: Merge PR on /merge command
+    # Only run on PR comments (not issue comments) that start with /merge
+    if: >
+      github.event.issue.pull_request != null &&
+      startsWith(github.event.comment.body, '/merge')
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Merge PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.issue.number;
+            const commenter = context.actor;
+
+            // Verify the PR has the peer-review:approved label before merging.
+            const labels = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+
+            const isApproved = labels.data.some(l => l.name === 'peer-review:approved');
+
+            if (!isApproved) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: `## ⛔ Cannot Merge\n\n@${commenter} — this PR has not yet been approved by all peer reviewers (\`peer-review:approved\` label is missing).\n\nPlease wait for the automated peer review to complete before running \`/merge\`.`
+              });
+              console.log('PR not peer-review approved. Skipping merge.');
+              return;
+            }
+
+            // Fetch PR details for the commit message.
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            // Merge the PR.
+            try {
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                merge_method: 'squash',
+                commit_title: `${pr.data.title} (#${prNumber})`,
+                commit_message: `Merged by @${commenter} after peer review approval.\n\nOriginal PR: #${prNumber}`
+              });
+
+              console.log(`✅ PR #${prNumber} merged successfully by @${commenter}`);
+
+            } catch (err) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: `## ❌ Merge Failed\n\n@${commenter} — merge could not be completed: **${err.message}**\n\nPlease resolve any conflicts and try \`/merge\` again, or merge manually.`
+              });
+              core.setFailed(`Merge failed: ${err.message}`);
+            }
