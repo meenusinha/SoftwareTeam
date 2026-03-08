@@ -504,7 +504,15 @@ async function saveLLMConfig() {
   });
 
   if (result.success) {
-    showAlert('llm-alerts', `${providerInfo.name} configured!`, 'success');
+    // Check if GitHub secrets had issues (local config succeeded but secrets failed)
+    const secretsFailed = result.github_secrets && result.github_secrets.results &&
+      result.github_secrets.results.some(s => !s.success);
+    if (secretsFailed) {
+      const failedNames = result.github_secrets.results.filter(s => !s.success).map(s => s.secret).join(', ');
+      showAlert('llm-alerts', `${providerInfo.name} configured locally, but GitHub Actions secrets failed (${failedNames}). Automated peer reviews may not work.`, 'warning');
+    } else {
+      showAlert('llm-alerts', `${providerInfo.name} configured!`, 'success');
+    }
     document.getElementById('llm-next').disabled = false;
     btn.textContent = '✓ Saved';
     // Issue 7: Disable radio buttons after save

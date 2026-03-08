@@ -388,20 +388,64 @@ def api_llm_configure(body):
         results.append(r)
 
     # Also set as GitHub secrets if gh is available and authenticated
+    github_secrets_status = {"attempted": False, "results": []}
     if is_installed("gh"):
         auth = run("gh auth status")
         if auth["success"]:
-            run(f'gh secret set LLM_PROVIDER --body "{provider}"', timeout=30)
+            github_secrets_status["attempted"] = True
+
+            # Ensure gh repo set-default is configured before setting secrets.
+            # The fork-clone step sets it with cwd=dest, but that only persists
+            # inside that repo's .git/config. When running from the wizard's own
+            # directory, gh may not know which repo to target.
+            default_check = run("gh repo set-default --view", timeout=10)
+            if not default_check["success"] or not default_check["stdout"].strip():
+                # Auto-detect repo owner from authenticated user
+                whoami = run("gh api user --jq .login", timeout=15)
+                repo_owner = whoami["stdout"].strip() if whoami["success"] else REPO_OWNER
+                set_default = run(f"gh repo set-default {repo_owner}/{REPO_NAME}", timeout=15)
+                if not set_default["success"]:
+                    # Fallback: try with template repo owner
+                    run(f"gh repo set-default {REPO_OWNER}/{REPO_NAME}", timeout=15)
+
+            # Set secrets with error checking
+            secret_provider = run(f'gh secret set LLM_PROVIDER --body "{provider}"', timeout=30)
+            github_secrets_status["results"].append({
+                "secret": "LLM_PROVIDER",
+                "success": secret_provider["success"],
+                "error": secret_provider["stderr"].strip() if not secret_provider["success"] else "",
+            })
+
             if provider != "copilot" and api_key:
-                run(f'gh secret set LLM_API_KEY --body "{api_key}"', timeout=30)
+                secret_key = run(f'gh secret set LLM_API_KEY --body "{api_key}"', timeout=30)
+                github_secrets_status["results"].append({
+                    "secret": "LLM_API_KEY",
+                    "success": secret_key["success"],
+                    "error": secret_key["stderr"].strip() if not secret_key["success"] else "",
+                })
+
             if provider == "azure" and azure_endpoint:
-                run(f'gh secret set AZURE_OPENAI_ENDPOINT --body "{azure_endpoint}"', timeout=30)
+                secret_endpoint = run(f'gh secret set AZURE_OPENAI_ENDPOINT --body "{azure_endpoint}"', timeout=30)
+                github_secrets_status["results"].append({
+                    "secret": "AZURE_OPENAI_ENDPOINT",
+                    "success": secret_endpoint["success"],
+                    "error": secret_endpoint["stderr"].strip() if not secret_endpoint["success"] else "",
+                })
 
     all_ok = all(r.get("success", False) for r in results)
+    secrets_ok = all(s["success"] for s in github_secrets_status["results"]) if github_secrets_status["results"] else True
+    message = f"LLM provider '{provider}' configured"
+    if not all_ok:
+        message = "Some local settings failed"
+    elif not secrets_ok:
+        failed = [s["secret"] for s in github_secrets_status["results"] if not s["success"]]
+        message = f"LLM provider '{provider}' configured locally, but GitHub secrets failed: {', '.join(failed)}"
+
     return {
         "success": all_ok,
-        "message": f"LLM provider '{provider}' configured" if all_ok else "Some settings failed",
+        "message": message,
         "details": results,
+        "github_secrets": github_secrets_status,
     }
 
 
