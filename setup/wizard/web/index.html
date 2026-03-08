@@ -155,7 +155,7 @@
     <!-- ===== Screen 4: GitHub Token ===== -->
     <div class="screen" id="screen-4">
       <h2>GitHub Token <span class="badge-optional">Optional</span></h2>
-      <p class="description">You're already signed in — AI agents can create Pull Requests using that login. A personal access token adds extra automation for scripts (e.g., CI/CD pipelines that automatically create PRs, or scripts that push changes without browser interaction). You can skip this step.</p>
+      <p class="description">You're already signed in — AI agents can create Pull Requests using that login. A personal access token is <strong>recommended</strong> to enable the automated peer review rework feature: when reviewers request changes, the AI author agent needs to push a fix directly to protected branches, which requires a token with admin privileges. Your token will be saved as the <code>ADMIN_PAT</code> repository secret automatically. You can skip this step, but the rework step of automated peer review may fail.</p>
 
       <div id="token-alerts"></div>
 

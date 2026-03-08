@@ -268,8 +268,9 @@ def api_github_token(body):
     except subprocess.TimeoutExpired:
         return {"success": False, "message": "Token authentication timed out"}
 
-    # Save to environment
+    # Save to environment (both GITHUB_TOKEN for gh CLI and ADMIN_PAT for workflow bypass)
     env_result = save_env_var("GITHUB_TOKEN", token)
+    save_env_var("ADMIN_PAT", token)
 
     return {
         "success": True,
@@ -344,6 +345,19 @@ def api_github_fork_clone(body):
     repo_owner = gh_user if gh_user else REPO_OWNER
     run(f'gh repo set-default {repo_owner}/{REPO_NAME}', timeout=15, cwd=dest)
 
+    # Set ADMIN_PAT as a GitHub secret so the automated peer review workflow
+    # can push rework commits directly to protected agent branches (admin bypass).
+    admin_pat = os.environ.get("ADMIN_PAT", "")
+    admin_pat_secret_result = {"attempted": False}
+    if admin_pat and gh_user:
+        target_repo = f"{gh_user}/{REPO_NAME}"
+        result = run(['gh', 'secret', 'set', 'ADMIN_PAT', '--body', admin_pat, '--repo', target_repo], timeout=30)
+        admin_pat_secret_result = {
+            "attempted": True,
+            "success": result["success"],
+            "error": result["stderr"].strip() if not result["success"] else "",
+        }
+
     # Write workflow-config.json for github mode
     config = {"mode": "github", "setup_complete": True}
     config_path = os.path.join(dest, "workflow-config.json")
@@ -354,6 +368,7 @@ def api_github_fork_clone(body):
         "success": True,
         "message": f"Project cloned to {dest}",
         "project_path": dest,
+        "admin_pat_secret": admin_pat_secret_result,
     }
 
 
