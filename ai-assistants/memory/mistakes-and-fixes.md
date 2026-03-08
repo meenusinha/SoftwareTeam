@@ -16,6 +16,9 @@ What went wrong and how it was fixed, organized by agent. Maximum 10 entries per
 **Mistake**: Fork didn't have the template branch, causing clone to fail.
 **Fix**: Use 3-strategy approach: direct clone → sync fork + retry → clone original + fix remotes.
 
+### 2026-03-08
+**Mistake**: Used `npm --prefix` with a relative path and npm resolved to a duplicated path, causing ENOENT for package.json.
+**Fix**: Run `npm install` from the module root with `cd` to ensure correct workspace resolution.
 ---
 
 ## Product Owner
