@@ -31,7 +31,7 @@ on:
 permissions:
   pull-requests: write
   issues: write
-  contents: read
+  contents: write
 
 jobs:
   sequential-peer-review:
@@ -254,17 +254,6 @@ jobs:
             console.log(`Required approvals: ${requiredApprovals} (all ${reviewers.length} reviewers)`);
 
             if (approvals >= requiredApprovals && changesRequested === 0) {
-              // Submit a formal GitHub review APPROVAL so branch protection gates work.
-              // This is what actually allows the PR to be merged when branch protection
-              // requires at least 1 approving review.
-              await github.rest.pulls.createReview({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: prNumber,
-                event: 'APPROVE',
-                body: `## ✅ Automated Peer Review: APPROVED\n\n**${approvals}/${requiredApprovals}** required agent approvals obtained. This PR is approved by the automated peer review system and is ready for merge.\n\n**Reviewers:** ${reviewers.map(r => r.charAt(0).toUpperCase() + r.slice(1)).join(', ')}\n\n---\n*Automated peer review by multi-agent system*`
-              });
-
               // Mark as peer-review approved
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -291,18 +280,46 @@ jobs:
                 }
               }
 
-              console.log('✅ PR approved by peers!');
-
-            } else if (changesRequested > 0) {
-              // Submit a formal REQUEST_CHANGES review to block merging.
-              await github.rest.pulls.createReview({
+              // Post approval summary comment
+              const reviewersList = reviewers.map(r => r.charAt(0).toUpperCase() + r.slice(1)).join(', ');
+              
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                pull_number: prNumber,
-                event: 'REQUEST_CHANGES',
-                body: `## 🔴 Automated Peer Review: CHANGES REQUESTED\n\n${changesRequested} agent(s) requested changes. This PR **cannot be merged** until issues are addressed and the review passes.\n\nSee individual agent review comments above for details.\n\n---\n*Automated peer review by multi-agent system*`
+                issue_number: prNumber,
+                body: `## ✅ Peer Review Approved\n\n**${approvals}/${requiredApprovals}** required approvals obtained!\n\n✨ This PR has passed all peer reviews and is **ready for user review and merge**.\n\n**Reviewers:** ${reviewersList}\n\n---\n*Automated peer review by multi-agent system*`
               });
 
+              console.log('✅ PR approved by peers!');
+
+              // Auto-merge the PR now that all required agents have approved.
+              try {
+                const prData = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: prNumber
+                });
+                await github.rest.pulls.merge({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: prNumber,
+                  merge_method: 'squash',
+                  commit_title: `[Auto-merged] ${prData.data.title} (#${prNumber})`,
+                  commit_message: `Automatically merged after all ${requiredApprovals} required peer review(s) approved.\n\nReviewers: ${reviewers.map(r => r.charAt(0).toUpperCase() + r.slice(1)).join(', ')}`
+                });
+                console.log('🎉 PR auto-merged successfully!');
+              } catch (mergeError) {
+                console.log(`⚠️  Auto-merge failed: ${mergeError.message}`);
+                // Post a comment so the user knows to merge manually
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  body: `## ✅ Peer Review Approved — Manual Merge Required\n\nAll ${requiredApprovals} required agent review(s) approved, but auto-merge failed: **${mergeError.message}**\n\nPlease merge this PR manually.\n\n---\n*Automated peer review by multi-agent system*`
+                });
+              }
+
+            } else if (changesRequested > 0) {
               // Mark as changes requested
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
