@@ -14,7 +14,7 @@ When instructions conflict, follow this priority order:
 2. **Provider file instructions** (default behavior when no user preference exists)
 3. **Agent file instructions** (role-specific defaults)
 
-If a user has expressed a preference (stored in [`memory/user-preferences.md`](./memory/user-preferences.md)), that preference takes priority over any instruction in the provider or agent files — even instructions marked as MANDATORY. Mandatory instructions define the **default** behavior; user preferences define **overrides**.
+If a user has expressed a preference (stored in [`memory/user-preferences.md`](./memory/user-preferences.md)), that preference takes priority over any instruction in the provider or agent files — even instructions marked as MANDATORY. Mandatory instructions define the **default** behavior; user preferences define **overrides**. 
 
 ---
 

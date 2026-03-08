@@ -1,19 +1,24 @@
 # User Preferences
 
-Behavioral overrides expressed by the user. These take priority over all provider and agent file instructions.
+Behavioral overrides expressed by the user. These take priority over all provider and agent file instructions. These persist across sessions so agents don't re-ask decided preferences.
 
-**Format**: Each entry has a date, the preference, and the original user quote.
+YOU MUST ASK one or all of following questions (depending on the need and relevance) and CONFIRM WITH USER always before making an entry to this file:
+Questions to be asked to user:
+
+QUESTION-1: Is this <preference/suggestion/ask> a one time suggestion/ask (option-1) or would you like to see it followed in all future actions (option-2)?
+
+QUESTION-2: Is this <preference/suggestion/ask> just for current working agent (option -1), or should it be followed by all the agents working on this task in future also (option-2)? 
+
+You can add more questions if needed or relevant.
+
+**MANDATORY Format for the preferences to be written to this file**: Each entry has a date, the preference, and the original user quote.
 
 ---
 
 <!-- Example entries (remove these and replace with actual preferences):
 
-### 2026-01-15
-**Preference**: Skip PR creation and review questions at handover. Complete deliverables and hand over directly. Inform user only when the full workflow is complete and the application can be run.
-**User said**: "I don't want you to be asking me before each handover, don't create PRs, don't ask me, just complete your deliverables and tasks and handover, and inform me when it's completed and I can run the application"
-
-### 2026-01-20
-**Preference**: Always use TypeScript instead of JavaScript.
-**User said**: "Use TypeScript for everything, no plain JS"
+### YYYY-MM-DD 
+**Preference**: <Write preference statement here>.
+**User said**: <Write exact statement from user here for asking this preference.>
 
 -->
