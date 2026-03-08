@@ -2,10 +2,12 @@ name: Automated Multi-Agent Peer Review
 
 # This workflow implements automated sequential peer review using LLM APIs.
 #
-# MANUAL TRIGGER ONLY - Saves API costs by running only when you click "Run workflow"
+# TRIGGERS:
+# - Automatically when a PR is opened/updated targeting any master_* branch
+# - Manually via "Run workflow" by entering a PR number
 #
 # Flow:
-# 1. Manually trigger workflow and enter PR number
+# 1. PR opened/updated on a master_* branch → workflow triggers automatically
 # 2. Agents review sequentially based on PR author
 # 3. Reviews posted with inline comments
 # 4. If 2+ approvals → Mark PR as peer-review:approved
@@ -15,6 +17,10 @@ name: Automated Multi-Agent Peer Review
 # - Supports: Anthropic, OpenAI, or other providers (configure in .llm/config.json)
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - 'master_*'
   workflow_dispatch:
     inputs:
       pr_number:
@@ -58,7 +64,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = ${{ inputs.pr_number }};
+            const prNumber = ${{ inputs.pr_number || github.event.pull_request.number }};
 
             // Get PR details
             const pr = await github.rest.pulls.get({
@@ -112,7 +118,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = ${{ inputs.pr_number }};
+            const prNumber = ${{ inputs.pr_number || github.event.pull_request.number }};
 
             // Get PR diff
             const diff = await github.rest.pulls.get({
@@ -184,7 +190,7 @@ jobs:
             
             node .github/scripts/automated-review.js \
               --agent "$agent" \
-              --pr-number "${{ inputs.pr_number }}" \
+              --pr-number "${{ inputs.pr_number || github.event.pull_request.number }}" \
               --repo "${{ github.repository }}" \
               --pr-details-file "pr_details.json"
             
@@ -207,7 +213,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = ${{ inputs.pr_number }};
+            const prNumber = ${{ inputs.pr_number || github.event.pull_request.number }};
 
             // Get all review comments with "APPROVE" or "REQUEST_CHANGES" markers
             const comments = await github.rest.issues.listComments({

@@ -437,19 +437,19 @@ Name: LLM_API_KEY
 Secret: your-mistral-api-key
 ```
 
-### Step 3: Run Automated Review
+### Step 3: Automated Review Runs Automatically
 
 1. Create a PR following the branch naming pattern:
    - `{llm-name}/{agent-type}-{project}-{sessionID}`
    - Example: `copilot/developer-sudoku-webapp-123456`
 
-2. Go to **Actions** tab → **Automated Multi-Agent Peer Review**
+2. The review workflow triggers automatically when the PR targets a `master_*` branch.
 
-3. Click **Run workflow** → Enter PR number
+3. Go to the **Actions** tab to monitor progress.
 
-4. Wait for sequential agent reviews (Architect, Tester)
+4. Reviews are posted as PR comments with inline suggestions.
 
-5. Reviews posted as PR comments with inline suggestions
+> **Manual trigger**: You can also go to **Actions** → **Automated Multi-Agent Peer Review** → **Run workflow** and enter a PR number to trigger a review manually on any PR.
 
 ### Switching Providers
 
