@@ -73,7 +73,6 @@ package.json                       @it-agent
 # ============================================================================
 
 # Main project documentation - Product Owner oversees
-/CLAUDE.md                         @product-owner-agent
 /README.md                         @product-owner-agent
 
 # Task management system - Product Owner manages
@@ -83,7 +82,7 @@ package.json                       @it-agent
 /docs/product-owner/               @product-owner-agent
 
 # Agent configuration - Product Owner manages
-/.claude/agents/                   @product-owner-agent
+/ai-assistants/agents/                   @product-owner-agent
 
 # ============================================================================
 # Notes

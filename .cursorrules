@@ -111,12 +111,14 @@ gh pr create --base master_{task_name} \
 
 ### Merging Before Handover
 
-When the user declines a PR and asks to hand over directly, you MUST merge your agent branch into the task branch first. This ensures the next agent has all previous work:
+When the user declines a PR and asks to hand over directly, you MUST merge your agent branch into the task branch first. This ensures the next agent has all previous work. Also, always delete the agent branch after merging to keep the repository clean:
 
 ```bash
 git checkout master_{task_name}
 git merge cursor/{agent}-{task_name}-{sessionID}
 git push origin master_{task_name}
+git branch -d cursor/{agent}-{task_name}-{sessionID}
+git push origin --delete cursor/{agent}-{task_name}-{sessionID}
 ```
 
 If you skip this step, the next agent will branch from an outdated task branch and miss all your work.
