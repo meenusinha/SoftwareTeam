@@ -30,3 +30,8 @@ You can add more questions if needed or relevant.
 ### 2026-03-08 
 **Preference**: All the agents MUST ANNOUNCE THEMSELVES before starting their step or task.
 **User said**: "I did not see IT-agent come-in after product-owner agent. All the agents, please always ANNOUNCE YOURSELVES, and then start to do your work."
+
+### 2026-03-08 
+**Preference**: If running the created application needs a port, then add command in the run script to first check if port is available, if not, then start it on another available port.
+**User said**: "Please look for availability of the port before running the created application. Run on available port only."
+
