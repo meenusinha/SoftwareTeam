@@ -16,6 +16,9 @@ What went wrong and how it was fixed, organized by agent. Maximum 10 entries per
 **Mistake**: Fork didn't have the template branch, causing clone to fail.
 **Fix**: Use 3-strategy approach: direct clone → sync fork + retry → clone original + fix remotes.
 
+### 2026-03-08
+**Mistake**: Terminal got stuck in a dangling quote after a command, causing `dquote>` prompts and blocking subsequent commands.
+**Fix**: Use a fresh background terminal session for the next command (or close the quote with a standalone `"`), then continue in the clean session.
 ---
 
 ## Product Owner
