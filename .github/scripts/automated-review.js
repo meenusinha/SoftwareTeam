@@ -511,23 +511,28 @@ function parseInlineComments(reviewText) {
   return comments;
 }
 
-// Extract summary from review text (everything before Inline Comments section)
+// Extract summary from review text (everything before the ### Decision section).
+// Works for both regular reviews (### Summary / ### Positive Aspects) and
+// rework reviews (### Rework Assessment / ### Previous Issues Status / ### Rework Remarks).
 function extractSummary(reviewText) {
-  // Get everything from Summary to before Inline Comments section
-  const summaryMatch = reviewText.match(/### Summary\s*([\s\S]*?)(?=### Inline Comments|### Positive Aspects|### Decision|$)/);
-  const positiveMatch = reviewText.match(/### Positive Aspects\s*([\s\S]*?)(?=### Decision|$)/);
+  const decisionIdx = reviewText.indexOf('### Decision');
   const decisionMatch = reviewText.match(/### Decision\s*([\s\S]*?)$/);
 
+  // Take everything before ### Decision, strip raw INLINE_COMMENT: blocks
+  // (those are rendered as inline comments separately)
+  const beforeDecision = decisionIdx >= 0
+    ? reviewText.substring(0, decisionIdx)
+    : reviewText;
+
+  const summaryText = beforeDecision
+    .replace(/^INLINE_COMMENT:.*$/mg, '')   // remove INLINE_COMMENT: header lines
+    .replace(/\n{3,}/g, '\n\n')             // collapse extra blank lines
+    .trim();
+
   let summary = '';
-
-  if (summaryMatch) {
-    summary += '### Summary\n' + summaryMatch[1].trim() + '\n\n';
+  if (summaryText) {
+    summary += summaryText + '\n\n';
   }
-
-  if (positiveMatch) {
-    summary += '### Positive Aspects\n' + positiveMatch[1].trim() + '\n\n';
-  }
-
   if (decisionMatch) {
     summary += '### Decision\n' + decisionMatch[1].trim();
   }
@@ -535,8 +540,9 @@ function extractSummary(reviewText) {
   return summary.trim();
 }
 
-// Resolve review threads for addressed issues using GitHub GraphQL API
-async function resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview) {
+// Resolve review threads for addressed issues using GitHub GraphQL API.
+// isRework=true resolves ALL threads unconditionally (forced approval pass).
+async function resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview, isRework = false) {
   if (!previousReview || !previousReview.comments || previousReview.comments.length === 0) {
     return;
   }
@@ -550,7 +556,9 @@ async function resolveReviewThreads(octokit, repo, prNumber, reviewText, previou
 
   console.log(`  Found ${resolvedCount} issues marked as RESOLVED in re-review`);
 
-  const shouldResolveAll = resolvedCount > 0 || reviewText.includes('All previous concerns have been addressed');
+  // In rework mode the PR is force-approved, so resolve ALL threads regardless
+  // of whether they're marked RESOLVED, PARTIALLY ADDRESSED, or STILL PRESENT.
+  const shouldResolveAll = isRework || resolvedCount > 0 || reviewText.includes('All previous concerns have been addressed');
   if (!shouldResolveAll) return;
 
   // Build a set of database IDs from the previous review's inline comments
@@ -765,7 +773,7 @@ async function main() {
   // Resolve threads if this is a re-review and issues were addressed
   if (previousReview && decision === 'APPROVE') {
     console.log('Resolving previous review threads...');
-    await resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview);
+    await resolveReviewThreads(octokit, repo, prNumber, reviewText, previousReview, isRework);
   }
 
   // Post review with inline comments
