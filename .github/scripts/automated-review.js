@@ -251,7 +251,45 @@ ${prDetails.body}
 **Changed Files** (${prDetails.files.length} files):
 ${prDetails.files.map(f => `- ${f.filename} (+${f.additions}/-${f.deletions})`).join('\n')}
 
-${previousReview ? `
+${previousReview && isRework ? `
+## 🔄 REWORK RE-REVIEW MODE
+
+The developer has reworked this PR to address your previous review. **This is the final review pass — no further rework will be requested.**
+
+**Your Previous Review** (${previousReview.state}):
+${previousReview.comments.length > 0 ? previousReview.comments.map((c, i) => `
+${i + 1}. **${c.path}:${c.line}**
+   ${c.body.replace(/\*\*🤖.*?\*\*\n\n/, '')}
+`).join('\n') : '(No inline comments in previous review)'}
+
+**Your Task**:
+1. Check each of your previous concerns against the new commits
+2. For each: note whether it was RESOLVED or still present (remarks only — no blocking)
+3. Add any new observations as inline remarks (optional, informational only)
+4. End with a mandatory approval — this is the final pass
+
+**Required Response Format**:
+
+### Rework Assessment
+[1-2 sentences: overall assessment of how well the rework addressed your concerns]
+
+### Previous Issues Status
+${previousReview.comments.map((c, i) => `Issue #${i + 1} (${c.path}:${c.line}):
+- Status: ✅ RESOLVED / ⚠️ PARTIALLY ADDRESSED / ❌ STILL PRESENT (remark only — not blocking)
+- Verification: [how you verified it / what remains]`).join('\n\n')}
+
+### Rework Remarks
+[Any new inline comments as observations on the rework — format same as below. Write "None" if no remarks.]
+
+INLINE_COMMENT: path/to/file.ext:123
+**[Severity: Minor]** [Observation title]
+[Brief note — informational, not blocking]
+
+### Decision
+[You MUST write this exact line — no other option:]
+✅ **APPROVED** - Rework reviewed. [1 sentence summary: e.g. "Critical issues were addressed." / "Some concerns remain but approval is granted for this pass."]
+
+` : previousReview ? `
 ## 🔄 RE-REVIEW MODE
 
 **IMPORTANT**: You have previously reviewed this PR and requested changes. The developer has pushed new commits to address your feedback.
@@ -291,9 +329,6 @@ Issue #1 (${previousReview.comments[0]?.path || 'file'}:${previousReview.comment
 
 Review this pull request thoroughly using your expertise and the following checklist:`}
 
-**Review Checklist**:
-${agent.checklist.map((item, i) => `${i + 1}. ${item}`).join('\n')}
-
 ## Code Changes
 
 ${prDetails.files.map(f => `
@@ -305,6 +340,17 @@ Changes: +${f.additions}/-${f.deletions}
 ${f.patch || '(Binary file or no patch available)'}
 \`\`\`
 `).join('\n')}
+
+${isRework ? `
+**IMPORTANT — REWORK REVIEW RULES**:
+- Follow the "Required Response Format" above exactly
+- Check every previous issue and mark it RESOLVED / PARTIALLY ADDRESSED / STILL PRESENT
+- Inline remarks are optional and informational only (Severity: Minor)
+- The Decision MUST be ✅ **APPROVED** — no other option is allowed
+- Your approval line MUST contain a brief summary sentence after the dash
+` : `
+**Review Checklist**:
+${agent.checklist.map((item, i) => `${i + 1}. ${item}`).join('\n')}
 
 ## Review Guidelines
 
@@ -357,14 +403,9 @@ INLINE_COMMENT: path/to/file.ext:123
 - [What was done well]
 
 ### Decision
-${isRework ? `
-**REWORK REVIEW — MANDATORY APPROVAL**
-This PR had changes requested and the author has already reworked it once. No further rework is allowed.
-You MUST output the APPROVED line below. You may still leave inline comments as remarks, but your decision MUST be approval.
-✅ **APPROVED** - Rework reviewed. Remarks left as inline comments where applicable.
-` : `[Write EXACTLY one of these two options:]
+[Write EXACTLY one of these two options:]
 ✅ **APPROVED** - This PR meets all quality standards for ${agent.role}.
-🔴 **CHANGES REQUESTED** - This PR requires changes before approval.`}
+🔴 **CHANGES REQUESTED** - This PR requires changes before approval.
 
 **IMPORTANT**:
 - Be strict but fair
@@ -377,7 +418,7 @@ You MUST output the APPROVED line below. You may still leave inline comments as 
 - **CRITICAL**: Provide MAXIMUM 10 inline comments - prioritize the most impactful issues
 - Focus ONLY on: Design, Functionality, Consistency, and Clean Code issues
 - Skip minor/trivial issues to stay within the 10-comment limit
-`;
+`}`;
 
   return prompt;
 }
