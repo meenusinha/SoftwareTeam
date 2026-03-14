@@ -48,3 +48,9 @@ What went wrong and how it was fixed, organized by agent. Maximum 10 entries per
 ## Tester
 
 <!-- No entries yet -->
+
+---
+
+## All Agents
+**Mistake**: Ran through all 9 workflow steps without asking user for handover approval between steps, despite no 'skip-confirmation user preference' being set.
+**Fix**: Always stop after each step's deliverables (code and documentation) and output the handover question. Do not generate the next agent's output in the same response.
