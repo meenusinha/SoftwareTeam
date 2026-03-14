@@ -287,8 +287,8 @@ Tokens and API keys:
 ```
 User clicks "Fork & Clone" in wizard UI
   -> POST /api/github/fork-clone {"path": "/Users/me/Desktop", "project_name": "my-project"}
-  -> Python runs: gh repo fork meenusinha/BigProjPOC --clone=false
-  -> Python runs: gh repo clone BigProjPOC "/Users/me/Desktop/my-project" -- --branch template/agentic-workflow-gui
+  -> Python runs: gh repo fork meenusinha/SoftwareTeam --clone=false
+  -> Python runs: gh repo clone SoftwareTeam "/Users/me/Desktop/my-project" -- --branch template/agentic-workflow-gui
   -> Response: {"success": true, "project_path": "/Users/me/Desktop/my-project"}
 ```
 

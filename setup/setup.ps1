@@ -2,7 +2,7 @@
 # Setup Wizard - Windows Entry Point (PowerShell)
 #
 # Usage (one-liner for users):
-#   irm https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.ps1 | iex
+#   irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/template/agentic-workflow-gui/setup/setup.ps1 | iex
 #
 # What this script does:
 #   1. Detects Windows version
@@ -15,7 +15,7 @@
 $ErrorActionPreference = "Stop"
 
 $RepoOwner = "meenusinha"
-$RepoName = "BigProjPOC"
+$RepoName = "SoftwareTeam"
 $RepoBranch = "template/agentic-workflow-gui"
 $ZipUrl = "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/$RepoBranch.zip"
 

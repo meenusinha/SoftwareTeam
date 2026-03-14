@@ -375,7 +375,7 @@ async function browsePath(targetInputId) {
 
 async function forkAndClone() {
   const btn = document.getElementById('fork-clone-btn');
-  const projectName = document.getElementById('project-name-input').value.trim() || 'BigProjPOC';
+  const projectName = document.getElementById('project-name-input').value.trim() || 'SoftwareTeam';
   // Issue 6: Add spinner while forking/cloning
   btn.innerHTML = '<span class="spinner"></span> Forking & Cloning...';
   btn.disabled = true;
@@ -400,7 +400,7 @@ async function forkAndClone() {
 // Screen 5 (local): Copy files
 async function copyLocal() {
   const btn = document.getElementById('local-copy-btn');
-  const projectName = document.getElementById('local-project-name').value.trim() || 'BigProjPOC';
+  const projectName = document.getElementById('local-project-name').value.trim() || 'SoftwareTeam';
   // Issue 6: Add spinner while copying
   btn.innerHTML = '<span class="spinner"></span> Copying files...';
   btn.disabled = true;

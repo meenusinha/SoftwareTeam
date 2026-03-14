@@ -3,7 +3,7 @@
 # Setup Wizard - Mac & Linux Entry Point
 #
 # Usage (one-liner for users):
-#   curl -sL https://raw.githubusercontent.com/meenusinha/BigProjPOC/template/agentic-workflow-gui/setup/setup.sh | bash
+#   curl -sL https://raw.githubusercontent.com/meenusinha/SoftwareTeam/template/agentic-workflow-gui/setup/setup.sh | bash
 #
 # What this script does:
 #   1. Detects OS (macOS vs Linux distro)
@@ -16,7 +16,7 @@
 set -e
 
 REPO_OWNER="meenusinha"
-REPO_NAME="BigProjPOC"
+REPO_NAME="SoftwareTeam"
 REPO_BRANCH="template/agentic-workflow-gui"
 TARBALL_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}/archive/refs/heads/${REPO_BRANCH}.tar.gz"
 
@@ -215,7 +215,7 @@ download_repo() {
         exit 1
     fi
 
-    # The tarball extracts to a directory like BigProjPOC-template-agentic-workflow-gui/
+    # The tarball extracts to a directory like SoftwareTeam-template-agentic-workflow-gui/
     # Find the extracted directory
     REPO_DIR=$(find "$TEMP_DIR" -maxdepth 1 -type d -name "${REPO_NAME}*" | head -1)
 
