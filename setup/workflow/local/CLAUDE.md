@@ -22,6 +22,18 @@ CRITICAL: For ANY user task, follow these steps IN ORDER. Do NOT skip steps.
 
 **BEFORE ANY STEP**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior or any other workflow aspect, follow the preference instead of the default instruction.
 
+**ANIMATION — MANDATORY: Execute this command RIGHT NOW before reading any further:**
+```bash
+bash scripts/start-animation.sh &
+```
+(Safe to run multiple times — duplicate instances are blocked automatically.)
+The floating pixel animation window will appear showing the active agent. Update it at the **start of every step** and **before every handover** using:
+```bash
+bash scripts/set-agent-state.sh {agent} {state} "{message}"
+```
+Valid agent names: `it`, `product-owner`, `cost-analyst`, `architect`, `developer`, `tester`
+Valid states: `thinking`, `typing`, `reviewing`, `reworking`, `handingoff`, `approved`, `celebrating`, `waiting`, `idle`
+
 ---
 
 # Steps followed by agents for executing the workflow
@@ -31,6 +43,12 @@ CRITICAL: For ANY user task, follow these steps IN ORDER. Do NOT skip steps.
  "Act as the IT Agent. **Read your instructions in [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) and this main `WORKFLOW GUIDE` carefully**, then begin Step 1: Verify Tools."
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
+
+**ANIMATION — Run both commands now** (launch window if not running, then set state):
+```bash
+bash scripts/start-animation.sh &
+bash scripts/set-agent-state.sh it thinking "Verifying tools..."
+```
 
 Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 1: Verify Tools](./ai-assistants/agents/it-agent.md#step-1-verify-tools) in that file.
 

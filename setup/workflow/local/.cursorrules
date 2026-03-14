@@ -22,10 +22,11 @@ CRITICAL: For ANY user task, follow these steps IN ORDER. Do NOT skip steps.
 
 **BEFORE ANY STEP**: Read [`ai-assistants/memory.md`](./ai-assistants/memory.md) first. User preferences stored in memory override all instructions below — even those marked MANDATORY. If the user has expressed a preference about handover behavior or any other workflow aspect, follow the preference instead of the default instruction.
 
-**ANIMATION — Do this FIRST, the moment the user gives any task** (launch once before Step 1, in background):
+**ANIMATION — MANDATORY: Execute this command RIGHT NOW before reading any further:**
 ```bash
 bash scripts/start-animation.sh &
 ```
+(Safe to run multiple times — duplicate instances are blocked automatically.)
 The floating pixel animation window will appear showing the active agent. Update it at the **start of every step** and **before every handover** using:
 ```bash
 bash scripts/set-agent-state.sh {agent} {state} "{message}"
@@ -43,8 +44,9 @@ Valid states: `thinking`, `typing`, `reviewing`, `reworking`, `handingoff`, `app
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
-**ANIMATION**: Update the animation window now:
+**ANIMATION — Run both commands now** (launch window if not running, then set state):
 ```bash
+bash scripts/start-animation.sh &
 bash scripts/set-agent-state.sh it thinking "Verifying tools..."
 ```
 
