@@ -68,17 +68,27 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh product-owner thinking "Gathering requirements..."
+```
+
 Read [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 2: Requirements](./ai-assistants/agents/product-owner-agent.md#step-2-requirements) in that file.
 
-Clarify requirements with the user and create a user story.
+Clarify requirements with the user and create a user story. When writing the user story document, update the animation:
+```bash
+bash scripts/set-agent-state.sh product-owner typing "Writing user story..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Present the user story to the user for confirmation
-2. Check user preferences for handover behavior. If no preference exists:
+1. Commit and push your work
+2. Run: `bash scripts/set-agent-state.sh product-owner handingoff "Handing off to Cost Analyst..."`
+3. Present the user story to the user for confirmation
+4. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review the user story before I hand over to Cost Analyst Agent for Cost Estimate?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
-3. Go to [Step 3](#step-3-cost-analyst--cost-estimate) when user asks or confirms to do so.
+5. Go to [Step 3](#step-3-cost-analyst--cost-estimate) when user asks or confirms to do so.
 
 ---
 
@@ -88,17 +98,26 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh cost-analyst reviewing "Estimating costs..."
+```
+
 Read [`ai-assistants/agents/cost-analyst-agent.md`](./ai-assistants/agents/cost-analyst-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 3: Cost Estimate](./ai-assistants/agents/cost-analyst-agent.md#step-3-cost-estimate).
 
-Estimate total task cost and warn the user if expensive.
+Estimate total task cost and warn the user if expensive. When writing the cost estimate document, update the animation:
+```bash
+bash scripts/set-agent-state.sh cost-analyst typing "Writing cost estimate..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Report the cost estimate to the user
-2. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, or would you like to adjust the scope?"
+1. Run: `bash scripts/set-agent-state.sh cost-analyst handingoff "Handing off to Architect..."`
+2. Report the cost estimate to the user
+3. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, or would you like to adjust the scope?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
-3. If the user wants to adjust scope, go back to Step 2
-4. Go to [Step 4](#step-4-architect--design) when user asks or confirms to do so.
+4. If the user wants to adjust scope, go back to Step 2
+5. Go to [Step 4](#step-4-architect--design) when user asks or confirms to do so.
 
 ---
 
@@ -108,16 +127,25 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh architect thinking "Designing the system..."
+```
+
 Read [`ai-assistants/agents/architect-agent.md`](./ai-assistants/agents/architect-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 4: Design](./ai-assistants/agents/architect-agent.md#step-4-design).
 
-Create the technical design and choose the tech stack.
+Create the technical design and choose the tech stack. When writing design documents, update the animation:
+```bash
+bash scripts/set-agent-state.sh architect typing "Writing technical specs..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Check user preferences for handover behavior. If no preference exists:
+1. Run: `bash scripts/set-agent-state.sh architect handingoff "Handing off to IT Agent..."`
+2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to IT Agent for Project Setup?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
-2. Go to [Step 5](#step-5-it-agent--project-setup) when user asks or confirms to do so.
+3. Go to [Step 5](#step-5-it-agent--project-setup) when user asks or confirms to do so.
 
 ---
 
@@ -127,19 +155,28 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh it thinking "Setting up project environment..."
+```
+
 Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 5: Project Setup](./ai-assistants/agents/it-agent.md#step-5-project-setup).
 
-Install project dependencies and create build/test/run scripts.
+Install project dependencies and create build/test/run scripts. When installing deps and writing scripts, update the animation:
+```bash
+bash scripts/set-agent-state.sh it typing "Installing dependencies and creating scripts..."
+```
 
 MANDATORY: **Always provide ONE SINGLE RUN COMMAND to user to run the task or app created. **NEVER** ask user to do any manual step in addition to your run command for running the task or app created. E.g., If running the app needs to open the browser, then add it in your run script itself, and DO NOT ask user to open the browser, or run any additional command (other than the run command) in any shell or terminal.
 
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Check user preferences for handover behavior. If no preference exists:
+1. Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Developer..."`
+2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to Developer Agent for Implementation?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
-2. Go to [Step 6](#step-6-developer--implementation) when user asks or confirms to do so.
+3. Go to [Step 6](#step-6-developer--implementation) when user asks or confirms to do so.
 
 ---
 
@@ -149,18 +186,27 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh developer thinking "Planning implementation..."
+```
+
 Read [`ai-assistants/agents/developer-agent.md`](./ai-assistants/agents/developer-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 6: Implementation".
-Implement the feature according to Architect's design.
+Implement the feature according to Architect's design. When writing code, update the animation:
+```bash
+bash scripts/set-agent-state.sh developer typing "Writing code..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Provide the one-line command to run the app:
+1. Run: `bash scripts/set-agent-state.sh developer handingoff "Handing off to Tester..."`
+2. Provide the one-line command to run the app:
    - Mac/Linux: `bash scripts/run.sh`
    - Windows: `scripts\run.ps1`
-2. Check user preferences for handover behavior. If no preference exists:
+3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to Tester Agent for Validation?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
-3. Go to [Step 7](#step-7-tester--validation) when user asks or confirms to do so.
+4. Go to [Step 7](#step-7-tester--validation) when user asks or confirms to do so.
 
 ---
 
@@ -170,19 +216,28 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh tester thinking "Planning tests..."
+```
+
 Read [`ai-assistants/agents/tester-agent.md`](./ai-assistants/agents/tester-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 7: Validation](./ai-assistants/agents/tester-agent.md#step-7-validation).
 
-Validate the implementation with tests.
+Validate the implementation with tests. When writing and running tests, update the animation:
+```bash
+bash scripts/set-agent-state.sh tester typing "Writing and running tests..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Provide the one-line command to run the tests:
+1. Run: `bash scripts/set-agent-state.sh tester handingoff "Handing off to IT for release..."`
+2. Provide the one-line command to run the tests:
    - Mac/Linux: `bash scripts/test.sh`
    - Windows: `scripts\test.ps1`
-2. Check user preferences for handover behavior. If no preference exists:
+3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to IT Agent for Release?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
-3. Go to [Step 8](#step-8-it-agent--release) when user asks or confirms to do so.
+4. Go to [Step 8](#step-8-it-agent--release) when user asks or confirms to do so.
 
 ---
 
@@ -192,16 +247,25 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh it thinking "Building release..."
+```
+
 Read [`ai-assistants/agents/it-agent.md`](./ai-assistants/agents/it-agent.md) in full — understand your role, expertise, and domain knowledge — then execute "Step 8: Release".
 
-Build release artifacts.
+Build release artifacts. When packaging artifacts, update the animation:
+```bash
+bash scripts/set-agent-state.sh it typing "Packaging release artifacts..."
+```
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Check user preferences for handover behavior. If no preference exists:
+1. Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Product Owner..."`
+2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to Product Owner Agent for Acceptance?"
    Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
-2. Go to [Step 9](#step-9-product-owner--acceptance) when user asks or confirms to do so.
+3. Go to [Step 9](#step-9-product-owner--acceptance) when user asks or confirms to do so.
 
 ---
 
@@ -211,6 +275,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **Announce yourself**: Tell the user which agent you are and what you'll do in this step.
 
+**ANIMATION**: Update the animation window now:
+```bash
+bash scripts/set-agent-state.sh product-owner reviewing "Final acceptance review..."
+```
+
 Read [`ai-assistants/agents/product-owner-agent.md`](./ai-assistants/agents/product-owner-agent.md) in full — understand your role, expertise, and domain knowledge — then execute [Step 9: Acceptance](./ai-assistants/agents/product-owner-agent.md#step-9-acceptance).
 
 Review the completed work and present to the user.
@@ -218,6 +287,10 @@ Review the completed work and present to the user.
 **MANDATORY:**
 1. Provide the run command and test command to the user
 2. Ask the user to review and accept the work
+3. When the user accepts the work, run:
+   ```bash
+   bash scripts/set-agent-state.sh product-owner celebrating "Task complete!"
+   ```
 
 ---
 

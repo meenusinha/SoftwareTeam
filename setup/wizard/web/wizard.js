@@ -635,6 +635,7 @@ const ANIMATION_INFO = {
     steps: [
       'The animation window launches automatically when Cursor opens the project.',
       'Cursor reads <code>.vscode/tasks.json</code> — no extra setup needed.',
+      '<strong>⚠️ Workspace Trust required:</strong> When Cursor opens the project for the first time, click <strong>"Yes, I trust the authors"</strong> in the trust dialog — automatic tasks are blocked in Restricted mode and the animation will not launch.',
       'The window shows which agent is active and updates as agents hand off.',
     ],
   },
@@ -643,6 +644,7 @@ const ANIMATION_INFO = {
     steps: [
       'The animation window launches automatically when Windsurf opens the project.',
       'Windsurf reads <code>.vscode/tasks.json</code> — no extra setup needed.',
+      '<strong>⚠️ Workspace Trust required:</strong> When Windsurf opens the project for the first time, click <strong>"Yes, I trust the authors"</strong> in the trust dialog — automatic tasks are blocked in Restricted mode and the animation will not launch.',
       'The window shows which agent is active and updates as agents hand off.',
     ],
   },
@@ -651,6 +653,7 @@ const ANIMATION_INFO = {
     steps: [
       'The animation window launches automatically when VS Code opens the project.',
       '<code>.vscode/settings.json</code> already has <code>task.allowAutomaticTasks: on</code> — no manual approval needed.',
+      '<strong>⚠️ Workspace Trust required:</strong> When VS Code opens the project for the first time, click <strong>"Yes, I trust the authors"</strong> in the trust dialog — automatic tasks are blocked in Restricted mode and the animation will not launch.',
       'The window shows which agent is active and updates as agents hand off.',
     ],
   },
@@ -659,6 +662,7 @@ const ANIMATION_INFO = {
     steps: [
       'The animation window launches automatically when VS Code opens the project.',
       '<code>.vscode/settings.json</code> already has <code>task.allowAutomaticTasks: on</code> — no manual approval needed.',
+      '<strong>⚠️ Workspace Trust required:</strong> When VS Code opens the project for the first time, click <strong>"Yes, I trust the authors"</strong> in the trust dialog — automatic tasks are blocked in Restricted mode and the animation will not launch.',
       'The window shows which agent is active and updates as agents hand off.',
     ],
   },
