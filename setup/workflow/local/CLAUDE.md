@@ -58,7 +58,7 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 **MANDATORY HANDOVER step before moving on:**
 1. Present the tool verification results to the user
 2. Ask the user: "Tools are verified. Shall I hand over to Product Owner Agent for Requirements?"
-   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
+   ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. Proceed to next step[Step 2](#step-2-product-owner--requirements) when user asks or confirms to do so.
 ---
 
@@ -83,11 +83,12 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
 1. Commit and push your work
-2. Run: `bash scripts/set-agent-state.sh product-owner handingoff "Handing off to Cost Analyst..."`
+2. ⛔ SINGLE RESPONSE — run this AND the handover question in the same message (do NOT make this a standalone tool call):
+   Run: `bash scripts/set-agent-state.sh product-owner handingoff "Handing off to Cost Analyst..."`
 3. Present the user story to the user for confirmation
 4. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review the user story before I hand over to Cost Analyst Agent for Cost Estimate?"
-   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
+   ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 5. Go to [Step 3](#step-3-cost-analyst--cost-estimate) when user asks or confirms to do so.
 
 ---
@@ -112,10 +113,11 @@ bash scripts/set-agent-state.sh cost-analyst typing "Writing cost estimate..."
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Run: `bash scripts/set-agent-state.sh cost-analyst handingoff "Handing off to Architect..."`
+1. ⛔ SINGLE RESPONSE — run this AND the handover question in the same message (do NOT make this a standalone tool call):
+   Run: `bash scripts/set-agent-state.sh cost-analyst handingoff "Handing off to Architect..."`
 2. Report the cost estimate to the user
 3. Ask the user: "The estimated cost is $X. Should I hand over to Architect Agent for Design, or would you like to adjust the scope?"
-   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
+   ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. If the user wants to adjust scope, go back to Step 2
 5. Go to [Step 4](#step-4-architect--design) when user asks or confirms to do so.
 
@@ -141,10 +143,11 @@ bash scripts/set-agent-state.sh architect typing "Writing technical specs..."
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Run: `bash scripts/set-agent-state.sh architect handingoff "Handing off to IT Agent..."`
+1. ⛔ SINGLE RESPONSE — run this AND the handover question in the same message (do NOT make this a standalone tool call):
+   Run: `bash scripts/set-agent-state.sh architect handingoff "Handing off to IT Agent..."`
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to IT Agent for Project Setup?"
-   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
+   ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. Go to [Step 5](#step-5-it-agent--project-setup) when user asks or confirms to do so.
 
 ---
@@ -172,10 +175,11 @@ MANDATORY: **Always provide ONE SINGLE RUN COMMAND to user to run the task or ap
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Developer..."`
+1. ⛔ SINGLE RESPONSE — run this AND the handover question in the same message (do NOT make this a standalone tool call):
+   Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Developer..."`
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to Developer Agent for Implementation?"
-   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
+   ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. Go to [Step 6](#step-6-developer--implementation) when user asks or confirms to do so.
 
 ---
@@ -199,13 +203,14 @@ bash scripts/set-agent-state.sh developer typing "Writing code..."
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Run: `bash scripts/set-agent-state.sh developer handingoff "Handing off to Tester..."`
+1. ⛔ SINGLE RESPONSE — run this AND the handover question in the same message (do NOT make this a standalone tool call):
+   Run: `bash scripts/set-agent-state.sh developer handingoff "Handing off to Tester..."`
 2. Provide the one-line command to run the app:
    - Mac/Linux: `bash scripts/run.sh`
    - Windows: `scripts\run.ps1`
 3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to Tester Agent for Validation?"
-   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
+   ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. Go to [Step 7](#step-7-tester--validation) when user asks or confirms to do so.
 
 ---
@@ -230,13 +235,14 @@ bash scripts/set-agent-state.sh tester typing "Writing and running tests..."
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Run: `bash scripts/set-agent-state.sh tester handingoff "Handing off to IT for release..."`
+1. ⛔ SINGLE RESPONSE — run this AND the handover question in the same message (do NOT make this a standalone tool call):
+   Run: `bash scripts/set-agent-state.sh tester handingoff "Handing off to IT for release..."`
 2. Provide the one-line command to run the tests:
    - Mac/Linux: `bash scripts/test.sh`
    - Windows: `scripts\test.ps1`
 3. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to IT Agent for Release?"
-   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
+   ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 4. Go to [Step 8](#step-8-it-agent--release) when user asks or confirms to do so.
 
 ---
@@ -261,10 +267,11 @@ bash scripts/set-agent-state.sh it typing "Packaging release artifacts..."
 Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on** (check [`ai-assistants/memory/user-preferences.md`](./ai-assistants/memory/user-preferences.md) for overrides):
-1. Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Product Owner..."`
+1. ⛔ SINGLE RESPONSE — run this AND the handover question in the same message (do NOT make this a standalone tool call):
+   Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Product Owner..."`
 2. Check user preferences for handover behavior. If no preference exists:
    Ask the user: "Would you like to review my work before I hand over to Product Owner Agent for Acceptance?"
-   Wait for the user's response — do NOT skip this step. STOP HERE. Output the handover question and DO NOT generate any further content until the user replies. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
+   ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
 3. Go to [Step 9](#step-9-product-owner--acceptance) when user asks or confirms to do so.
 
 ---
