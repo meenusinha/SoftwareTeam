@@ -36,6 +36,12 @@ Valid states: `thinking`, `typing`, `reviewing`, `reworking`, `handingoff`, `app
 
 ⚡ **TERMINAL EXECUTION REQUIRED**: Every `bash scripts/...` command in this document MUST be run via your terminal/shell tool. Do NOT write these commands as text or code blocks in your response — use your tool to actually execute them. If you display the command instead of running it, the animation will not work.
 
+⚡ **WAITING STATE RULE**: Whenever you ask the user ANY question and stop to wait for their answer (clarifications, requirements, decisions — not just handover questions), run this BEFORE asking:
+```bash
+bash scripts/set-agent-state.sh {current_agent} waiting "Your question summary here..."
+```
+This tells the animation window the agent is waiting for user input.
+
 ---
 
 # Steps followed by agents for executing the workflow

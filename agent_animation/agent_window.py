@@ -186,33 +186,28 @@ class AgentWindow:
         interval = max(80, int(1000 / sc['fps']))
         self.root.after(interval, self._schedule_frame)
 
-    # Seconds in 'handingoff' before auto-transitioning display to 'waiting'
+    # Seconds in 'handingoff' before auto-transitioning display to 'waiting'.
+    # Reliable because 'handingoff' is only ever set when asking the handover
+    # question — the agent then stops, so 4 s of silence means it is waiting.
     _HANDOFF_WAIT_SECS = 4.0
-    # Seconds since the last state-file write before assuming agent is waiting
-    # for user input (question, clarification, permission prompt, etc.)
-    _QUIET_WAIT_SECS   = 25.0
-    # States that are naturally terminal — don't auto-transition these
-    _NO_AUTO_WAIT = {'idle', 'waiting', 'celebrating', 'approved'}
 
     def _render_frame(self):
         agent_cfg = get_agent(self._agent_name)
 
         display_state = self._state_name
         display_msg   = self._message
-        now           = time.time()
-        quiet_secs    = now - self._state_file_ts
 
-        if display_state not in self._NO_AUTO_WAIT:
-            if (display_state == 'handingoff' and
-                    now - self._state_change_time > self._HANDOFF_WAIT_SECS):
-                # Agent asked handover question — quickly flip to waiting
-                display_state = 'waiting'
-                display_msg   = 'Waiting for user input, please respond...'
-            elif quiet_secs > self._QUIET_WAIT_SECS:
-                # Agent went quiet — asked a question, needs permission, or is
-                # waiting for clarification from the user
-                display_state = 'waiting'
-                display_msg   = 'Waiting for user input, please respond...'
+        # Only auto-transition handingoff → waiting (reliable signal).
+        # A general quiet-timer is intentionally NOT used here because long
+        # operations (npm install, code generation, running tests) also produce
+        # silence and would cause false "waiting for user input" displays.
+        # For other questions/clarifications, agents must call:
+        #   set-agent-state.sh {agent} waiting "Your question here..."
+        # Permission dialogs are handled immediately by the PreToolUse hook.
+        if (display_state == 'handingoff' and
+                time.time() - self._state_change_time > self._HANDOFF_WAIT_SECS):
+            display_state = 'waiting'
+            display_msg   = 'Waiting for user input, please respond...'
 
         state_cfg = get_state_config(display_state)
 
