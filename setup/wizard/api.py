@@ -221,6 +221,12 @@ def api_github_login(body=None):
         except Exception:
             pass
         api_github_login._success = proc.returncode == 0
+        if api_github_login._success:
+            # Configure git credential helper so git push uses this account's token.
+            try:
+                subprocess.run(["gh", "auth", "setup-git"], capture_output=True, timeout=15)
+            except Exception:
+                pass
         api_github_login._done = True
 
     t = threading.Thread(target=reader, daemon=True)
@@ -280,6 +286,14 @@ def api_github_token(body):
         return {"success": False, "message": "GitHub CLI (gh) is not installed"}
     except subprocess.TimeoutExpired:
         return {"success": False, "message": "Token authentication timed out"}
+
+    # Configure git to use gh as credential helper so git push uses the right account.
+    # Without this, git falls back to the system credential store (which may hold a
+    # different account's token), causing "permission denied" on push.
+    try:
+        subprocess.run(["gh", "auth", "setup-git"], capture_output=True, timeout=15)
+    except Exception:
+        pass  # Non-fatal — user can run manually if needed
 
     # Save to environment (both GITHUB_TOKEN for gh CLI and ADMIN_PAT for workflow bypass)
     env_result = save_env_var("GITHUB_TOKEN", token)

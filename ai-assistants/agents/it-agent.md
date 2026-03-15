@@ -262,6 +262,9 @@ fi
 if command -v gh 2>&1 | grep -q '^/'; then
   if gh auth status 2>&1 | grep -q 'Logged in'; then
     echo "✅ gh: authenticated"
+    # Ensure git uses gh's credential helper so 'git push' uses the correct account.
+    # This prevents "permission denied" errors when pushing to a forked repository.
+    gh auth setup-git && echo "✅ gh: git credential helper configured" || echo "⚠️  gh auth setup-git failed (non-fatal)"
   else
     echo "⚠️  gh is installed but not authenticated. Attempting interactive login..."
     gh auth login || echo "❌ gh auth login failed. The agent will retry authentication when needed."
