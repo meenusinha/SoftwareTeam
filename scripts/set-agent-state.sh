@@ -10,7 +10,7 @@
 cd "$(dirname "$0")/.."
 
 # Auto-start animation window if not already running (safe — duplicate guard is in start-animation.sh)
-bash scripts/start-animation.sh &
+bash scripts/start-animation.sh
 
 AGENT="${1:-developer}"
 STATE="${2:-idle}"

@@ -9,5 +9,8 @@ if ($existing) { exit 0 }
 
 $root = Split-Path $PSScriptRoot
 Set-Location $root
-$extraArgs = if ($Demo) { '--demo' } else { '' }
-python -m agent_animation.agent_window $extraArgs
+$extraArgs = if ($Demo) { @('--demo') } else { @() }
+
+# Start as independent process so it survives the calling shell exiting
+Start-Process python -ArgumentList (@('-m', 'agent_animation.agent_window') + $extraArgs) `
+    -WorkingDirectory $root -WindowStyle Hidden
