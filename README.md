@@ -1,11 +1,12 @@
-# SoftwareTeam – Your AI Software Team #
+# SoftwareTeam 
+### An AI-powered software team that turns your idea into a working system.
 
-**Give it a task. Your AI team plans, designs, and builds it in your AI tool.**
+- **Give it a task** - Your agentic team plans, designs, and builds it automatically in your AI tool.
 
-**"A **provider-agnostic approach** for AI-assisted multi-agent development workflows."**
+- **Provider-agnostic approach** for AI-assisted multi-agent development workflows.
 
-**“Predefined AI agents work out-of-the-box, or use this as a template to customize your workflows.”**
-
+- **Predefined AI agents** work out-of-the-box, or **use this as a template** to customize your workflows.
+[Pixel based animation makes AI collaboration feel alive and tangible.]
 
 ## SoftwareTeam comes with predefined AI agents that mimic the workflow of a real software team: ##
 
@@ -18,17 +19,93 @@
 
 **Your team collaborates automatically. You simply open your AI tool (Claude, Cursor, vscode-Copilot, etc.) and provide your task prompt.**
 
+### [Attribution (optional but appreciated)]:
+If you use this project, please consider linking back to:
+https://github.com/meenusinha/SoftwareTeam
+
+---
+
+
+# Why SoftwareTeam?
+
+Modern AI tools can generate code—but they often lack structure, documentation, long term vision, and control.
+
+SoftwareTeam changes that by introducing a collaborative agent workflow:
+
+- Multiple AI agents work together like a real software team
+- Each agent produces work that is documentated, reviewed and approved before moving forward
+- You stay in control by final review/approval while agents handle execution
+- The system enables action-driven progress, with agents asking the necessary “what”, “how”, and “why” questions along the way when necessary
+- Frees you for other important tasks while the agentic system manages coordination
+
+## Features
+
+- **LLM Provider Agnostic** - Works with any AI
+- **Multi-agent workflow** with peer review
+- **Git worktree support** for versioned work
+- **Task management system**
+- **GitHub Actions** for automation
+- **Secure API key handling** (environment variables, gitignored)
+
+---
+
+
+# Built for Simplicity and Extensibility
+
+## SoftwareTeam is intentionally lightweight:
+- No heavy frameworks required
+- No hidden abstractions
+- Built on:
+   > Markdown-based workflows
+   > Git-based collaboration scripts
+
+**This makes it:**
+- Easy to understand
+- Easy to customize
+- Easy to extend with advanced systems like:
+   - RAG
+   - MCP
+- Custom AI pipelines
+
+---
+
+
+## Documentation as a First-Class Output
+
+### Agents contributes to:
+- system design
+- requirements
+- implementation
+- testing
+- operations
+
+**Result: a fully documented, modular system generated as part of the workflow.**
+
+**This gives you:**
+- Clear architecture visibility
+- Reusable knowledge
+- Maintainibility of the software over time and across teams
+- High-quality documentation without extra effort
+
+---
+
+
+## Example Workflow
+
+**"Build a task management app"**
+- Product Owner creates user stories
+- Architect designs system
+- Developer implements features
+- Tester validates the work
+- IT handles infrastructure and release
+
+All coordinated through agent collaboration and mandatory approval-before-handover steps.
+
 ---
 
 
 ## Platform supported
 Works on **Mac, Windows, and Linux**, and supports multiple [AI providers](#works-with-any-ai).
-
----
-
-
-## Quick Demo
-[]
 
 ---
 
@@ -83,7 +160,7 @@ irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.p
 
 ## Works With Any AI
 <details>
-<summary>Click to expand AI tool options</summary>
+<summary>Click to open AI tools options</summary>
 
 | Provider | Models | Recommended Tools |
 |----------|--------|-------------------|
@@ -93,17 +170,18 @@ irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.p
 | **Azure** | GPT-4, GPT-3.5 | Aider, Cursor, Windsurf |
 | **GitHub** | Copilot | GitHub Copilot (VS Code) |
 | **Ollama** | Local models | Aider, Continue |
-
 ---
-
+</details>
 
 ## Quick Start (For Developers)
+<details>
+<summary>Click to open quickstart guide</summary>
 
-git clone <repo-url> my-project
+git clone <repo-url> mySoftwareTeam
 ```bash
 # 1. Clone this template
-git clone https://github.com/meenusinha/SoftwareTeam.git my-softwareTeam
-cd my-softwareTeam
+git clone https://github.com/meenusinha/SoftwareTeam.git mySoftwareTeam
+cd mySoftwareTeam
 
 # 2. Set up your AI provider
 cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
@@ -121,8 +199,6 @@ cursor .         # For Cursor IDE
 ```
 
 ## Alternative Setup Methods
-
-<details>
 <summary>Click to expand manual setup options</summary>
 
 ### Option 1: GitHub Fork
@@ -167,14 +243,8 @@ git push -u origin main
 
 </details>
 
-## Features
+---
 
-- **LLM Provider Agnostic** - Works with any AI
-- **Multi-agent workflow** with peer review
-- **Git worktree support** for parallel work
-- **Task management system**
-- **GitHub Actions** for automation
-- **Secure API key handling** (environment variables, gitignored)
 
 ## Structure
 
@@ -261,6 +331,7 @@ aider
 ```
 
 See `ai-assistants/provider-setup/README.md` for detailed setup instructions.
+</details>
 
 ## Optional Customization 
 
