@@ -2,7 +2,7 @@
 # Setup Wizard - Windows Entry Point (PowerShell)
 #
 # Usage (one-liner for users):
-#   irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/setup/setup.ps1 | iex
+#   irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.ps1 | iex
 #
 # What this script does:
 #   1. Detects Windows version
