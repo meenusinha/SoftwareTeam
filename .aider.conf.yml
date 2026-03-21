@@ -2,8 +2,13 @@
 
 # Read files at startup to understand the workflow
 read:
-  - ai-assistants/agents/product-owner-agent.md
   - .aider.conventions.md
+  - ai-assistants/agents/product-owner-agent.md
+  - ai-assistants/agents/architect-agent.md
+  - ai-assistants/agents/developer-agent.md
+  - ai-assistants/agents/tester-agent.md
+  - ai-assistants/agents/it-agent.md
+  - ai-assistants/agents/cost-analyst-agent.md
 
 # Convention file with workflow instructions
 conventions: .aider.conventions.md

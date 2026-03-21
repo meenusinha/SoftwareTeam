@@ -22,7 +22,7 @@ If a user has expressed a preference (stored in [`memory/user-preferences.md`](.
 
   Before handing off to the next agent, ALWAYS check [`memory/user-preferences.md`](./memory/user-preferences.md).
   - If a "skip handover confirmation" preference exists → hand over directly
-  - If no such preference exists → STOP and ask the user
+  - If no such preference exists → STOP and ask the user the mandatory handover question ("Would you like me to create a PR for review, or should I hand over to next Agent"?).
   A single "yes" or "hand over" or "continue" or similar response does NOT create a preference.
   Only an entry in user-preferences.md does.
 

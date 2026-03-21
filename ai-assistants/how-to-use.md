@@ -15,7 +15,7 @@ This template includes configuration files that instruct AI assistants to follow
 | Continue | `.continuerules` | Instructions for Continue extension |
 | Aider | `.aider.conf.yml` + `.aider.conventions.md` | Instructions for Aider CLI |
 
-These files ensure the AI **always starts as Product Owner** and follows the complete workflow.
+These files ensure the AI **always starts as IT-agent** and follows the complete workflow.
 
 ## Quick Setup (5 minutes)
 
@@ -69,7 +69,7 @@ Download from https://cursor.sh
 
 When you interact with the AI, it will automatically:
 
-1. **Start as Product Owner** - ALWAYS the first role for any request
+1. **Start as IT agent** - ALWAYS the first role for any request
 2. **Customize the template** - Update domain info and agent skills for your project
 3. **Adopt specialized roles** - Architect, Developer, Tester, IT as needed
 4. **Follow the workflow** - Requirements, design, implement, test, release
@@ -77,11 +77,13 @@ When you interact with the AI, it will automatically:
 
 ### What Happens on First Request
 
-When you give the AI its first task, the Product Owner will:
-1. Update agent files in `ai-assistants/agents/` with your project's domain information
-2. Update agent skills in `ai-assistants/agents/` for your project type
-3. Create a user story documenting your request
-4. Then proceed with the normal workflow
+When you give the AI its first task, the IT agent will:
+1. Start the agentic pixel animation, verify that git and gh CLI are installed and authenticated.
+Then Product Owner will
+2. Update agent files in `ai-assistants/agents/` with your project's domain information
+3. Update agent skills in `ai-assistants/agents/` for your project type
+4. Create a user story documenting your request
+5. Then proceed with the normal workflow
 
 ### The 6 Agent Roles
 
@@ -102,11 +104,12 @@ You say:
 > "I want to add a login page with email and password"
 
 The AI will:
-1. Product Owner: Create user story with acceptance criteria
-2. Architect: Design the login flow with technical specs
-3. Developer: Implement the code
-4. Tester: Validate it works
-5. Create a PR for your review
+1. IT-agent: Start pixel agentic animation, verify git and gh installations and authentications.
+2. Product Owner: Create user story with acceptance criteria
+3. Architect: Design the login flow with technical specs
+4. Developer: Implement the code
+5. Tester: Validate it works
+6. Create a PR for your review
 
 ### Fixing a Bug
 
@@ -124,6 +127,7 @@ The AI will:
 
 ```
 your-project/
+├── agent_animation/         # Pixel agentic animation
 ├── ai-assistants/           # AI configuration (you are here)
 │   ├── agents/              # Agent role definitions
 │   ├── provider-setup/      # Your AI provider config
