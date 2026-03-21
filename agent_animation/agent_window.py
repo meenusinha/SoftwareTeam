@@ -26,6 +26,9 @@ import math
 import time
 import random
 import argparse
+import glob
+import os
+import sys
 
 from .sprites import PALETTE, CELL, get_agent, get_state_config, AGENTS, STATE_CONFIG
 from .state import read as read_state
@@ -478,13 +481,47 @@ def _default_message(state: str) -> str:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+def _ensure_display():
+    """
+    On Wayland sessions (Fedora, Ubuntu with Wayland, etc.) DISPLAY is not set
+    but XWayland is usually running and exposes an X11 socket.  Try to find it
+    so Tkinter can connect.
+    """
+    if os.environ.get('DISPLAY'):
+        return  # already set, nothing to do
+
+    # Look for any live X11 socket under /tmp/.X11-unix/
+    sockets = sorted(glob.glob('/tmp/.X11-unix/X*'))
+    for sock in sockets:
+        if os.path.exists(sock):
+            display_num = sock.replace('/tmp/.X11-unix/X', '')
+            os.environ['DISPLAY'] = f':{display_num}'
+            return
+
+    # Fallback: :0 is the conventional XWayland display
+    os.environ['DISPLAY'] = ':0'
+
+
 def main():
     parser = argparse.ArgumentParser(description='Agent animation floating window')
     parser.add_argument('--demo', action='store_true',
                         help='Cycle through all agents and states automatically')
     args = parser.parse_args()
 
-    root = tk.Tk()
+    # Ensure DISPLAY is set before Tkinter tries to open it (needed on Wayland)
+    _ensure_display()
+
+    try:
+        root = tk.Tk()
+    except tk.TclError as exc:
+        # Provide an actionable error instead of a silent crash into the log
+        print(f'[agent_animation] Cannot open display: {exc}', file=sys.stderr)
+        print('[agent_animation] Suggestions:', file=sys.stderr)
+        print('  - Run: export DISPLAY=:0  (XWayland must be running)', file=sys.stderr)
+        print('  - Or install XWayland:    sudo dnf install xorg-x11-server-Xwayland',
+              file=sys.stderr)
+        sys.exit(1)
+
     AgentWindow(root, demo=args.demo)
     root.mainloop()
 
