@@ -462,6 +462,8 @@ def api_github_fork_clone(body):
     force = body.get("force", False)
     dest = os.path.join(dest_parent, project_name)
 
+    print(f"[fork-clone] dest={dest!r} force={force!r} type={type(force).__name__}", flush=True)
+
     # Validate prerequisites BEFORE touching the filesystem
     if not is_installed("gh"):
         return {"success": False, "message": "GitHub CLI is required for fork & clone"}
@@ -474,9 +476,12 @@ def api_github_fork_clone(body):
                 "dest": dest,
                 "message": f"A project folder already exists at: {dest}",
             }
+        print(f"[fork-clone] removing {dest!r}", flush=True)
         try:
             shutil.rmtree(dest)
+            print(f"[fork-clone] removed OK, exists now: {os.path.exists(dest)}", flush=True)
         except Exception as e:
+            print(f"[fork-clone] rmtree failed: {e}", flush=True)
             return {"success": False, "message": f"Could not remove existing folder: {e}"}
 
     # Detect the authenticated GitHub username
@@ -748,6 +753,8 @@ def api_local_copy(body):
     force = body.get("force", False)
     dest = os.path.join(dest_parent, project_name)
 
+    print(f"[local-copy] dest={dest!r} force={force!r} type={type(force).__name__}", flush=True)
+
     # Validate prerequisites BEFORE touching the filesystem
     # The repo was already extracted to a temp dir by setup.sh
     # That path is passed as an env var
@@ -766,9 +773,12 @@ def api_local_copy(body):
                 "dest": dest,
                 "message": f"A project folder already exists at: {dest}",
             }
+        print(f"[local-copy] removing {dest!r}", flush=True)
         try:
             shutil.rmtree(dest)
+            print(f"[local-copy] removed OK, exists now: {os.path.exists(dest)}", flush=True)
         except Exception as e:
+            print(f"[local-copy] rmtree failed: {e}", flush=True)
             return {"success": False, "message": f"Could not remove existing folder: {e}"}
 
     try:

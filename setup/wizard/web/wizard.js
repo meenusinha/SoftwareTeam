@@ -422,11 +422,10 @@ async function forkAndClone(force = false) {
   btn.innerHTML = '<span class="spinner"></span> Forking & Cloning...';
   btn.disabled = true;
 
-  const result = await api('/api/github/fork-clone', {
-    path: state.projectPath,
-    project_name: projectName,
-    force,
-  });
+  const payload = { path: state.projectPath, project_name: projectName, force: force };
+  console.log('[forkAndClone] sending:', JSON.stringify(payload));
+  const result = await api('/api/github/fork-clone', payload);
+  console.log('[forkAndClone] result:', JSON.stringify(result));
 
   if (result.success) {
     state.projectPath = result.project_path;
@@ -451,11 +450,10 @@ async function copyLocal(force = false) {
   btn.innerHTML = '<span class="spinner"></span> Copying files...';
   btn.disabled = true;
 
-  const result = await api('/api/local/copy', {
-    path: state.projectPath,
-    project_name: projectName,
-    force,
-  });
+  const payload = { path: state.projectPath, project_name: projectName, force: force };
+  console.log('[copyLocal] sending:', JSON.stringify(payload));
+  const result = await api('/api/local/copy', payload);
+  console.log('[copyLocal] result:', JSON.stringify(result));
 
   if (result.success) {
     state.projectPath = result.project_path;
