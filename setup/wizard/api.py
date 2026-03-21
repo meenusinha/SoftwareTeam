@@ -46,6 +46,7 @@ def handle_api(path, body=None):
         "/api/prerequisites/install": api_prerequisites_install,
         "/api/install/start": api_install_start,
         "/api/install/log": api_install_log,
+        "/api/install/needs-sudo": api_install_needs_sudo,
         "/api/github/auth-status": api_github_auth_status,
         "/api/github/login": api_github_login,
         "/api/github/token": api_github_token,
@@ -132,13 +133,47 @@ def api_prerequisites_install(body):
 
 # --- Background Install Jobs ---
 
+def _sudo_authorize(password, log_lines=None):
+    """Validate sudo password and cache the ticket. Returns True on success."""
+    import subprocess
+    from setup.wizard.utils.shell import _get_env
+    result = subprocess.run(
+        ["sudo", "-S", "-v"],
+        input=password + "\n",
+        capture_output=True,
+        text=True,
+        timeout=15,
+        env=_get_env(),
+    )
+    if log_lines is not None and result.returncode != 0:
+        log_lines.append("[error] sudo: incorrect password or sudo not available")
+    return result.returncode == 0
+
+
+def _sudo_keep_alive(password, stop_event):
+    """Refresh sudo ticket every 4 minutes so long installs don't lose auth."""
+    import subprocess
+    import time
+    from setup.wizard.utils.shell import _get_env
+    while not stop_event.wait(240):
+        subprocess.run(
+            ["sudo", "-S", "-v"],
+            input=password + "\n",
+            capture_output=True,
+            text=True,
+            timeout=10,
+            env=_get_env(),
+        )
+
+
 def api_install_start(body):
     """Start an installation in a background thread and return a job_id for polling.
 
-    body: {"kind": "prerequisite"|"tool", "tool": "<name>"}
+    body: {"kind": "prerequisite"|"tool", "tool": "<name>", "sudo_password": "<pass>" (Linux only)}
     """
     kind = body.get("kind")
     tool = body.get("tool")
+    sudo_password = body.get("sudo_password", "").strip()
     installer = _get_installer()
 
     if kind == "prerequisite":
@@ -155,12 +190,34 @@ def api_install_start(body):
     else:
         return {"success": False, "message": f"Unknown kind: {kind}"}
 
+    # On Linux, check if sudo is needed and validate the password if provided
+    info = get_os_info()
+    if info.get("os") == "linux":
+        from setup.wizard.installers.linux import _sudo
+        needs_sudo = _sudo() == "sudo "
+        if needs_sudo and not sudo_password:
+            return {"success": False, "message": "sudo password is required to install packages on this system."}
+        if needs_sudo and sudo_password:
+            if not _sudo_authorize(sudo_password):
+                return {"success": False, "message": "Incorrect sudo password. Please try again."}
+
     job_id = str(uuid.uuid4())[:8]
     job = {"lines": [], "done": False, "success": False, "message": "", "error_log": ""}
     _jobs[job_id] = job
 
     def run_job():
+        import time as _time
         from setup.wizard.utils.shell import set_log_context, clear_log_context
+
+        stop_event = threading.Event()
+        # Keep sudo ticket alive for long installs (ticket normally expires in 5-15 min)
+        if sudo_password:
+            _sudo_authorize(sudo_password, job["lines"])
+            t_refresh = threading.Thread(
+                target=_sudo_keep_alive, args=(sudo_password, stop_event), daemon=True
+            )
+            t_refresh.start()
+
         set_log_context(job["lines"])
         try:
             result = fn()
@@ -172,11 +229,21 @@ def api_install_start(body):
             job["message"] = str(e)
             job["error_log"] = str(e)
         finally:
+            stop_event.set()
             clear_log_context()
             job["done"] = True
 
     threading.Thread(target=run_job, daemon=True).start()
     return {"job_id": job_id}
+
+
+def api_install_needs_sudo():
+    """Return whether sudo password is needed on this system."""
+    info = get_os_info()
+    if info.get("os") != "linux":
+        return {"needs_sudo": False}
+    from setup.wizard.installers.linux import _sudo
+    return {"needs_sudo": _sudo() == "sudo "}
 
 
 def api_install_log(params):

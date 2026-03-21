@@ -1,9 +1,36 @@
 """Linux-specific installation logic."""
 
 import os
+import subprocess
 
-from setup.wizard.utils.shell import run, launch, is_installed
+from setup.wizard.utils.shell import run, launch, is_installed, _get_env
 from setup.wizard.utils.os_detect import get_os_info
+
+
+def _sudo():
+    """Return 'sudo ' prefix only when needed.
+
+    Returns '' if already running as root (uid 0) or if passwordless sudo
+    is available (sudo -n). Returns 'sudo ' otherwise so the caller prompts
+    for a password via the wizard UI.
+    """
+    try:
+        if os.getuid() == 0:
+            return ""
+    except AttributeError:
+        pass  # Windows — shouldn't happen in linux.py
+
+    # Check passwordless sudo
+    result = subprocess.run(
+        ["sudo", "-n", "true"],
+        capture_output=True,
+        timeout=5,
+        env=_get_env(),
+    )
+    if result.returncode == 0:
+        return ""
+
+    return "sudo "
 
 
 def _find_vscode_cmd():
@@ -64,16 +91,17 @@ def _pkg_install(packages):
     info = get_os_info()
     mgr = info.get("pkg_manager")
 
+    s = _sudo()
     if mgr == "apt":
-        cmd = f"sudo apt update && sudo apt install -y {packages.get('apt', '')}"
+        cmd = f"{s}apt update && {s}apt install -y {packages.get('apt', '')}"
     elif mgr == "dnf":
-        cmd = f"sudo dnf install -y {packages.get('dnf', '')}"
+        cmd = f"{s}dnf install -y {packages.get('dnf', '')}"
     elif mgr == "yum":
-        cmd = f"sudo yum install -y {packages.get('yum', packages.get('dnf', ''))}"
+        cmd = f"{s}yum install -y {packages.get('yum', packages.get('dnf', ''))}"
     elif mgr == "pacman":
-        cmd = f"sudo pacman -S --noconfirm {packages.get('pacman', '')}"
+        cmd = f"{s}pacman -S --noconfirm {packages.get('pacman', '')}"
     elif mgr == "zypper":
-        cmd = f"sudo zypper install -y {packages.get('zypper', '')}"
+        cmd = f"{s}zypper install -y {packages.get('zypper', '')}"
     else:
         return {"success": False, "message": "No supported package manager found", "error_log": f"Detected package manager: {mgr}"}
 
@@ -106,23 +134,24 @@ def install_gh():
     info = get_os_info()
     mgr = info.get("pkg_manager")
 
+    s = _sudo()
     if mgr == "apt":
         # Official gh repo for Debian/Ubuntu
         cmds = (
-            "type -p curl >/dev/null || sudo apt install curl -y && "
+            f"type -p curl >/dev/null || {s}apt install curl -y && "
             "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | "
-            "sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && "
-            "sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && "
+            f"{s}dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && "
+            f"{s}chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && "
             'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] '
             'https://cli.github.com/packages stable main" | '
-            "sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && "
-            "sudo apt update && sudo apt install gh -y"
+            f"{s}tee /etc/apt/sources.list.d/github-cli.list > /dev/null && "
+            f"{s}apt update && {s}apt install gh -y"
         )
         result = run(cmds, timeout=600)
     elif mgr == "dnf":
-        result = run("sudo dnf install -y gh", timeout=300)
+        result = run(f"{s}dnf install -y gh", timeout=300)
     elif mgr == "pacman":
-        result = run("sudo pacman -S --noconfirm github-cli", timeout=300)
+        result = run(f"{s}pacman -S --noconfirm github-cli", timeout=300)
     else:
         return {"success": False, "message": f"Cannot auto-install gh: package manager '{mgr}' is not yet supported.", "error_log": f"Detected pkg manager: {mgr}"}
 
@@ -241,19 +270,20 @@ def _install_vscode():
     info = get_os_info()
     mgr = info.get("pkg_manager")
 
+    s = _sudo()
     if mgr == "apt":
         cmds = (
             "curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/ms.gpg && "
-            "sudo install -o root -g root -m 644 /tmp/ms.gpg /etc/apt/trusted.gpg.d/ && "
+            f"{s}install -o root -g root -m 644 /tmp/ms.gpg /etc/apt/trusted.gpg.d/ && "
             'echo "deb [arch=amd64] https://packages.microsoft.com/repos/code stable main" | '
-            "sudo tee /etc/apt/sources.list.d/vscode.list && "
-            "sudo apt update && sudo apt install -y code"
+            f"{s}tee /etc/apt/sources.list.d/vscode.list && "
+            f"{s}apt update && {s}apt install -y code"
         )
         result = run(cmds, timeout=300)
     elif mgr == "dnf":
-        result = run("sudo dnf install -y code", timeout=120)
+        result = run(f"{s}dnf install -y code", timeout=120)
     elif mgr == "pacman":
-        result = run("sudo pacman -S --noconfirm code", timeout=120)
+        result = run(f"{s}pacman -S --noconfirm code", timeout=120)
     else:
         return {"success": False, "message": "Please install VS Code manually from https://code.visualstudio.com"}
 
@@ -282,19 +312,20 @@ def _install_vscode_only():
     info = get_os_info()
     mgr = info.get("pkg_manager")
 
+    s = _sudo()
     if mgr == "apt":
         cmds = (
             "curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/ms.gpg && "
-            "sudo install -o root -g root -m 644 /tmp/ms.gpg /etc/apt/trusted.gpg.d/ && "
+            f"{s}install -o root -g root -m 644 /tmp/ms.gpg /etc/apt/trusted.gpg.d/ && "
             'echo "deb [arch=amd64] https://packages.microsoft.com/repos/code stable main" | '
-            "sudo tee /etc/apt/sources.list.d/vscode.list && "
-            "sudo apt update && sudo apt install -y code"
+            f"{s}tee /etc/apt/sources.list.d/vscode.list && "
+            f"{s}apt update && {s}apt install -y code"
         )
         result = run(cmds, timeout=300)
     elif mgr == "dnf":
-        result = run("sudo dnf install -y code", timeout=120)
+        result = run(f"{s}dnf install -y code", timeout=120)
     elif mgr == "pacman":
-        result = run("sudo pacman -S --noconfirm code", timeout=120)
+        result = run(f"{s}pacman -S --noconfirm code", timeout=120)
     else:
         return {"success": False, "message": "Please install VS Code manually from https://code.visualstudio.com"}
 

@@ -142,6 +142,11 @@ async function initWelcome() {
 
 // Screen 2: Prerequisites
 async function initPrerequisites() {
+  // Show sudo prompt only when actually needed
+  const sudoCheck = await api('/api/install/needs-sudo');
+  state.needsSudo = sudoCheck.needs_sudo || false;
+  const sudoPrompt = document.getElementById('prereq-sudo-prompt');
+  if (sudoPrompt) sudoPrompt.style.display = state.needsSudo ? '' : 'none';
   await refreshPrerequisites();
 }
 
@@ -249,10 +254,19 @@ async function installPrerequisite(tool) {
   }, 1000);
   btn.textContent = 'Installing...';
 
-  const startRes = await api('/api/install/start', { kind: 'prerequisite', tool });
+  const sudoPassword = state.needsSudo
+    ? (document.getElementById('prereq-sudo-input') || {}).value || ''
+    : '';
+
+  const startRes = await api('/api/install/start', { kind: 'prerequisite', tool, sudo_password: sudoPassword });
   if (!startRes.job_id) {
     clearInterval(timer);
-    showAlert('prereq-alerts', startRes.message || 'Failed to start installation.', 'danger');
+    const hint = document.getElementById('prereq-sudo-hint');
+    if (hint && startRes.message && startRes.message.toLowerCase().includes('sudo')) {
+      hint.textContent = startRes.message;
+    } else {
+      showAlert('prereq-alerts', startRes.message || 'Failed to start installation.', 'danger');
+    }
     btn.textContent = origText;
     btn.disabled = false;
     return;
@@ -622,12 +636,16 @@ async function selectTool(id) {
     installBtn.disabled = true;
     launchBtn.style.display = '';
     nextBtn.disabled = false;
+    const sudoPrompt = document.getElementById('tool-sudo-prompt');
+    if (sudoPrompt) sudoPrompt.style.display = 'none';
   } else {
     showAlert('tool-alerts', '', 'info');
     installBtn.textContent = 'Install';
     installBtn.disabled = false;
     launchBtn.style.display = 'none';
     nextBtn.disabled = true;
+    const sudoPrompt = document.getElementById('tool-sudo-prompt');
+    if (sudoPrompt) sudoPrompt.style.display = state.needsSudo ? '' : 'none';
   }
 }
 
@@ -647,10 +665,19 @@ async function installTool() {
   }, 1000);
   btn.innerHTML = '<span class="spinner"></span> Installing...';
 
-  const startRes = await api('/api/install/start', { kind: 'tool', tool: state.selectedTool });
+  const sudoPassword = state.needsSudo
+    ? (document.getElementById('tool-sudo-input') || {}).value || ''
+    : '';
+
+  const startRes = await api('/api/install/start', { kind: 'tool', tool: state.selectedTool, sudo_password: sudoPassword });
   if (!startRes.job_id) {
     clearInterval(timer);
-    showAlert('tool-alerts', startRes.message || 'Failed to start installation.', 'danger');
+    const hint = document.getElementById('tool-sudo-hint');
+    if (hint && startRes.message && startRes.message.toLowerCase().includes('sudo')) {
+      hint.textContent = startRes.message;
+    } else {
+      showAlert('tool-alerts', startRes.message || 'Failed to start installation.', 'danger');
+    }
     btn.textContent = 'Retry';
     btn.disabled = false;
     return;

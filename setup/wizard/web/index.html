@@ -106,6 +106,14 @@
         </div>
       </div>
 
+      <div id="prereq-sudo-prompt" style="display:none; margin-top:14px">
+        <div class="sudo-prompt-label">&#128274; This requires sudo. Enter your system password:</div>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:6px">
+          <input type="password" id="prereq-sudo-input" class="sudo-input" placeholder="sudo password" autocomplete="current-password">
+          <span id="prereq-sudo-hint" class="sudo-hint"></span>
+        </div>
+      </div>
+
       <div class="log-box-wrapper" id="prereq-log-box" style="display:none">
         <div class="log-box-header">
           <span>&#128196; Installation Log</span>
@@ -359,6 +367,14 @@
       <div style="margin:20px 0; display:flex; gap:12px; flex-wrap:wrap">
         <button class="btn btn-primary" id="install-tool-btn" onclick="installTool()" disabled>Install</button>
         <button class="btn btn-success" id="launch-tool-btn" onclick="launchTool()" style="display:none">Launch</button>
+      </div>
+
+      <div id="tool-sudo-prompt" style="display:none; margin-top:14px">
+        <div class="sudo-prompt-label">&#128274; This requires sudo. Enter your system password:</div>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:6px">
+          <input type="password" id="tool-sudo-input" class="sudo-input" placeholder="sudo password" autocomplete="current-password">
+          <span id="tool-sudo-hint" class="sudo-hint"></span>
+        </div>
       </div>
 
       <div class="log-box-wrapper" id="tool-log-box" style="display:none">
