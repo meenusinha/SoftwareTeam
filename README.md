@@ -1,4 +1,4 @@
-# SoftwareTeam 
+# SoftwareTeam - Turn any AI tool into a structured software team—using simple markdown files.
 ### An AI-powered software team that turns your idea into a working system.
 
 - **Give it a task** - Your agentic team plans, designs, and builds it automatically in your AI tool.
@@ -6,7 +6,7 @@
 - **Predefined AI agents** work out-of-the-box, or **use this as a template** to customize your workflows.
 [Pixel based animation makes AI collaboration feel alive and tangible.]
 
-## SoftwareTeam comes with predefined AI agents that mimic the workflow of a real software team: ##
+## SoftwareTeam comes with predefined AI agents prompts that mimic the workflow of a software team: ##
 
 - **Product Owner**: Customer-facing, gathers requirements, creates user stories
 - **Architect**: Designs systems and creates technical specifications
@@ -23,18 +23,60 @@ https://github.com/meenusinha/SoftwareTeam
 
 ---
 
+# Why not just use Claude, ChatGPT, Cursor, or Copilot?
+
+Those tools are powerful—but they are unstructured:
+ - You rely on prompts for each step
+ - You manually guide the entire process
+ - There is no built-in collaboration between roles
+ - Outputs vary depending on how you prompt
+
+SoftwareTeam gives you a system, not just AI
+ - A repeatable development workflow
+ - Specialized AI roles (Product Owner, Architect, Developer, Tester)
+ - Structured outputs at each stage
+ - Collaborative AI agents working together
+ - Consistent results across projects
+
+## The key idea
+
+It’s just markdown files.
+
+But those files define:
+
+- how your AI works
+- how it collaborates
+- how it builds software
+
+## The difference
+
+- With Cursor/Claude/etc: You are the system.
+
+- With SoftwareTeam: The system runs for you.
+
+## The result
+- No complex setup
+- No new platform to learn
+- Works with your existing AI tools
+
+**You don’t just talk to AI.**
+**You run a structured AI-powered software team.**
+
+“This is what you would build if AI tools already worked together like a real software team.”
 
 # Why SoftwareTeam?
 
 Modern AI tools can generate code—but they often lack structure, documentation, long term vision, and control.
 
-SoftwareTeam changes that by introducing a collaborative agent workflow:
+SoftwareTeam changes that by introducing a collaborative agent workflow only using prompts and markdown files:
 
 - Multiple AI agents work together like a real software team
 - Each agent produces work that is documentated, reviewed and approved before moving forward
 - You stay in control by final review/approval while agents handle execution
 - The system enables action-driven progress, with agents asking the necessary “what”, “how”, and “why” questions along the way when necessary
+- It maintains consistency across runs
 - Frees you for other important tasks while the agentic system manages coordination
+
 
 ## Features
 
