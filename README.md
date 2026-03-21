@@ -107,9 +107,9 @@ cd my-softwareTeam
 cp ai-assistants/provider-setup/config.template.json ai-assistants/provider-setup/config.json
 
 # Linux/macOS:
-export ANTHROPIC_API_KEY="your-api-key"  # or GOOGLE_API_KEY or OPENAI_API_KEY
-# Windows (PowerShell): $env:ANTHROPIC_API_KEY = "your-api-key"
-# Windows (CMD): set ANTHROPIC_API_KEY=your-api-key
+export LLM_API_KEY="your-api-key"  # provider api key e.g., anthropic, gemini etc
+# Windows (PowerShell): $env:LLM_API_KEY = "your-api-key"
+# Windows (CMD): set LLM_API_KEY=your-api-key
 
 # 3. Start your AI tool and describe what you want to build
 claude           # For Claude Code (recommended)
@@ -228,8 +228,8 @@ git push -u origin main
 ### Anthropic Claude (Recommended)
 ```bash
 # Linux/macOS:
-export ANTHROPIC_API_KEY="sk-ant-..."
-# Windows (PowerShell): $env:ANTHROPIC_API_KEY = "sk-ant-..."
+export LLM_API_KEY="sk-ant-..."
+# Windows (PowerShell): $env:LLM_API_KEY = "sk-ant-..."
 
 npm install -g @anthropic-ai/claude-code
 claude
@@ -238,8 +238,8 @@ claude
 ### Google Gemini
 ```bash
 # Linux/macOS:
-export GOOGLE_API_KEY="your-key-here"
-# Windows (PowerShell): $env:GOOGLE_API_KEY = "your-key-here"
+export LLM_API_KEY="your-key-here"
+# Windows (PowerShell): $env:LLM_API_KEY = "your-key-here"
 
 pip install aider-chat
 aider --model gemini/gemini-1.5-pro-latest
@@ -248,8 +248,8 @@ aider --model gemini/gemini-1.5-pro-latest
 ### OpenAI (GPT-4)
 ```bash
 # Linux/macOS:
-export OPENAI_API_KEY="sk-..."
-# Windows (PowerShell): $env:OPENAI_API_KEY = "sk-..."
+export LLM_API_KEY="your-key-here"
+# Windows (PowerShell): $env:LLM_API_KEY = "sk-..."
 
 pip install aider-chat
 aider
@@ -257,7 +257,7 @@ aider
 
 See `ai-assistants/provider-setup/README.md` for detailed setup instructions.
 
-## Customization
+## Optional Customization 
 
 1. **Configure your AI provider** - Edit `ai-assistants/provider-setup/config.json`
 2. **Add domain expertise** - Update agent files in `ai-assistants/agents/`
@@ -273,4 +273,4 @@ See `ai-assistants/provider-setup/README.md` for detailed setup instructions.
 
 ## License
 
-[Add your license here]
+[MIT License](LICENSE)

@@ -459,7 +459,7 @@ Just update the `LLM_PROVIDER` secret in GitHub - no code changes needed!
 # Example: Switch from OpenAI to Claude
 # In GitHub: Settings → Secrets → Actions
 # Edit LLM_PROVIDER: change "openai" to "anthropic"
-# Edit LLM_API_KEY: change to your Anthropic key
+# Edit LLM_API_KEY: change to your provider (e.g., Anthropic) key
 ```
 
 ---

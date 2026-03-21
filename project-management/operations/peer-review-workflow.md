@@ -74,7 +74,7 @@ Agents review each other's work:
 
 ### Two-Phase Review
 
-1. **Phase 1 - Peer Review**: Agents review each other (2-3 approvals required)
+1. **Phase 1 - Peer Review**: Agents review each other (2 approvals required)
 2. **Phase 2 - User Review**: After peer approval, user reviews and merges
 
 **Critical**: User review happens **only after** peer approvals are obtained.
@@ -96,11 +96,11 @@ Examples:
 
 | PR Author | Required Reviewers | Minimum Approvals |
 |-----------|-------------------|-------------------|
-| **Developer** | Product Owner, Architect, Tester | 3 |
+| **Developer** | Product Owner, Architect, Tester | 2 |
 | **Architect** | Product Owner, Developer | 2 |
 | **Tester** | Product Owner, Developer | 2 |
 | **IT** | Product Owner, Architect | 2 |
-| **Product Owner** | Architect, Developer, Tester | 3 |
+| **Product Owner** | Architect, Developer, Tester | 2 |
 
 ### Rationale
 

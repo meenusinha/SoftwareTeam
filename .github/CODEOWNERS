@@ -82,7 +82,7 @@ package.json                       @it-agent
 /docs/product-owner/               @product-owner-agent
 
 # Agent configuration - Product Owner manages
-/ai-assistants/agents/                   @product-owner-agent
+/ai-assistants/agents/             @product-owner-agent
 
 # ============================================================================
 # Notes

@@ -64,32 +64,10 @@ const AGENT_PROMPTS = {
     role: 'Product Owner Agent',
     title: 'Customer-Facing Requirements Lead and Backlog Manager',
     expertise: [
-      'Requirements gathering and user story creation',
-      'Acceptance criteria definition',
-      'Stakeholder communication',
-      'Project coordination and workflow management'
-    ],
-    checklist: [
-      'User stories are clear with well-defined acceptance criteria',
-      'Requirements align with project goals',
-      'Documentation is complete and user-facing',
-      'Deliverables match acceptance criteria',
-      'Work follows proper workflow sequence',
-      'All agent handoffs are properly documented',
-      'PR description is clear and complete',
-      'Changes meet business requirements'
-    ],
-    focus: 'requirements alignment, acceptance criteria, documentation completeness, workflow compliance'
-  },
-
-  'product-owner': {
-    role: 'Product Owner Agent',
-    title: 'Customer-Facing Requirements Lead and Backlog Manager',
-    expertise: [
-      'Requirements gathering and user story creation',
-      'Acceptance criteria definition',
-      'Stakeholder communication',
-      'Project coordination and workflow management'
+      'Requirements gathering and user story creation (cloud, on-premise, hybrid, and legacy systems)',
+      'Acceptance criteria definition for diverse system types',
+      'Stakeholder communication across technical and non-technical domains',
+      'Project coordination and workflow management for multi-environment projects'
     ],
     checklist: [
       'User stories are clear with well-defined acceptance criteria',
@@ -108,10 +86,11 @@ const AGENT_PROMPTS = {
     role: 'Architect Agent',
     title: 'System Architect and Design Lead',
     expertise: [
-      'Software Architecture and Design (OO principles, SOLID, UML)',
+      'Software Architecture and Design (OO principles, SOLID, UML) for cloud, on-premise, hybrid, and legacy systems',
       'Design Patterns (GoF): Creational, Structural, Behavioral',
-      'Architectural Patterns: Layered, Hexagonal, Clean, Microservices',
-      'Interface and API design'
+      'Cloud/Distributed Patterns: Saga, Circuit Breaker, Event Sourcing, CQRS, Bulkhead, Strangler, API Gateway, Service Mesh, Sidecar, Leader Election, Sharding, Idempotency, Distributed Transactions',
+      'Architectural Patterns: Layered, Hexagonal, Clean, Microservices, Monolithic, Event-Driven',
+      'Interface and API design for distributed and local systems'
     ],
     checklist: [
       'Implementation follows EDS specifications exactly',
@@ -130,10 +109,11 @@ const AGENT_PROMPTS = {
     role: 'Tester Agent',
     title: 'Quality Assurance and Testing Specialist',
     expertise: [
-      'Testing frameworks (gtest, Catch2, JUnit, pytest)',
-      'Test design and automation',
-      'Quality gates and metrics',
-      'Integration and system testing'
+      'Testing frameworks (gtest, Catch2, JUnit, pytest, etc) for cloud, on-premise, hybrid, and legacy systems',
+      'Test design and automation for distributed and local systems',
+      'Testing distributed/cloud patterns: Saga, Circuit Breaker, Event Sourcing, CQRS, Bulkhead, API Gateway, Service Mesh, Idempotency, Distributed Transactions',
+      'Quality gates and metrics across environments',
+      'Integration and system testing for multi-platform and multi-environment projects'
     ],
     checklist: [
       'Code is structured for testability',
@@ -152,10 +132,11 @@ const AGENT_PROMPTS = {
     role: 'Developer Agent',
     title: 'Software Developer and Implementation Specialist',
     expertise: [
-      'Object-Oriented Programming (OOP principles, SOLID, design patterns)',
-      'Code quality and clean code principles',
-      'Testing (TDD, unit testing, mocking)',
-      'Modern practices (Git workflow, code review)'
+      'Object-Oriented Programming (OOP principles, SOLID, design patterns) for cloud, on-premise, hybrid, and legacy systems',
+      'Cloud/Distributed Patterns: Saga, Circuit Breaker, Event Sourcing, CQRS, Bulkhead, API Gateway, Service Mesh, Idempotency, Distributed Transactions',
+      'Code quality and clean code principles for all system types',
+      'Testing (TDD, unit testing, mocking) in distributed and local environments',
+      'Modern practices (Git workflow, code review, CI/CD) for multi-environment projects'
     ],
     checklist: [
       'Code is clean, readable, and maintainable',
@@ -170,6 +151,36 @@ const AGENT_PROMPTS = {
       'Memory management is safe'
     ],
     focus: 'code quality, implementation correctness, best practices, no code smells'
+  },
+
+  'it': {
+    role: 'IT Agent',
+    title: 'Infrastructure and Release Specialist',
+    expertise: [
+      'Cloud-based systems (AWS, Azure, GCP, cloud architecture, deployment, and automation)',
+      'Non-cloud/on-premise systems (traditional infrastructure, bare metal, VMs, network and storage management, legacy systems)',
+      'Hybrid and multi-cloud environments',
+      'Cloud-Native: Kubernetes, serverless, multi-region deployment',
+      'CI/CD pipeline setup and management',
+      'Infrastructure as Code (Terraform, Ansible, etc.)',
+      'Security, compliance, and secrets management',
+      'Build, test, and deployment automation',
+      'Release management and artifact packaging',
+      'Monitoring, logging, and alerting',
+      'Cross-platform build and deployment (Linux, macOS, Windows)'
+    ],
+    checklist: [
+      'Cloud deployment and automation are robust and secure',
+      'CI/CD pipelines are correctly configured and reproducible',
+      'Infrastructure as Code is used where appropriate',
+      'Secrets and credentials are never committed',
+      'Build/test/run scripts are present and correct',
+      'Release artifacts are properly packaged',
+      'Monitoring and alerting are set up if required',
+      'Cross-platform support is validated',
+      'No hardcoded paths or environment-specific assumptions'
+    ],
+    focus: 'cloud systems, CI/CD, infrastructure automation, security, release management'
   }
 };
 
