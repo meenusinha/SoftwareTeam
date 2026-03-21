@@ -427,9 +427,10 @@ async function forkAndClone(force = false) {
   const result = await api('/api/github/fork-clone', payload);
   console.log('[forkAndClone] result:', JSON.stringify(result));
 
+  const dbgHtml = result._debug ? `<br><small style="font-family:monospace;color:#888">debug: ${JSON.stringify(result._debug)}</small>` : '';
   if (result.success) {
     state.projectPath = result.project_path;
-    showAlert('clone-alerts', `${result.message}<br><small style="color:var(--text-muted)">Repository context configured for PR creation.</small>`, 'success');
+    showAlert('clone-alerts', `${result.message}${dbgHtml}<br><small style="color:var(--text-muted)">Repository context configured for PR creation.</small>`, 'success');
     document.getElementById('clone-next').disabled = false;
     btn.textContent = '✓ Forked & Cloned';
   } else if (result.exists) {
@@ -437,7 +438,7 @@ async function forkAndClone(force = false) {
     btn.textContent = 'Fork & Clone';
     btn.disabled = false;
   } else {
-    showAlert('clone-alerts', result.message, 'danger');
+    showAlert('clone-alerts', result.message + dbgHtml, 'danger');
     btn.textContent = 'Fork & Clone';
     btn.disabled = false;
   }
@@ -455,9 +456,10 @@ async function copyLocal(force = false) {
   const result = await api('/api/local/copy', payload);
   console.log('[copyLocal] result:', JSON.stringify(result));
 
+  const dbgHtml = result._debug ? `<br><small style="font-family:monospace;color:#888">debug: ${JSON.stringify(result._debug)}</small>` : '';
   if (result.success) {
     state.projectPath = result.project_path;
-    showAlert('local-alerts', result.message, 'success');
+    showAlert('local-alerts', result.message + dbgHtml, 'success');
     document.getElementById('local-next').disabled = false;
     btn.textContent = '✓ Copied';
   } else if (result.exists) {
@@ -465,7 +467,7 @@ async function copyLocal(force = false) {
     btn.textContent = 'Copy Project Files';
     btn.disabled = false;
   } else {
-    showAlert('local-alerts', result.message, 'danger');
+    showAlert('local-alerts', result.message + dbgHtml, 'danger');
     btn.textContent = 'Copy Project Files';
     btn.disabled = false;
   }

@@ -461,12 +461,13 @@ def api_github_fork_clone(body):
     project_name = body.get("project_name", REPO_NAME)
     force = body.get("force", False)
     dest = os.path.join(dest_parent, project_name)
+    _dbg = {"received_force": force, "force_type": type(force).__name__, "dest": dest}
 
     print(f"[fork-clone] dest={dest!r} force={force!r} type={type(force).__name__}", flush=True)
 
     # Validate prerequisites BEFORE touching the filesystem
     if not is_installed("gh"):
-        return {"success": False, "message": "GitHub CLI is required for fork & clone"}
+        return {"success": False, "message": "GitHub CLI is required for fork & clone", "_debug": _dbg}
 
     if os.path.exists(dest):
         if not force:
@@ -475,14 +476,20 @@ def api_github_fork_clone(body):
                 "exists": True,
                 "dest": dest,
                 "message": f"A project folder already exists at: {dest}",
+                "_debug": _dbg,
             }
         print(f"[fork-clone] removing {dest!r}", flush=True)
         try:
             shutil.rmtree(dest)
+            _dbg["rmtree_called"] = True
+            _dbg["dest_exists_after_rmtree"] = os.path.exists(dest)
             print(f"[fork-clone] removed OK, exists now: {os.path.exists(dest)}", flush=True)
         except Exception as e:
             print(f"[fork-clone] rmtree failed: {e}", flush=True)
-            return {"success": False, "message": f"Could not remove existing folder: {e}"}
+            return {"success": False, "message": f"Could not remove existing folder: {e}", "_debug": _dbg}
+    else:
+        _dbg["rmtree_called"] = False
+        _dbg["reason"] = "dest did not exist"
 
     # Detect the authenticated GitHub username
     whoami = run("gh api user --jq .login", timeout=15)
@@ -557,6 +564,7 @@ def api_github_fork_clone(body):
         "message": f"Project cloned to {dest}",
         "project_path": dest,
         "admin_pat_secret": admin_pat_secret_result,
+        "_debug": _dbg,
     }
 
 
@@ -752,6 +760,7 @@ def api_local_copy(body):
     project_name = body.get("project_name", REPO_NAME)
     force = body.get("force", False)
     dest = os.path.join(dest_parent, project_name)
+    _dbg = {"received_force": force, "force_type": type(force).__name__, "dest": dest}
 
     print(f"[local-copy] dest={dest!r} force={force!r} type={type(force).__name__}", flush=True)
 
@@ -776,10 +785,15 @@ def api_local_copy(body):
         print(f"[local-copy] removing {dest!r}", flush=True)
         try:
             shutil.rmtree(dest)
+            _dbg["rmtree_called"] = True
+            _dbg["dest_exists_after_rmtree"] = os.path.exists(dest)
             print(f"[local-copy] removed OK, exists now: {os.path.exists(dest)}", flush=True)
         except Exception as e:
             print(f"[local-copy] rmtree failed: {e}", flush=True)
-            return {"success": False, "message": f"Could not remove existing folder: {e}"}
+            return {"success": False, "message": f"Could not remove existing folder: {e}", "_debug": _dbg}
+    else:
+        _dbg["rmtree_called"] = False
+        _dbg["reason"] = "dest did not exist"
 
     try:
         # 1. Copy base project (skip .git and setup/ dirs)
@@ -814,9 +828,10 @@ def api_local_copy(body):
             "success": True,
             "message": f"Project copied to {dest}",
             "project_path": dest,
+            "_debug": _dbg,
         }
     except Exception as e:
-        return {"success": False, "message": f"Copy failed: {str(e)}"}
+        return {"success": False, "message": f"Copy failed: {str(e)}", "_debug": _dbg}
 
 
 def _overlay_files(src_dir, dest_dir):
