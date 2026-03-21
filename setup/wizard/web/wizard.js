@@ -415,16 +415,16 @@ async function browsePath(targetInputId) {
   }
 }
 
-async function forkAndClone() {
+async function forkAndClone(force = false) {
   const btn = document.getElementById('fork-clone-btn');
   const projectName = document.getElementById('project-name-input').value.trim() || 'SoftwareTeam';
-  // Issue 6: Add spinner while forking/cloning
   btn.innerHTML = '<span class="spinner"></span> Forking & Cloning...';
   btn.disabled = true;
 
   const result = await api('/api/github/fork-clone', {
     path: state.projectPath,
     project_name: projectName,
+    force,
   });
 
   if (result.success) {
@@ -432,6 +432,10 @@ async function forkAndClone() {
     showAlert('clone-alerts', `${result.message}<br><small style="color:var(--text-muted)">Repository context configured for PR creation.</small>`, 'success');
     document.getElementById('clone-next').disabled = false;
     btn.textContent = '✓ Forked & Cloned';
+  } else if (result.exists) {
+    showReplaceConfirm('clone-alerts', result.dest, () => forkAndClone(true));
+    btn.textContent = 'Fork & Clone';
+    btn.disabled = false;
   } else {
     showAlert('clone-alerts', result.message, 'danger');
     btn.textContent = 'Fork & Clone';
@@ -440,16 +444,16 @@ async function forkAndClone() {
 }
 
 // Screen 5 (local): Copy files
-async function copyLocal() {
+async function copyLocal(force = false) {
   const btn = document.getElementById('local-copy-btn');
   const projectName = document.getElementById('local-project-name').value.trim() || 'SoftwareTeam';
-  // Issue 6: Add spinner while copying
   btn.innerHTML = '<span class="spinner"></span> Copying files...';
   btn.disabled = true;
 
   const result = await api('/api/local/copy', {
     path: state.projectPath,
     project_name: projectName,
+    force,
   });
 
   if (result.success) {
@@ -457,6 +461,10 @@ async function copyLocal() {
     showAlert('local-alerts', result.message, 'success');
     document.getElementById('local-next').disabled = false;
     btn.textContent = '✓ Copied';
+  } else if (result.exists) {
+    showReplaceConfirm('local-alerts', result.dest, () => copyLocal(true));
+    btn.textContent = 'Copy Project Files';
+    btn.disabled = false;
   } else {
     showAlert('local-alerts', result.message, 'danger');
     btn.textContent = 'Copy Project Files';
@@ -826,6 +834,22 @@ function showAlert(containerId, message, type) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+}
+
+function showReplaceConfirm(containerId, dest, onConfirm) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = `
+    <div class="alert alert-warning">
+      <strong>Folder already exists</strong><br>
+      <span style="word-break:break-all">${dest}</span><br><br>
+      Do you want to replace the existing project files?<br>
+      <small style="color:var(--text-muted)">This will delete the existing folder and replace it with a fresh copy.</small>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-danger btn-sm" onclick="(${onConfirm.toString()})()">Yes, Replace</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('${containerId}').innerHTML=''">Cancel</button>
+      </div>
+    </div>`;
 }
 
 function copyToClipboard(text) {

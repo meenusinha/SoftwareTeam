@@ -454,14 +454,23 @@ def api_github_token(body):
 def api_github_fork_clone(body):
     """Fork the template repo and clone to user's chosen location.
 
-    body: {"path": "/Users/me/Desktop", "project_name": "my-project"}
+    body: {"path": "/Users/me/Desktop", "project_name": "my-project", "force": false}
+    Pass force=true to replace an existing directory.
     """
     dest_parent = body.get("path", "")
     project_name = body.get("project_name", REPO_NAME)
+    force = body.get("force", False)
     dest = os.path.join(dest_parent, project_name)
 
     if os.path.exists(dest):
-        return {"success": False, "message": f"Directory already exists: {dest}"}
+        if not force:
+            return {
+                "success": False,
+                "exists": True,
+                "dest": dest,
+                "message": f"A project folder already exists at: {dest}",
+            }
+        shutil.rmtree(dest)
 
     if not is_installed("gh"):
         return {"success": False, "message": "GitHub CLI is required for fork & clone"}
@@ -727,14 +736,23 @@ def api_local_copy(body):
     Copies the project, then overlays local-mode workflow files that remove
     all git/branch/PR instructions, and writes workflow-config.json.
 
-    body: {"path": "/Users/me/Desktop", "project_name": "my-project"}
+    body: {"path": "/Users/me/Desktop", "project_name": "my-project", "force": false}
+    Pass force=true to replace an existing directory.
     """
     dest_parent = body.get("path", "")
     project_name = body.get("project_name", REPO_NAME)
+    force = body.get("force", False)
     dest = os.path.join(dest_parent, project_name)
 
     if os.path.exists(dest):
-        return {"success": False, "message": f"Directory already exists: {dest}"}
+        if not force:
+            return {
+                "success": False,
+                "exists": True,
+                "dest": dest,
+                "message": f"A project folder already exists at: {dest}",
+            }
+        shutil.rmtree(dest)
 
     # The repo was already extracted to a temp dir by setup.sh
     # That path is passed as an env var
