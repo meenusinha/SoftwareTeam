@@ -3,7 +3,7 @@
 # Setup Wizard - Mac & Linux Entry Point
 #
 # Usage (one-liner for users):
-#   curl -sL https://raw.githubusercontent.com/meenusinha/SoftwareTeam/setup/setup.sh | bash
+#   curl -sL https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.sh | bash
 #
 # What this script does:
 #   1. Detects OS (macOS vs Linux distro)
