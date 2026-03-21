@@ -15,6 +15,18 @@ const state = {
   selectedProvider: null,
 };
 
+// Global replace callback — stored here so inline onclick handlers can reach it
+// without relying on closure serialization via toString().
+let _replaceCallback = null;
+function _confirmReplace() {
+  if (_replaceCallback) { _replaceCallback(); _replaceCallback = null; }
+}
+function _cancelReplace(containerId) {
+  _replaceCallback = null;
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = '';
+}
+
 // --- API helpers ---
 
 async function api(path, body) {
@@ -837,6 +849,7 @@ function showAlert(containerId, message, type) {
 }
 
 function showReplaceConfirm(containerId, dest, onConfirm) {
+  _replaceCallback = onConfirm;
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = `
@@ -846,8 +859,8 @@ function showReplaceConfirm(containerId, dest, onConfirm) {
       Do you want to replace the existing project files?<br>
       <small style="color:var(--text-muted)">This will delete the existing folder and replace it with a fresh copy.</small>
       <div style="margin-top:10px;display:flex;gap:8px">
-        <button class="btn btn-danger btn-sm" onclick="(${onConfirm.toString()})()">Yes, Replace</button>
-        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('${containerId}').innerHTML=''">Cancel</button>
+        <button class="btn btn-danger btn-sm" onclick="_confirmReplace()">Yes, Replace</button>
+        <button class="btn btn-secondary btn-sm" onclick="_cancelReplace('${containerId}')">Cancel</button>
       </div>
     </div>`;
 }
