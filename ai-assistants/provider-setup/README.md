@@ -13,7 +13,6 @@ This directory contains configuration for your LLM (Large Language Model) provid
    # $env:LLM_API_KEY = "your-api-key-here"
    ```
 
-3. **Edit config.json** with your provider settings
 
 ## Supported Providers
 
@@ -149,7 +148,6 @@ set LLM_API_KEY=your-api-key-here   # Only LLM_API_KEY is required for this repo
 ## Security
 
 **Never commit API keys!** The following are gitignored:
-- `ai-assistants/provider-setup/config.json` (your actual config)
 - `.env` files
 - `*_key`, `*_token`, `*_secret` files
 - `.api_key`, `.llm_key`

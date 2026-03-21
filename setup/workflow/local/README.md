@@ -161,7 +161,7 @@ See `ai-assistants/provider-setup/README.md` for detailed setup instructions.
 
 ## Customization
 
-1. **Configure your AI provider** - Edit `ai-assistants/provider-setup/config.json`
+1. **Configure your AI provider** - Set your `LLM_API_KEY` environment variable (see `ai-assistants/provider-setup/README.md`)
 2. **Add domain expertise** - Update agent files in `ai-assistants/agents/`
 3. **Customize structure** - Modify directories for your project
 4. **Configure builds** - Add your build system
