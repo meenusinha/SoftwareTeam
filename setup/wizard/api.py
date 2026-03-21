@@ -8,6 +8,8 @@ import json
 import os
 import platform
 import shutil
+import threading
+import uuid
 
 from setup.wizard.utils.os_detect import get_os_info
 from setup.wizard.utils.shell import run, is_installed, get_version
@@ -16,6 +18,9 @@ from setup.wizard.utils.config import save_env_var, get_suggested_paths, browse_
 
 # Repository to fork/clone
 REPO_OWNER = "meenusinha"
+
+# Background install jobs: job_id -> {lines, done, success, message, error_log}
+_jobs = {}
 REPO_NAME = "SoftwareTeam"
 REPO_BRANCH = "main"
 
@@ -24,16 +29,23 @@ def handle_api(path, body=None):
     """Route an API request to the right handler.
 
     Args:
-        path: URL path (e.g., "/api/os-info")
+        path: URL path, optionally with query string (e.g., "/api/install/log?job_id=abc")
         body: Parsed JSON body for POST requests
 
     Returns:
         dict to be serialized as JSON response
     """
+    from urllib.parse import urlparse, parse_qs
+    parsed = urlparse(path)
+    route = parsed.path
+    params = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+
     routes = {
         "/api/os-info": api_os_info,
         "/api/prerequisites/status": api_prerequisites_status,
         "/api/prerequisites/install": api_prerequisites_install,
+        "/api/install/start": api_install_start,
+        "/api/install/log": api_install_log,
         "/api/github/auth-status": api_github_auth_status,
         "/api/github/login": api_github_login,
         "/api/github/token": api_github_token,
@@ -51,13 +63,15 @@ def handle_api(path, body=None):
         "/api/debug": api_debug,
     }
 
-    handler = routes.get(path)
+    handler = routes.get(route)
     if not handler:
-        return {"error": f"Unknown endpoint: {path}"}
+        return {"error": f"Unknown endpoint: {route}"}
 
     try:
         if body is not None:
             return handler(body)
+        elif params:
+            return handler(params)
         return handler()
     except Exception as e:
         return {"error": str(e)}
@@ -114,6 +128,74 @@ def api_prerequisites_install(body):
     elif tool == "gh":
         return installer.install_gh()
     return {"success": False, "message": f"Unknown tool: {tool}"}
+
+
+# --- Background Install Jobs ---
+
+def api_install_start(body):
+    """Start an installation in a background thread and return a job_id for polling.
+
+    body: {"kind": "prerequisite"|"tool", "tool": "<name>"}
+    """
+    kind = body.get("kind")
+    tool = body.get("tool")
+    installer = _get_installer()
+
+    if kind == "prerequisite":
+        if tool == "git":
+            fn = installer.install_git
+        elif tool == "gh":
+            fn = installer.install_gh
+        elif tool == "python-tk":
+            fn = installer.install_tkinter
+        else:
+            return {"success": False, "message": f"Unknown prerequisite: {tool}"}
+    elif kind == "tool":
+        fn = lambda: installer.install_ai_tool(tool)
+    else:
+        return {"success": False, "message": f"Unknown kind: {kind}"}
+
+    job_id = str(uuid.uuid4())[:8]
+    job = {"lines": [], "done": False, "success": False, "message": "", "error_log": ""}
+    _jobs[job_id] = job
+
+    def run_job():
+        from setup.wizard.utils.shell import set_log_context, clear_log_context
+        set_log_context(job["lines"])
+        try:
+            result = fn()
+            job["success"] = result.get("success", False)
+            job["message"] = result.get("message", "")
+            job["error_log"] = result.get("error_log", "")
+        except Exception as e:
+            job["success"] = False
+            job["message"] = str(e)
+            job["error_log"] = str(e)
+        finally:
+            clear_log_context()
+            job["done"] = True
+
+    threading.Thread(target=run_job, daemon=True).start()
+    return {"job_id": job_id}
+
+
+def api_install_log(params):
+    """Return accumulated log lines for a background install job.
+
+    params: {"job_id": "<id>"}
+    """
+    job_id = params.get("job_id", "")
+    job = _jobs.get(job_id)
+    if not job:
+        return {"error": "Job not found", "lines": [], "done": True,
+                "success": False, "message": "Job not found"}
+    return {
+        "lines": list(job["lines"]),
+        "done": job["done"],
+        "success": job["success"],
+        "message": job["message"],
+        "error_log": job.get("error_log", ""),
+    }
 
 
 # --- GitHub Account ---

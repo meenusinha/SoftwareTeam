@@ -106,11 +106,12 @@
         </div>
       </div>
 
-      <div id="prereq-error-log" style="display:none; margin-top:12px">
-        <details>
-          <summary style="cursor:pointer; color:var(--text-muted); font-size:13px; padding:4px 0">&#9660; Show error details</summary>
-          <pre id="prereq-error-content" class="error-log"></pre>
-        </details>
+      <div class="log-box-wrapper" id="prereq-log-box" style="display:none">
+        <div class="log-box-header">
+          <span>&#128196; Installation Log</span>
+          <button class="log-toggle-btn" onclick="toggleLogBox('prereq-log-box', 'prereq-log-content')">Hide</button>
+        </div>
+        <pre id="prereq-log-content" class="install-log"></pre>
       </div>
 
       <div class="btn-row">
@@ -358,6 +359,14 @@
       <div style="margin:20px 0; display:flex; gap:12px; flex-wrap:wrap">
         <button class="btn btn-primary" id="install-tool-btn" onclick="installTool()" disabled>Install</button>
         <button class="btn btn-success" id="launch-tool-btn" onclick="launchTool()" style="display:none">Launch</button>
+      </div>
+
+      <div class="log-box-wrapper" id="tool-log-box" style="display:none">
+        <div class="log-box-header">
+          <span>&#128196; Installation Log</span>
+          <button class="log-toggle-btn" onclick="toggleLogBox('tool-log-box', 'tool-log-content')">Hide</button>
+        </div>
+        <pre id="tool-log-content" class="install-log"></pre>
       </div>
 
       <div class="btn-row">

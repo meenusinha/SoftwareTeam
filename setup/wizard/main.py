@@ -6,6 +6,7 @@ JSON API calls to perform installations and configuration.
 """
 
 import http.server
+from http.server import ThreadingHTTPServer
 import json
 import os
 import socket
@@ -90,7 +91,7 @@ def find_free_port():
 
 def main():
     port = find_free_port()
-    server = http.server.HTTPServer(("127.0.0.1", port), WizardHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", port), WizardHandler)
 
     # Register shutdown callback so the API can stop the server
     def shutdown():

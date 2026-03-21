@@ -546,6 +546,62 @@ body {
   overflow-y: auto;
 }
 
+/* ===== Install Log Box ===== */
+
+.log-box-wrapper {
+  margin-top: 16px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #312e81;
+}
+
+.log-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 14px;
+  background: #1e1b4b;
+  color: #a5b4fc;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.log-toggle-btn {
+  background: none;
+  border: 1px solid #4338ca;
+  color: #a5b4fc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 8px;
+  line-height: 1.6;
+}
+
+.log-toggle-btn:hover {
+  background: #312e81;
+}
+
+.install-log {
+  background: #0a0818;
+  color: #c4b5fd;
+  font-family: 'SFMono-Regular', Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  padding: 12px 14px;
+  height: 220px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  border: none;
+}
+
+/* Highlight command lines in the log */
+.install-log::first-line {
+  color: #818cf8;
+}
+
 /* ===== GitHub Actions Modal ===== */
 .modal-overlay {
   position: fixed;

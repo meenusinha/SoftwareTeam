@@ -186,12 +186,62 @@ function updateStatusItem(id, info) {
   }
 }
 
+// --- Install job polling ---
+
+let _pollTimer = null;
+let _logOffset = 0;
+
+function _startLogBox(boxId, contentId) {
+  const box = document.getElementById(boxId);
+  const content = document.getElementById(contentId);
+  if (box) box.style.display = '';
+  if (content) content.textContent = '';
+  _logOffset = 0;
+}
+
+function toggleLogBox(boxId, contentId) {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  const content = document.getElementById(contentId);
+  const btn = box.querySelector('.log-toggle-btn');
+  const isHidden = content && content.style.display === 'none';
+  if (content) content.style.display = isHidden ? '' : 'none';
+  if (btn) btn.textContent = isHidden ? 'Hide' : 'Show';
+}
+
+function _pollInstallLog(jobId, contentId, onDone) {
+  if (_pollTimer) clearInterval(_pollTimer);
+  _pollTimer = setInterval(async () => {
+    const res = await api(`/api/install/log?job_id=${jobId}`);
+    if (!res || res.error) { clearInterval(_pollTimer); return; }
+
+    // Append only new lines
+    const newLines = res.lines.slice(_logOffset);
+    _logOffset = res.lines.length;
+    if (newLines.length > 0) {
+      const content = document.getElementById(contentId);
+      if (content) {
+        content.textContent += newLines.join('\n') + '\n';
+        content.scrollTop = content.scrollHeight;
+      }
+    }
+
+    if (res.done) {
+      clearInterval(_pollTimer);
+      _pollTimer = null;
+      onDone(res);
+    }
+  }, 500);
+}
+
 async function installPrerequisite(tool) {
   const btn = event.target;
   const origText = btn.textContent;
   btn.disabled = true;
 
-  // Show elapsed time so user knows it's working
+  _startLogBox('prereq-log-box', 'prereq-log-content');
+  showAlert('prereq-alerts', '', 'info');
+
   let elapsed = 0;
   const timer = setInterval(() => {
     elapsed++;
@@ -199,35 +249,27 @@ async function installPrerequisite(tool) {
   }, 1000);
   btn.textContent = 'Installing...';
 
-  // Clear previous error log
-  const logDiv = document.getElementById('prereq-error-log');
-  if (logDiv) logDiv.style.display = 'none';
-
-  let result;
-  try {
-    // 6-minute client-side timeout (backend is 3min, this covers network lag)
-    result = await apiWithTimeout('/api/prerequisites/install', { tool }, 380);
-  } catch (e) {
-    result = { success: false, message: 'Request timed out.', error_log: String(e) };
+  const startRes = await api('/api/install/start', { kind: 'prerequisite', tool });
+  if (!startRes.job_id) {
+    clearInterval(timer);
+    showAlert('prereq-alerts', startRes.message || 'Failed to start installation.', 'danger');
+    btn.textContent = origText;
+    btn.disabled = false;
+    return;
   }
 
-  clearInterval(timer);
-
-  if (result.success) {
-    await refreshPrerequisites();
-    showAlert('prereq-alerts', `${tool === 'git' ? 'Git' : 'GitHub CLI'} installed successfully!`, 'success');
-  } else {
-    showAlert('prereq-alerts', result.message, 'danger');
-    // Show error log if available
-    const logContent = document.getElementById('prereq-error-content');
-    if (logDiv && logContent && result.error_log) {
-      logContent.textContent = result.error_log;
-      logDiv.style.display = '';
+  _pollInstallLog(startRes.job_id, 'prereq-log-content', async (result) => {
+    clearInterval(timer);
+    if (result.success) {
+      await refreshPrerequisites();
+      showAlert('prereq-alerts', `${tool === 'git' ? 'Git' : 'GitHub CLI'} installed successfully!`, 'success');
+      btn.textContent = '\u2713 Installed';
+    } else {
+      showAlert('prereq-alerts', result.message || 'Installation failed. See log above.', 'danger');
+      btn.textContent = origText;
+      btn.disabled = false;
     }
-  }
-
-  btn.textContent = origText;
-  btn.disabled = false;
+  });
 }
 
 // Screen 3: GitHub Account
@@ -595,7 +637,9 @@ async function installTool() {
   const btn = document.getElementById('install-tool-btn');
   btn.disabled = true;
 
-  // Show elapsed time
+  _startLogBox('tool-log-box', 'tool-log-content');
+  showAlert('tool-alerts', '', 'info');
+
   let elapsed = 0;
   const timer = setInterval(() => {
     elapsed++;
@@ -603,29 +647,28 @@ async function installTool() {
   }, 1000);
   btn.innerHTML = '<span class="spinner"></span> Installing...';
 
-  let result;
-  try {
-    result = await apiWithTimeout('/api/tools/install', { tool: state.selectedTool }, 380);
-  } catch (e) {
-    result = { success: false, message: 'Request timed out.', error_log: String(e) };
-  }
-
-  clearInterval(timer);
-
-  if (result.success) {
-    showAlert('tool-alerts', result.message, 'success');
-    document.getElementById('launch-tool-btn').style.display = '';
-    document.getElementById('tool-next').disabled = false;
-    btn.textContent = '✓ Installed';
-  } else {
-    let msg = result.message;
-    if (result.error_log) {
-      msg += `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px">Show error details</summary><pre class="error-log" style="margin-top:6px">${result.error_log}</pre></details>`;
-    }
-    showAlert('tool-alerts', msg, 'danger');
+  const startRes = await api('/api/install/start', { kind: 'tool', tool: state.selectedTool });
+  if (!startRes.job_id) {
+    clearInterval(timer);
+    showAlert('tool-alerts', startRes.message || 'Failed to start installation.', 'danger');
     btn.textContent = 'Retry';
     btn.disabled = false;
+    return;
   }
+
+  _pollInstallLog(startRes.job_id, 'tool-log-content', (result) => {
+    clearInterval(timer);
+    if (result.success) {
+      showAlert('tool-alerts', result.message, 'success');
+      document.getElementById('launch-tool-btn').style.display = '';
+      document.getElementById('tool-next').disabled = false;
+      btn.textContent = '\u2713 Installed';
+    } else {
+      showAlert('tool-alerts', result.message || 'Installation failed. See log above.', 'danger');
+      btn.textContent = 'Retry';
+      btn.disabled = false;
+    }
+  });
 }
 
 // Animation info per tool: { desc, steps[], note }

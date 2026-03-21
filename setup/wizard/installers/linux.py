@@ -77,7 +77,7 @@ def _pkg_install(packages):
     else:
         return {"success": False, "message": "No supported package manager found", "error_log": f"Detected package manager: {mgr}"}
 
-    result = run(cmd, timeout=300)
+    result = run(cmd, timeout=600)
     return {
         "success": result["success"],
         "message": result["stdout"] if result["success"] else "Installation failed.",
@@ -118,11 +118,11 @@ def install_gh():
             "sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && "
             "sudo apt update && sudo apt install gh -y"
         )
-        result = run(cmds, timeout=300)
+        result = run(cmds, timeout=600)
     elif mgr == "dnf":
-        result = run("sudo dnf install -y gh", timeout=120)
+        result = run("sudo dnf install -y gh", timeout=300)
     elif mgr == "pacman":
-        result = run("sudo pacman -S --noconfirm github-cli", timeout=120)
+        result = run("sudo pacman -S --noconfirm github-cli", timeout=300)
     else:
         return {"success": False, "message": f"Cannot auto-install gh: package manager '{mgr}' is not yet supported.", "error_log": f"Detected pkg manager: {mgr}"}
 
