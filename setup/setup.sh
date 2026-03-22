@@ -80,39 +80,29 @@ elif command -v gtimeout &>/dev/null; then
     _TIMEOUT_CMD="gtimeout"
 fi
 
-# Run a command with a timeout, streaming its output live and capturing to a log.
+# Run a command with a timeout, showing output directly to the terminal.
 # Usage: run_timed LABEL TIMEOUT_SECS CMD [ARGS...]
-# Shows "LABEL (timeout: Xs)..." before running.
-# On failure or timeout, prints the last 15 lines of the output log.
-# Returns 0 on success, non-zero on failure or timeout.
+# Shows "LABEL (timeout: Xs)..." before running, then streams all output live.
+# Piping through tee is intentionally avoided — apt/brew/dnf detect pipes and
+# buffer all output until completion, making it look like the script is frozen.
 run_timed() {
     local label="$1"
     local timeout_sec="$2"
     shift 2
-    local logfile
-    logfile=$(mktemp)
+    local exit_code=0
 
     info "$label (timeout: ${timeout_sec}s)..."
     if [ -n "$_TIMEOUT_CMD" ]; then
-        $_TIMEOUT_CMD "$timeout_sec" "$@" 2>&1 | tee "$logfile"
-        local exit_code=${PIPESTATUS[0]}
+        "$_TIMEOUT_CMD" "$timeout_sec" "$@" || exit_code=$?
     else
-        "$@" 2>&1 | tee "$logfile"
-        local exit_code=${PIPESTATUS[0]}
+        "$@" || exit_code=$?
     fi
 
-    if [ "$exit_code" -eq 0 ]; then
-        rm -f "$logfile"
-        return 0
-    elif [ "$exit_code" -eq 124 ]; then
-        warn "Timed out after ${timeout_sec}s. Output log (last 15 lines):"
-        tail -15 "$logfile"
-    else
-        warn "Failed (exit code: $exit_code). Output log (last 15 lines):"
-        tail -15 "$logfile"
+    if [ "$exit_code" -eq 124 ]; then
+        warn "Timed out after ${timeout_sec}s."
+        return 1
     fi
-    rm -f "$logfile"
-    return 1
+    return "$exit_code"
 }
 
 # Verify that a Python command is 3.6 or newer.
