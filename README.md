@@ -155,7 +155,7 @@ Works on **Mac, Windows, and Linux**, and supports multiple [AI providers](#work
 The setup wizard can install everything automatically, but you can install these manually first — it's the most reliable way to avoid permission issues.
 
 <details>
-<summary><strong>Python 3.8+</strong> &nbsp;(required to run the wizard)</summary>
+<summary><strong>Python 3.6+</strong> &nbsp;(required to run the wizard)</summary>
 
 **macOS**
 ```bash

@@ -42,15 +42,58 @@ If you prefer to set things up manually, or the wizard doesn't work for your env
 
 ## Prerequisites - IMPORTANT!
 
-Before choosing an AI tool path, you **MUST** set up these prerequisites:
+Before choosing an AI tool path, you **MUST** set up these prerequisites.
+
+> **Tip:** The setup wizard (one-command above) can install git and gh automatically. If you run into permission issues, install them manually using the commands below — it's faster and more reliable.
+
+### 0. Python 3.6+ (required to run the wizard)
+
+The setup wizard itself needs Python 3.6+. If it's already installed, skip this.
+
+**Mac:**
+```bash
+brew install python3
+```
+Or download from https://python.org
+
+**Ubuntu / Linux / WSL:**
+```bash
+sudo apt-get update && sudo apt-get install -y python3
+```
+
+**Windows (PowerShell):**
+```powershell
+winget install Python.Python.3.12
+```
+Or download from https://python.org — tick ✅ **"Add Python to PATH"** during install.
+
+---
 
 ### 1. Git Installation
-- **Mac**: `brew install git` (or `xcode-select --install`)
-- **Windows**: `winget install Git.Git` or download from https://git-scm.com/
-- **Linux (Debian/Ubuntu)**: `sudo apt install git`
-- **Linux (Fedora)**: `sudo dnf install git`
 
-> **Note:** IT Agent (Step 0) will also verify and install `git` automatically when the workflow starts.
+**Mac:**
+```bash
+brew install git
+# or: xcode-select --install
+```
+
+**Ubuntu / Linux / WSL:**
+```bash
+sudo apt-get update && sudo apt-get install -y git
+```
+
+**Windows (PowerShell):**
+```powershell
+winget install Git.Git
+```
+Or download from https://git-scm.com
+
+**Linux (Fedora):**
+```bash
+sudo dnf install -y git
+```
+
+> **Note:** The setup wizard will also verify and install `git` automatically.
 
 ### 2. GitHub Account
 - Go to https://github.com and sign up (or sign in)
@@ -86,22 +129,28 @@ $env:GITHUB_TOKEN = "your_github_token_here"
 
 ### 5. Install `gh` CLI (for automatic PR creation)
 
-**On Mac:**
+**Mac:**
 ```bash
 brew install gh
 ```
 
-**On Windows (PowerShell as Administrator):**
+**Windows (PowerShell):**
 ```powershell
 winget install GitHub.cli --accept-package-agreements --accept-source-agreements
 ```
 
-**On Linux (Debian/Ubuntu):**
+**Ubuntu / Linux / WSL** — `gh` is not in the default apt repos; add the GitHub CLI repo first:
 ```bash
-sudo apt update && sudo apt install -y gh
+sudo mkdir -p -m 755 /etc/apt/keyrings
+wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+  | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+sudo apt-get update && sudo apt-get install -y gh
 ```
 
-**On Linux (Fedora):**
+**Linux (Fedora):**
 ```bash
 sudo dnf install -y gh
 ```
@@ -112,7 +161,7 @@ gh auth login   # First time: authenticate
 gh auth status  # Verify authentication
 ```
 
-> **Note:** IT Agent (Step 0) will also verify and install `gh` automatically when the workflow starts.
+> **Note:** The setup wizard will also verify and install `gh` automatically.
 
 ---
 
