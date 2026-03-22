@@ -181,21 +181,31 @@ ensure_python() {
         fi
 
     elif [ "$OS" = "linux" ]; then
-        if command -v apt &>/dev/null; then
-            run_timed "Updating package lists" 60 sudo apt update || true
-            if run_timed "Installing Python 3 via apt" 120 sudo apt install -y python3; then
+        # Use 'sudo' only when not already root.
+        # Use 'apt-get' (not 'apt') — apt-get is script-safe and does not suppress
+        # output based on stdin/stdout TTY detection the way the newer 'apt' command does.
+        # Set DEBIAN_FRONTEND=noninteractive to prevent any interactive prompts from apt.
+        local _SUDO=""
+        if [ "$(id -u)" != "0" ]; then
+            _SUDO="sudo"
+            info "Note: package installation requires sudo — you may be prompted for your password."
+        fi
+        export DEBIAN_FRONTEND=noninteractive
+        if command -v apt-get &>/dev/null; then
+            run_timed "Updating package lists" 60 ${_SUDO} apt-get update || true
+            if run_timed "Installing Python 3 via apt" 120 ${_SUDO} apt-get install -y python3; then
                 py_installed=true
             fi
         elif command -v dnf &>/dev/null; then
-            if run_timed "Installing Python 3 via dnf" 120 sudo dnf install -y python3; then
+            if run_timed "Installing Python 3 via dnf" 120 ${_SUDO} dnf install -y python3; then
                 py_installed=true
             fi
         elif command -v pacman &>/dev/null; then
-            if run_timed "Installing Python 3 via pacman" 120 sudo pacman -S --noconfirm python; then
+            if run_timed "Installing Python 3 via pacman" 120 ${_SUDO} pacman -S --noconfirm python; then
                 py_installed=true
             fi
         elif command -v zypper &>/dev/null; then
-            if run_timed "Installing Python 3 via zypper" 120 sudo zypper install -y python3; then
+            if run_timed "Installing Python 3 via zypper" 120 ${_SUDO} zypper install -y python3; then
                 py_installed=true
             fi
         fi
