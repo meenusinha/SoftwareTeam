@@ -140,7 +140,33 @@ def browse_folder():
         except Exception:
             pass  # fall through to tkinter
 
-    # --- tkinter (Mac / Linux with display, and Windows fallback) ---
+    # --- macOS: osascript (must come before tkinter on macOS) ---
+    # tk.Tk() creates an NSWindow which macOS requires on the main thread.
+    # The wizard HTTP server calls this from a background thread, which crashes
+    # the whole Python process with NSInternalInconsistencyException.
+    # osascript spawns its own subprocess (its own main thread) — safe from any thread.
+    if system == "Darwin":
+        try:
+            result = subprocess.run(
+                ["osascript",
+                 "-e", 'set theFolder to choose folder with prompt "Choose project location"',
+                 "-e", "POSIX path of theFolder"],
+                capture_output=True, text=True, timeout=300,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return {"success": True, "path": result.stdout.strip().rstrip("/")}
+            if result.returncode == 0:
+                return {"success": True, "path": ""}  # user cancelled
+        except Exception:
+            pass
+        return {
+            "success": False,
+            "path": "",
+            "message": "Could not open folder picker. Please type the path directly into the text box.",
+        }
+
+    # --- tkinter (Linux with display, and Windows fallback) ---
+    # NOT used on macOS — see above.
     try:
         import tkinter as tk
         from tkinter import filedialog
@@ -160,22 +186,8 @@ def browse_folder():
     except Exception:
         pass
 
-    # --- macOS: osascript fallback ---
-    if system == "Darwin":
-        try:
-            result = subprocess.run(
-                ["osascript",
-                 "-e", "set theFolder to choose folder with prompt \"Choose project location\"",
-                 "-e", "POSIX path of theFolder"],
-                capture_output=True, text=True, timeout=300,
-            )
-            if result.returncode == 0 and result.stdout.strip():
-                return {"success": True, "path": result.stdout.strip().rstrip("/")}
-        except Exception:
-            pass
-
     # --- Linux: zenity or kdialog ---
-    elif system == "Linux":
+    if system == "Linux":
         for cmd, args in [
             ("zenity", ["zenity", "--file-selection", "--directory",
                         "--title=Choose project location"]),
