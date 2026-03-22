@@ -150,6 +150,81 @@ Works on **Mac, Windows, and Linux**, and supports multiple [AI providers](#work
 ---
 
 
+## Prerequisites
+
+The setup wizard can install everything automatically, but you can install these manually first — it's the most reliable way to avoid permission issues.
+
+<details>
+<summary><strong>Python 3.8+</strong> &nbsp;(required to run the wizard)</summary>
+
+**macOS**
+```bash
+brew install python3
+```
+Or download from [python.org](https://www.python.org/downloads/) and run the installer.
+
+**Ubuntu / Linux / WSL**
+```bash
+sudo apt-get update && sudo apt-get install -y python3
+```
+
+**Windows** (run in PowerShell)
+```powershell
+winget install Python.Python.3.12
+```
+Or download from [python.org](https://www.python.org/downloads/) — tick ✅ **"Add Python to PATH"** during install.
+</details>
+
+<details>
+<summary><strong>Git</strong> &nbsp;(required for version control)</summary>
+
+**macOS**
+```bash
+brew install git
+# or: xcode-select --install
+```
+
+**Ubuntu / Linux / WSL**
+```bash
+sudo apt-get update && sudo apt-get install -y git
+```
+
+**Windows** (run in PowerShell)
+```powershell
+winget install Git.Git
+```
+Or download from [git-scm.com](https://git-scm.com).
+</details>
+
+<details>
+<summary><strong>GitHub CLI (gh)</strong> &nbsp;(required for GitHub workflow; optional for local-only)</summary>
+
+**macOS**
+```bash
+brew install gh
+```
+
+**Ubuntu / Linux / WSL**
+```bash
+sudo mkdir -p -m 755 /etc/apt/keyrings
+wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+  | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+sudo apt-get update && sudo apt-get install -y gh
+```
+
+**Windows** (run in PowerShell)
+```powershell
+winget install GitHub.cli
+```
+</details>
+
+> **Already installed them?** Skip straight to the [One-Command Setup](#one-command-setup-recommended) below — the wizard will detect them automatically.
+
+---
+
 ## One-Command Setup (Recommended)
 
 Open your terminal / command line, paste ONE command, and press Enter.

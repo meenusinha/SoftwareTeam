@@ -702,6 +702,76 @@ body {
 .modal-done-btn { padding: 12px 28px; font-size: 15px; }
 .modal-skip-btn { padding: 12px 20px; }
 
+/* Manual install tip + expandable sections */
+.manual-install-tip {
+  margin: 16px 0 8px;
+  padding: 10px 14px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #92400e;
+  line-height: 1.5;
+}
+.manual-install-details {
+  margin: 6px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.manual-install-details summary {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--surface);
+  user-select: none;
+}
+.manual-install-details[open] summary {
+  border-bottom: 1px solid var(--border);
+}
+.manual-install-body {
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.manual-os-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.manual-os-row code {
+  background: #f1f5f9;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: monospace;
+}
+.manual-cmd-block {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 6px 0 4px;
+}
+.copy-btn {
+  padding: 2px 10px;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.copy-btn:hover { background: var(--surface); }
+
 /* Responsive */
 @media (max-width: 600px) {
   .wizard-container { padding: 20px 12px 40px; }

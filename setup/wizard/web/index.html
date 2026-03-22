@@ -106,6 +106,39 @@
         </div>
       </div>
 
+      <!-- Manual install section -->
+      <div class="manual-install-tip">
+        <strong>&#9888;&#65039; Tip:</strong> Automatic installation may need a sudo/administrator password and can be slow.
+        Installing manually is faster and avoids permission issues — open a terminal and paste the command for your OS, then click <em>Check Again</em>.
+      </div>
+
+      <details class="manual-install-details">
+        <summary>&#128203; Git &mdash; manual install commands</summary>
+        <div class="manual-install-body">
+          <div class="manual-os-row"><strong>Mac:</strong><code>brew install git</code><button class="copy-btn" onclick="copyCmd(this,'brew install git')">Copy</button></div>
+          <div class="manual-os-row"><strong>Ubuntu&nbsp;/&nbsp;Linux&nbsp;/&nbsp;WSL:</strong><code>sudo apt-get install -y git</code><button class="copy-btn" onclick="copyCmd(this,'sudo apt-get install -y git')">Copy</button></div>
+          <div class="manual-os-row"><strong>Windows&nbsp;(PowerShell):</strong><code>winget install Git.Git</code><button class="copy-btn" onclick="copyCmd(this,'winget install Git.Git')">Copy</button></div>
+          <div class="manual-os-row"><em>Or download from</em> <a href="https://git-scm.com" target="_blank">git-scm.com &rarr;</a></div>
+        </div>
+      </details>
+
+      <details class="manual-install-details">
+        <summary>&#128203; GitHub CLI (gh) &mdash; manual install commands</summary>
+        <div class="manual-install-body">
+          <div class="manual-os-row"><strong>Mac:</strong><code>brew install gh</code><button class="copy-btn" onclick="copyCmd(this,'brew install gh')">Copy</button></div>
+          <div class="manual-os-row"><strong>Windows&nbsp;(PowerShell):</strong><code>winget install GitHub.cli</code><button class="copy-btn" onclick="copyCmd(this,'winget install GitHub.cli')">Copy</button></div>
+          <div class="manual-os-row"><strong>Ubuntu&nbsp;/&nbsp;Linux&nbsp;/&nbsp;WSL</strong> (run these lines in order):</div>
+          <pre class="manual-cmd-block">sudo mkdir -p -m 755 /etc/apt/keyrings
+wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+  | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+sudo apt-get update &amp;&amp; sudo apt-get install -y gh</pre>
+          <button class="copy-btn" style="margin-top:4px" onclick="copyCmd(this,`sudo mkdir -p -m 755 /etc/apt/keyrings\nwget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null\nsudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg\necho \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null\nsudo apt-get update && sudo apt-get install -y gh`)">Copy Linux commands</button>
+        </div>
+      </details>
+
       <div class="log-box-wrapper" id="prereq-log-box" style="display:none">
         <div class="log-box-header">
           <span>&#128196; Installation Log</span>
