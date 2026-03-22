@@ -2,7 +2,7 @@
 
 import os
 
-from setup.wizard.utils.shell import run, launch, is_installed
+from setup.wizard.utils.shell import run, launch, is_installed, log_message
 
 
 def _find_vscode_cmd():
@@ -20,18 +20,47 @@ def _find_vscode_cmd():
     return None
 
 
+def _open_terminal_for_cmd(label, cmd):
+    """Open Terminal.app with a command that needs sudo.
+
+    The password prompt appears in the visible terminal, never in the wizard GUI.
+    Returns terminal_launched=True so the caller knows to show 'Check Again'.
+    """
+    log_message(f"[sudo required] Opening Terminal.app to install {label}.")
+    log_message("[action needed]  Enter your password in the Terminal window that opens.")
+    # Escape for osascript double-quoted string
+    escaped = cmd.replace("\\", "\\\\").replace('"', '\\"').replace("'", "\\'")
+    script = (
+        f"osascript "
+        f"-e 'tell application \"Terminal\" to do script \"{escaped}\"' "
+        f"-e 'tell application \"Terminal\" to activate'"
+    )
+    launch(script)
+    return {
+        "success": True,
+        "message": (
+            f"Terminal.app has been opened to install {label}. "
+            "Please enter your password there and wait for it to finish, "
+            "then click 'Check Again'."
+        ),
+        "terminal_launched": True,
+    }
+
+
 def install_homebrew():
-    """Install Homebrew if not present."""
+    """Install Homebrew if not present.
+
+    The official installer calls sudo internally, so we open Terminal.app
+    rather than running it silently in the background where there is no TTY
+    for the password prompt.
+    """
     if is_installed("brew"):
         return {"success": True, "message": "Homebrew is already installed", "skipped": True}
 
-    result = run(
+    return _open_terminal_for_cmd(
+        "Homebrew",
         '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-        timeout=300,
     )
-    if result["success"]:
-        return {"success": True, "message": "Homebrew installed successfully"}
-    return {"success": False, "message": "Failed to install Homebrew.", "error_log": result["stderr"] or result["stdout"]}
 
 
 def install_git():
@@ -45,10 +74,14 @@ def install_git():
         return {"success": True, "message": "Git installed via Xcode Command Line Tools"}
 
     # Fallback to brew
-    if is_installed("brew"):
-        result = run("brew install git", timeout=120)
-        if result["success"]:
-            return {"success": True, "message": "Git installed via Homebrew"}
+    if not is_installed("brew"):
+        brew_result = install_homebrew()
+        if not brew_result["success"] or brew_result.get("terminal_launched"):
+            return brew_result  # propagate error or "terminal opened, check again"
+
+    result = run("brew install git", timeout=120)
+    if result["success"]:
+        return {"success": True, "message": "Git installed via Homebrew"}
 
     return {"success": False, "message": "Failed to install git automatically."}
 
@@ -60,8 +93,8 @@ def install_gh():
 
     if not is_installed("brew"):
         brew_result = install_homebrew()
-        if not brew_result["success"]:
-            return {"success": False, "message": "Cannot install gh: Homebrew is required"}
+        if not brew_result["success"] or brew_result.get("terminal_launched"):
+            return brew_result  # propagate error or "terminal opened, check again"
 
     result = run("brew install gh", timeout=120)
     if result["success"]:
@@ -126,8 +159,8 @@ def install_ai_tool(tool):
 def _install_cursor():
     if not is_installed("brew"):
         brew = install_homebrew()
-        if not brew["success"]:
-            return {"success": False, "message": "Homebrew is required for Cursor and could not be installed.", "error_log": brew.get("error_log", "")}
+        if not brew["success"] or brew.get("terminal_launched"):
+            return brew
     result = run("brew install --cask cursor", timeout=300)
     if result["success"]:
         return {"success": True, "message": "Cursor installed successfully"}
@@ -137,8 +170,8 @@ def _install_cursor():
 def _install_windsurf():
     if not is_installed("brew"):
         brew = install_homebrew()
-        if not brew["success"]:
-            return {"success": False, "message": "Homebrew is required for Windsurf and could not be installed.", "error_log": brew.get("error_log", "")}
+        if not brew["success"] or brew.get("terminal_launched"):
+            return brew
     result = run("brew install --cask windsurf", timeout=300)
     if result["success"]:
         return {"success": True, "message": "Windsurf installed successfully"}
@@ -147,14 +180,14 @@ def _install_windsurf():
 
 def _install_claude_code():
     if not is_installed("npm"):
-        if is_installed("brew"):
-            node_result = run("brew install node", timeout=120)
-            if not node_result["success"]:
-                return {"success": False, "message": "Failed to install Node.js (required for Claude Code).",
-                        "error_log": node_result["stderr"] or node_result["stdout"]}
-        else:
-            return {"success": False, "message": "Homebrew not found — cannot install Node.js for Claude Code.",
-                    "error_log": "brew not in PATH"}
+        if not is_installed("brew"):
+            brew = install_homebrew()
+            if not brew["success"] or brew.get("terminal_launched"):
+                return brew
+        node_result = run("brew install node", timeout=120)
+        if not node_result["success"]:
+            return {"success": False, "message": "Failed to install Node.js (required for Claude Code).",
+                    "error_log": node_result["stderr"] or node_result["stdout"]}
 
     result = run("npm install -g @anthropic-ai/claude-code", timeout=120)
     if result["success"]:
@@ -165,8 +198,8 @@ def _install_claude_code():
 def _install_vscode():
     if not is_installed("brew"):
         brew = install_homebrew()
-        if not brew["success"]:
-            return {"success": False, "message": "Homebrew is required for VS Code and could not be installed.", "error_log": brew.get("error_log", "")}
+        if not brew["success"] or brew.get("terminal_launched"):
+            return brew
     result = run("brew install --cask visual-studio-code", timeout=300)
     if result["success"]:
         vscode_cmd = _find_vscode_cmd() or "code"
@@ -178,8 +211,8 @@ def _install_vscode():
 def _install_copilot():
     if not is_installed("brew"):
         brew = install_homebrew()
-        if not brew["success"]:
-            return {"success": False, "message": "Homebrew is required for VS Code and could not be installed.", "error_log": brew.get("error_log", "")}
+        if not brew["success"] or brew.get("terminal_launched"):
+            return brew
     vscode_cmd = _find_vscode_cmd()
     if not vscode_cmd:
         result = run("brew install --cask visual-studio-code", timeout=300)

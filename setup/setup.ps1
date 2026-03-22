@@ -24,6 +24,16 @@ function Write-Ok($msg) { Write-Host "[OK] $msg" -ForegroundColor Green }
 function Write-Warn($msg) { Write-Host "[WARN] $msg" -ForegroundColor Yellow }
 function Write-Err($msg) { Write-Host "[ERROR] $msg" -ForegroundColor Red }
 
+# Pause and exit — keeps the window open so the user can read the error.
+# Critical for the `irm ... | iex` pattern where exit would close the window.
+function Exit-WithPause($code, $hint = "") {
+    Write-Host ""
+    if ($hint) { Write-Host $hint -ForegroundColor Yellow }
+    Write-Host "Press Enter to close this window..." -ForegroundColor DarkGray
+    try { $null = Read-Host } catch { }
+    exit $code
+}
+
 # --- Detect Windows version ---
 function Get-WindowsInfo {
     $version = [System.Environment]::OSVersion.Version
@@ -54,6 +64,15 @@ function Ensure-Winget {
             $ver = & winget --version 2>&1
             if ("$ver" -match "v[\d.]+") {
                 Write-Ok "winget is available: $ver"
+                # Refresh the package source database so installs don't fail with
+                # "No package found" in fresh environments (e.g. Windows Sandbox).
+                Write-Info "Updating winget package sources..."
+                try {
+                    & winget source update --disable-interactivity 2>&1 | Out-Null
+                    Write-Ok "winget sources updated."
+                } catch {
+                    Write-Warn "Could not update winget sources (will try anyway): $_"
+                }
                 return
             }
         } catch { }
@@ -211,7 +230,7 @@ function Ensure-Python {
     $winget = Get-Command winget -ErrorAction SilentlyContinue
     if ($winget) {
         Write-Info "Installing Python 3 via winget..."
-        $wingetOut = & winget install Python.Python.3.12 --accept-package-agreements --accept-source-agreements 2>&1
+        $wingetOut = & winget install Python.Python.3.12 --source winget --accept-package-agreements --accept-source-agreements 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-Ok "Python 3 installed via winget."
             $pyInstalled = $true
@@ -320,8 +339,7 @@ function Ensure-Python {
         }
 
         Write-Err "All automatic Python installation methods failed."
-        Write-Err "Please check your internet connection and try running this script again."
-        exit 1
+        Exit-WithPause 1 "Please check your internet connection and try running this script again."
     }
 
     # Refresh PATH
@@ -365,7 +383,7 @@ function Ensure-Python {
 
     $ErrorActionPreference = $prevPref
     Write-Err "Failed to find Python 3. Please install it from https://python.org and ensure 'Add to PATH' is checked."
-    exit 1
+    Exit-WithPause 1 "Tip: Run the script again after installing Python, or install Python manually from https://python.org"
 }
 
 # --- Download repo zip ---
@@ -385,8 +403,8 @@ function Download-Repo {
 
     if (-not $repoDir) {
         Write-Err "Failed to download project files."
-        Remove-Item $tempDir.FullName -Recurse -Force
-        exit 1
+        Remove-Item $tempDir.FullName -Recurse -Force -ErrorAction SilentlyContinue
+        Exit-WithPause 1 "Please check your internet connection and try again."
     }
 
     Write-Ok "Project files downloaded."
@@ -434,8 +452,15 @@ Write-Host "  Project Setup Wizard"
 Write-Host "==============================="
 Write-Host ""
 
-Get-WindowsInfo
-Ensure-Winget
-$python = Ensure-Python
-$paths = Download-Repo
-Launch-Wizard $python $paths.RepoDir $paths.TempDir
+try {
+    Get-WindowsInfo
+    Ensure-Winget
+    $python = Ensure-Python
+    $paths = Download-Repo
+    Launch-Wizard $python $paths.RepoDir $paths.TempDir
+} catch {
+    Write-Host ""
+    Write-Err "Unexpected error: $_"
+    Write-Err $_.ScriptStackTrace
+    Exit-WithPause 1 "The wizard could not start. See the error above."
+}

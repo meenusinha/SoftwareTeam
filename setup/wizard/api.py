@@ -196,7 +196,7 @@ def api_install_start(body):
     _ = sudo_password  # retained in signature for backward-compat; unused
 
     job_id = str(uuid.uuid4())[:8]
-    job = {"lines": [], "done": False, "success": False, "message": "", "error_log": ""}
+    job = {"lines": [], "done": False, "success": False, "message": "", "error_log": "", "terminal_launched": False}
     _jobs[job_id] = job
 
     def run_job():
@@ -218,6 +218,7 @@ def api_install_start(body):
             job["success"] = result.get("success", False)
             job["message"] = result.get("message", "")
             job["error_log"] = result.get("error_log", "")
+            job["terminal_launched"] = result.get("terminal_launched", False)
         except Exception as e:
             job["success"] = False
             job["message"] = str(e)
@@ -256,6 +257,7 @@ def api_install_log(params):
         "success": job["success"],
         "message": job["message"],
         "error_log": job.get("error_log", ""),
+        "terminal_launched": job.get("terminal_launched", False),
     }
 
 

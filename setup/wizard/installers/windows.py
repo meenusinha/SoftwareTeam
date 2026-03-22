@@ -37,6 +37,19 @@ def _find_vscode_cmd():
     return None
 
 
+def _winget_update_sources():
+    """Refresh winget package sources (needed in fresh environments like Windows Sandbox).
+
+    Without this, winget install can fail with 'No package found matching input criteria'
+    because the local source database is empty or stale.
+    Only runs once per Python process session.
+    """
+    if getattr(_winget_update_sources, '_done', False):
+        return
+    _winget_update_sources._done = True
+    run("winget source update --disable-interactivity", timeout=60)
+
+
 def install_git():
     """Install git on Windows."""
     if is_installed("git"):
@@ -45,8 +58,9 @@ def install_git():
     errors = []
 
     if is_installed("winget"):
+        _winget_update_sources()
         result = run(
-            "winget install Git.Git --accept-package-agreements --accept-source-agreements",
+            "winget install Git.Git --source winget --accept-package-agreements --accept-source-agreements",
             timeout=180,
         )
         if result["success"]:
@@ -77,8 +91,9 @@ def install_gh():
     errors = []
 
     if is_installed("winget"):
+        _winget_update_sources()
         result = run(
-            "winget install GitHub.cli --accept-package-agreements --accept-source-agreements",
+            "winget install GitHub.cli --source winget --accept-package-agreements --accept-source-agreements",
             timeout=180,
         )
         if result["success"]:
@@ -147,8 +162,9 @@ def install_ai_tool(tool):
 
 def _install_cursor():
     if is_installed("winget"):
+        _winget_update_sources()
         result = run(
-            "winget install Anysphere.Cursor --accept-package-agreements --accept-source-agreements",
+            "winget install Anysphere.Cursor --source winget --accept-package-agreements --accept-source-agreements",
             timeout=300,
         )
         if result["success"]:
@@ -159,8 +175,9 @@ def _install_cursor():
 
 def _install_windsurf():
     if is_installed("winget"):
+        _winget_update_sources()
         result = run(
-            "winget install Codeium.Windsurf --accept-package-agreements --accept-source-agreements",
+            "winget install Codeium.Windsurf --source winget --accept-package-agreements --accept-source-agreements",
             timeout=300,
         )
         if result["success"]:
@@ -173,8 +190,9 @@ def _install_claude_code():
     if not is_installed("npm"):
         # Try installing Node.js first
         if is_installed("winget"):
+            _winget_update_sources()
             node_result = run(
-                "winget install OpenJS.NodeJS --accept-package-agreements --accept-source-agreements",
+                "winget install OpenJS.NodeJS --source winget --accept-package-agreements --accept-source-agreements",
                 timeout=300,
             )
             if not node_result["success"]:
@@ -192,8 +210,9 @@ def _install_claude_code():
 
 def _install_vscode():
     if is_installed("winget"):
+        _winget_update_sources()
         result = run(
-            "winget install Microsoft.VisualStudioCode --accept-package-agreements --accept-source-agreements",
+            "winget install Microsoft.VisualStudioCode --source winget --accept-package-agreements --accept-source-agreements",
             timeout=300,
         )
         if result["success"]:
@@ -208,8 +227,9 @@ def _install_copilot():
     vscode_cmd = _find_vscode_cmd()
     if not vscode_cmd:
         if is_installed("winget"):
+            _winget_update_sources()
             result = run(
-                "winget install Microsoft.VisualStudioCode --accept-package-agreements --accept-source-agreements",
+                "winget install Microsoft.VisualStudioCode --source winget --accept-package-agreements --accept-source-agreements",
                 timeout=300,
             )
             if not result["success"]:
@@ -228,8 +248,9 @@ def install_python():
         return {"success": True, "message": "Python is already installed", "skipped": True}
 
     if is_installed("winget"):
+        _winget_update_sources()
         result = run(
-            "winget install Python.Python.3.12 --accept-package-agreements --accept-source-agreements",
+            "winget install Python.Python.3.12 --source winget --accept-package-agreements --accept-source-agreements",
             timeout=300,
         )
         if result["success"]:

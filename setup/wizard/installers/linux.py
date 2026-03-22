@@ -3,7 +3,7 @@
 import os
 import subprocess
 
-from setup.wizard.utils.shell import run, launch, is_installed, _get_env
+from setup.wizard.utils.shell import run, launch, is_installed, log_message, _get_env
 from setup.wizard.utils.os_detect import get_os_info
 
 
@@ -118,8 +118,8 @@ def _install_via_terminal(tool_name, cmd, check_binary):
 
     Launches the command in a visible terminal window so sudo prompts
     appear in a trusted terminal rather than the browser wizard.
-    When the terminal closes, returns a result based on whether the
-    binary is now detectable.
+    Uses launch() (fire-and-forget) so the wizard never blocks or times out
+    waiting for the terminal to close.
     """
     if not cmd:
         return {"success": False, "message": f"No install command available for {tool_name}"}
@@ -134,8 +134,14 @@ def _install_via_terminal(tool_name, cmd, check_binary):
         ("mate-terminal", "-e"),
     ]:
         if is_installed(terminal):
-            full_cmd = f"{terminal} {flag} bash -c \"{cmd}; echo; echo 'Done. Close this window.'; read -p 'Press Enter to close...' _\""
-            result = run(full_cmd, timeout=5)
+            full_cmd = (
+                f"{terminal} {flag} bash -c "
+                f'"{cmd}; echo; echo \'Installation complete. You may close this window.\'; '
+                f"read -p 'Press Enter to close...' _\""
+            )
+            log_message(f"[sudo required] Opening a terminal window to install {tool_name}.")
+            log_message("[action needed]  Enter your sudo password in the terminal that appears.")
+            launch(full_cmd)  # fire-and-forget — terminal runs independently
             launched = True
             break
 
@@ -153,7 +159,8 @@ def _install_via_terminal(tool_name, cmd, check_binary):
         "success": True,
         "message": (
             f"A terminal window has opened to install {tool_name}. "
-            "Please complete the installation there, then click 'Check Again'."
+            "Please enter your sudo password there and wait for it to finish, "
+            "then click 'Check Again'."
         ),
         "terminal_launched": True,
     }
@@ -334,23 +341,41 @@ def _install_windsurf():
 
 def _install_claude_code():
     if not is_installed("npm"):
-        result = _pkg_install({
-            "apt": "nodejs npm",
-            "dnf": "nodejs npm",
-            "pacman": "nodejs npm",
-        })
-        if not result["success"]:
-            return {"success": False, "message": "Failed to install Node.js (required for Claude Code).",
-                    "error_log": result.get("error_log", "")}
+        s = _sudo()
+        if s:
+            # Need elevated access for the package manager — open terminal
+            info = get_os_info()
+            mgr = info.get("pkg_manager")
+            cmds = {
+                "apt":    "sudo apt install -y nodejs npm",
+                "dnf":    "sudo dnf install -y nodejs npm",
+                "pacman": "sudo pacman -S --noconfirm nodejs npm",
+            }
+            cmd = cmds.get(mgr, "")
+            if cmd:
+                return _install_via_terminal("Node.js (required for Claude Code)", cmd, "npm")
+            return {"success": False, "message": f"No Node.js install command for package manager: {mgr}"}
+        else:
+            result = _pkg_install({
+                "apt": "nodejs npm",
+                "dnf": "nodejs npm",
+                "pacman": "nodejs npm",
+            })
+            if not result["success"]:
+                return {"success": False, "message": "Failed to install Node.js (required for Claude Code).",
+                        "error_log": result.get("error_log", "")}
 
     result = run("npm install -g @anthropic-ai/claude-code", timeout=120)
     if result["success"]:
         return {"success": True, "message": "Claude Code installed successfully"}
-    # Try with sudo
-    result = run("sudo npm install -g @anthropic-ai/claude-code", timeout=120)
-    if result["success"]:
-        return {"success": True, "message": "Claude Code installed successfully"}
-    return {"success": False, "message": "Failed to install Claude Code via npm.", "error_log": result["stderr"] or result["stdout"]}
+
+    # Global install failed (system npm requires sudo) — open terminal instead of
+    # running sudo in the background where no password prompt is visible
+    return _install_via_terminal(
+        "Claude Code",
+        "sudo npm install -g @anthropic-ai/claude-code",
+        "claude",
+    )
 
 
 def _install_vscode():
@@ -491,7 +516,11 @@ def minimize_wizard_window():
 
 
 def install_tkinter():
-    """Install python3-tk (required for agent animation window)."""
+    """Install python3-tk (required for agent animation window).
+
+    Uses a terminal window when sudo is required so the password prompt
+    is visible — never asks for credentials in the wizard GUI.
+    """
     try:
         import importlib
         if importlib.util.find_spec("tkinter") is not None:
@@ -499,6 +528,25 @@ def install_tkinter():
     except Exception:
         pass
 
+    info = get_os_info()
+    mgr = info.get("pkg_manager")
+    s = _sudo()
+
+    # If we need sudo and can't do it passwordlessly, open a terminal
+    if s:
+        cmds = {
+            "apt":    "sudo apt install -y python3-tk",
+            "dnf":    "sudo dnf install -y python3-tkinter",
+            "yum":    "sudo yum install -y python3-tkinter",
+            "pacman": "sudo pacman -S --noconfirm tk",
+            "zypper": "sudo zypper install -y python3-tk",
+        }
+        cmd = cmds.get(mgr, "")
+        if cmd:
+            return _install_via_terminal("python3-tk (animation window)", cmd, None)
+        return {"success": False, "message": f"No install command for package manager: {mgr}"}
+
+    # Running as root or passwordless sudo — install directly
     result = _pkg_install({
         "apt":    "python3-tk",
         "dnf":    "python3-tkinter",

@@ -261,7 +261,19 @@ async function installPrerequisite(tool) {
 
   _pollInstallLog(startRes.job_id, 'prereq-log-content', async (result) => {
     clearInterval(timer);
-    if (result.success) {
+    if (result.terminal_launched) {
+      // A terminal was opened for sudo — user must complete it, then click Check Again
+      const alertsEl = document.getElementById('prereq-alerts');
+      if (alertsEl) {
+        alertsEl.innerHTML = `<div class="alert alert-warning">
+          ${result.message}
+          <br><br>
+          <button class="btn btn-outline btn-sm" onclick="refreshPrerequisites()">Check Again</button>
+        </div>`;
+      }
+      btn.textContent = origText;
+      btn.disabled = false;
+    } else if (result.success) {
       await refreshPrerequisites();
       showAlert('prereq-alerts', `${tool === 'git' ? 'Git' : 'GitHub CLI'} installed successfully!`, 'success');
       btn.textContent = '\u2713 Installed';
@@ -659,7 +671,20 @@ async function installTool() {
 
   _pollInstallLog(startRes.job_id, 'tool-log-content', (result) => {
     clearInterval(timer);
-    if (result.success) {
+    if (result.terminal_launched) {
+      // A terminal was opened for sudo — user must complete it, then click Check Again
+      const alertsEl = document.getElementById('tool-alerts');
+      if (alertsEl) {
+        alertsEl.innerHTML = `<div class="alert alert-warning">
+          ${result.message}
+          <br><br>
+          <button class="btn btn-outline btn-sm" onclick="selectTool('${state.selectedTool}')">Check Again</button>
+        </div>`;
+      }
+      btn.textContent = 'Check Again';
+      btn.disabled = false;
+      btn.onclick = () => selectTool(state.selectedTool);
+    } else if (result.success) {
       showAlert('tool-alerts', result.message, 'success');
       document.getElementById('launch-tool-btn').style.display = '';
       document.getElementById('tool-next').disabled = false;

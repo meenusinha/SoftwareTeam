@@ -169,6 +169,17 @@ def get_version(name):
     return None
 
 
+def log_message(text):
+    """Append a message to the current job log (if an install log context is active).
+
+    Call this from installer functions to emit status lines that appear in the
+    wizard log box without running an actual command.
+    """
+    lines = getattr(_thread_local, 'log_lines', None)
+    if lines is not None:
+        lines.append(text)
+
+
 def _get_env():
     """Get environment with PATH expanded to common install locations."""
     env = os.environ.copy()
