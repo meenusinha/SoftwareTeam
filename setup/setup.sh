@@ -34,7 +34,9 @@ error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # --- Detect OS ---
 detect_os() {
-    case "$(uname -s)" in
+    local uname_s
+    uname_s="$(uname -s)"
+    case "$uname_s" in
         Darwin*)
             OS="mac"
             info "Detected: macOS $(sw_vers -productVersion 2>/dev/null || echo '')"
@@ -50,8 +52,20 @@ detect_os() {
                 DISTRO_ID="linux"
             fi
             ;;
+        MINGW*|MSYS*|CYGWIN*)
+            # Git Bash / MSYS2 / Cygwin on Windows — this script is for Mac/Linux only.
+            error "Detected: Windows ($uname_s)"
+            error "This script does not support Windows bash environments (Git Bash, MSYS2, Cygwin)."
+            error ""
+            error "Please use the PowerShell setup script instead:"
+            error "  1. Open PowerShell (not Git Bash)"
+            error "  2. Run:  irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.ps1 | iex"
+            echo ""
+            read -r -p "Press Enter to close..." _dummy || true
+            exit 1
+            ;;
         *)
-            error "Unsupported OS: $(uname -s)"
+            error "Unsupported OS: $uname_s"
             error "For Windows, use setup.ps1 instead."
             exit 1
             ;;
@@ -101,26 +115,50 @@ run_timed() {
     return 1
 }
 
+# Verify that a Python command is 3.6 or newer.
+# Usage: _verify_python_version <cmd>   returns 0 if OK, 1 if too old or not found
+_verify_python_version() {
+    local cmd="$1"
+    "$cmd" -c "import sys; sys.exit(0 if sys.version_info >= (3,6) else 1)" 2>/dev/null
+}
+
 # --- Check/Install Python 3 ---
 ensure_python() {
-    # Check for python3
+    # Check for python3 first — most reliable name for Python 3
     if command -v python3 &>/dev/null; then
-        PYTHON="python3"
-        ok "Python 3 found: $(python3 --version)"
-        return
+        if _verify_python_version python3; then
+            PYTHON="python3"
+            ok "Python 3 found: $(python3 --version)"
+            return
+        else
+            warn "python3 found but is too old ($(python3 --version 2>&1)) — need 3.6+. Will install a newer version."
+        fi
     fi
 
-    # Check for python (might be Python 3)
+    # Check for python (might be Python 3 on some systems)
     if command -v python &>/dev/null; then
         PY_VER=$(python --version 2>&1)
-        if echo "$PY_VER" | grep -q "Python 3"; then
+        if echo "$PY_VER" | grep -q "Python 3" && _verify_python_version python; then
             PYTHON="python"
             ok "Python 3 found: $PY_VER"
             return
         fi
+        # python is Python 2 (or too old Python 3) — don't use it
+        warn "Found '$(python --version 2>&1)' but Python 3.6+ is required."
     fi
 
-    warn "Python 3 not found. Installing automatically..."
+    warn "Python 3.6+ is required but was not found on this system."
+    echo ""
+    read -r -p "May we install Python 3 automatically? [y/N] " _py_answer
+    case "$_py_answer" in
+        [yY]|[yY][eE][sS]) ;;
+        *)
+            error "Python 3 is required to run the setup wizard."
+            error "Please install Python 3.6+ from https://python.org and run this script again."
+            exit 1
+            ;;
+    esac
+    info "Installing Python 3..."
     local py_installed=false
 
     if [ "$OS" = "mac" ]; then
@@ -245,8 +283,45 @@ launch_wizard() {
     echo "============================================"
     echo ""
 
+    # Final safety check — if $PYTHON is Python 2 or too old, try harder before giving up
+    if ! _verify_python_version "$PYTHON"; then
+        warn "'$PYTHON' is $(${PYTHON} --version 2>&1) — not Python 3.6+. Searching for a usable Python 3..."
+
+        # Try explicit python3 variants first (may have just been installed but $PYTHON wasn't updated)
+        for _p3 in python3 python3.12 python3.11 python3.10 python3.9 python3.8; do
+            if command -v "$_p3" &>/dev/null && _verify_python_version "$_p3"; then
+                PYTHON="$_p3"
+                ok "Found usable Python 3: $($PYTHON --version)"
+                break
+            fi
+        done
+
+        # Still not Python 3? Ask the user before installing
+        if ! _verify_python_version "$PYTHON"; then
+            echo ""
+            read -r -p "No Python 3.6+ found. May we install it automatically? [y/N] " _py_answer2
+            case "$_py_answer2" in
+                [yY]|[yY][eE][sS])
+                    ensure_python
+                    ;;
+                *)
+                    error "Python 3 is required. Please install Python 3.6+ from https://python.org"
+                    exit 1
+                    ;;
+            esac
+        fi
+
+        # Last resort — if still wrong, give a clear error
+        if ! _verify_python_version "$PYTHON"; then
+            error "Python 3.6+ could not be installed automatically."
+            error "Please install Python 3 manually from https://python.org"
+            error "Then run this script again."
+            exit 1
+        fi
+    fi
+
     # Run the wizard (run script directly to avoid 'setup' package name conflicts)
-    PYTHONPATH="$REPO_DIR" $PYTHON "$REPO_DIR/setup/wizard/main.py"
+    PYTHONPATH="$REPO_DIR" "$PYTHON" "$REPO_DIR/setup/wizard/main.py"
 
     # Cleanup temp directory when done
     info "Cleaning up temporary files..."

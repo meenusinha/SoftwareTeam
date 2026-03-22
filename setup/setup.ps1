@@ -201,8 +201,18 @@ function Ensure-Python {
 
     $ErrorActionPreference = $prevPref
 
-    # Need to install Python 3
-    Write-Warn "Python 3 not found. Installing automatically..."
+    # Need to install Python 3 — ask first
+    Write-Host ""
+    Write-Warn "Python 3.6+ is required but was not found on this system."
+    Write-Host ""
+    $pyAnswer = Read-Host "May we install Python 3 automatically? [Y/n]"
+    if ($pyAnswer -match '^[Nn]') {
+        Write-Err "Python 3 is required to run the setup wizard."
+        Write-Err "Please install Python 3.6+ from https://python.org"
+        Write-Err "(During installation, check 'Add Python to PATH'.)"
+        Exit-WithPause 1 "Run this script again after installing Python 3."
+    }
+    Write-Info "Installing Python 3..."
 
     $pyInstallLog = "$env:TEMP\python-install.log"
     $pyInstalled  = $false
@@ -426,6 +436,31 @@ function Launch-Wizard($python, $repoDir, $tempDir) {
     Write-Host "  look for the URL printed below."
     Write-Host "============================================"
     Write-Host ""
+
+    # Safety check — ensure the python we found is actually 3.6+
+    $versionCheck = if ($python -eq "py -3") {
+        & py -3 -c "import sys; sys.exit(0 if sys.version_info>=(3,6) else 1)" 2>&1
+        $LASTEXITCODE
+    } elseif ($python -like "*\*") {
+        & "$python" -c "import sys; sys.exit(0 if sys.version_info>=(3,6) else 1)" 2>&1
+        $LASTEXITCODE
+    } else {
+        & $python -c "import sys; sys.exit(0 if sys.version_info>=(3,6) else 1)" 2>&1
+        $LASTEXITCODE
+    }
+    if ($versionCheck -ne 0) {
+        Write-Host ""
+        Write-Warn "The Python found ('$python') is not Python 3.6+ (Python 3.6 or newer is required)."
+        Write-Host ""
+        $pyAnswer2 = Read-Host "May we install or upgrade to Python 3 automatically? [Y/n]"
+        if ($pyAnswer2 -match '^[Nn]') {
+            Write-Err "Python 3.6+ is required to run the setup wizard."
+            Write-Err "Please install Python 3 from https://python.org"
+            Write-Err "(During installation, check 'Add Python to PATH'.)"
+            Exit-WithPause 1 "Run this script again after installing Python 3."
+        }
+        $python = Ensure-Python
+    }
 
     # Run script directly to avoid 'setup' package name conflicts
     $env:PYTHONPATH = $repoDir
