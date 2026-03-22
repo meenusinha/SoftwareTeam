@@ -61,7 +61,7 @@ detect_os() {
             error "  1. Open PowerShell (not Git Bash)"
             error "  2. Run:  irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.ps1 | iex"
             echo ""
-            read -r -p "Press Enter to close..." _dummy || true
+            { read -r _dummy </dev/tty || read -r _dummy; } 2>/dev/null || true
             exit 1
             ;;
         *)
@@ -131,7 +131,7 @@ ensure_python() {
             ok "Python 3 found: $(python3 --version)"
             return
         else
-            warn "python3 found but is too old ($(python3 --version 2>&1)) — need 3.6+. Will install a newer version."
+            warn "python3 found but is $(python3 --version 2>&1) — need 3.6+ (f-strings require 3.6; 3.5 is also end-of-life since 2020). Will install a newer version."
         fi
     fi
 
@@ -144,12 +144,17 @@ ensure_python() {
             return
         fi
         # python is Python 2 (or too old Python 3) — don't use it
-        warn "Found '$(python --version 2>&1)' but Python 3.6+ is required."
+        warn "Found '$(python --version 2>&1)' but Python 3.6+ is required (f-strings were added in 3.6; Python 3.5 is end-of-life)."
     fi
 
     warn "Python 3.6+ is required but was not found on this system."
     echo ""
-    read -r -p "May we install Python 3 automatically? [y/N] " _py_answer
+    # Read from /dev/tty so the prompt works even when stdin is a pipe (curl | bash)
+    if [ -e /dev/tty ]; then
+        { read -r -p "May we install Python 3 automatically? [y/N] " _py_answer </dev/tty; } || true
+    else
+        { read -r -p "May we install Python 3 automatically? [y/N] " _py_answer; } || true
+    fi
     case "$_py_answer" in
         [yY]|[yY][eE][sS]) ;;
         *)
@@ -299,7 +304,11 @@ launch_wizard() {
         # Still not Python 3? Ask the user before installing
         if ! _verify_python_version "$PYTHON"; then
             echo ""
-            read -r -p "No Python 3.6+ found. May we install it automatically? [y/N] " _py_answer2
+            if [ -e /dev/tty ]; then
+                { read -r -p "No Python 3.6+ found. May we install it automatically? [y/N] " _py_answer2 </dev/tty; } || true
+            else
+                { read -r -p "No Python 3.6+ found. May we install it automatically? [y/N] " _py_answer2; } || true
+            fi
             case "$_py_answer2" in
                 [yY]|[yY][eE][sS])
                     ensure_python

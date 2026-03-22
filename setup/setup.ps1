@@ -450,7 +450,7 @@ function Launch-Wizard($python, $repoDir, $tempDir) {
     }
     if ($versionCheck -ne 0) {
         Write-Host ""
-        Write-Warn "The Python found ('$python') is not Python 3.6+ (Python 3.6 or newer is required)."
+        Write-Warn "The Python found ('$python') is not Python 3.6+ (f-strings require 3.6; Python 3.5 is end-of-life since 2020)."
         Write-Host ""
         $pyAnswer2 = Read-Host "May we install or upgrade to Python 3 automatically? [Y/n]"
         if ($pyAnswer2 -match '^[Nn]') {
