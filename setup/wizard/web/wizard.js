@@ -439,14 +439,20 @@ function useCustomPath() {
 }
 
 async function browsePath(targetInputId) {
-  const result = await api('/api/paths/browse');
-  if (result.success && result.path) {
-    state.projectPath = result.path;
-    const input = document.getElementById(targetInputId);
-    if (input) input.value = result.path;
-  } else if (result.message) {
-    showAlert('clone-alerts', result.message, 'warning');
-    showAlert('local-alerts', result.message, 'warning');
+  const btn = event ? event.target : null;
+  if (btn) { btn.textContent = 'Opening…'; btn.disabled = true; }
+  try {
+    const result = await api('/api/paths/browse');
+    if (result.success && result.path) {
+      state.projectPath = result.path;
+      const input = document.getElementById(targetInputId);
+      if (input) input.value = result.path;
+    } else if (result.message) {
+      showAlert('clone-alerts', result.message, 'warning');
+      showAlert('local-alerts', result.message, 'warning');
+    }
+  } finally {
+    if (btn) { btn.textContent = 'Browse...'; btn.disabled = false; }
   }
 }
 

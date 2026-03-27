@@ -119,8 +119,16 @@ def browse_folder():
     if system == "Windows":
         ps_script = (
             "Add-Type -AssemblyName System.Windows.Forms; "
+            # Create a tiny visible TopMost form as owner so ShowDialog()
+            # is anchored to a real on-screen window. Without Show(), the
+            # FolderBrowserDialog has no visible owner and can appear behind
+            # the browser window — especially on VMs.
             "$owner = [System.Windows.Forms.Form]::new(); "
             "$owner.TopMost = $true; "
+            "$owner.ShowInTaskbar = $false; "
+            "$owner.Size = [System.Drawing.Size]::new(1,1); "
+            "$owner.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen; "
+            "$owner.Show(); "
             "$f = [System.Windows.Forms.FolderBrowserDialog]::new(); "
             "$f.Description = 'Choose project location'; "
             "$f.SelectedPath = [System.Environment]::GetFolderPath('Desktop'); "
