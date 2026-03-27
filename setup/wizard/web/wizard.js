@@ -862,9 +862,8 @@ function initVerification() {
   document.getElementById('verify-tool-name').textContent = tool.name;
   document.getElementById('verify-instruction-file').textContent = tool.file;
 
-  // Expected first agent depends on workflow mode
-  const firstAgent = state.workflowMode === 'local' ? 'Product Owner' : 'IT Agent';
-  const firstRole = state.workflowMode === 'local' ? 'Product Owner' : 'IT Agent';
+  const firstAgent = 'IT Agent';
+  const firstRole = 'IT Agent';
 
   document.getElementById('verify-expected-agent').textContent = `"${firstAgent}"`;
   document.getElementById('verify-expected-agent-2').textContent = firstAgent;
