@@ -112,33 +112,86 @@ def browse_folder():
     import shutil as _shutil
     system = platform.system()
 
-    # --- Windows: PowerShell FolderBrowserDialog with a topmost owner form ---
-    # Tried first because tkinter dialogs on Windows often appear behind the
-    # browser window even with -topmost. A hidden TopMost Form as owner forces
-    # the dialog to the front reliably.
+    # --- Windows: IFileOpenDialog (modern Explorer-style picker with address bar) ---
+    # FolderBrowserDialog is the old XP-era tree picker with no address bar.
+    # IFileOpenDialog with FOS_PICKFOLDERS gives the modern dialog where the
+    # user can type or paste a path directly. Invoked via a base64-encoded
+    # PowerShell script so here-strings (needed for Add-Type) work correctly.
     if system == "Windows":
-        ps_script = (
-            "Add-Type -AssemblyName System.Windows.Forms; "
-            # Create a tiny visible TopMost form as owner so ShowDialog()
-            # is anchored to a real on-screen window. Without Show(), the
-            # FolderBrowserDialog has no visible owner and can appear behind
-            # the browser window — especially on VMs.
-            "$owner = [System.Windows.Forms.Form]::new(); "
-            "$owner.TopMost = $true; "
-            "$owner.ShowInTaskbar = $false; "
-            "$owner.Size = [System.Drawing.Size]::new(1,1); "
-            "$owner.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen; "
-            "$owner.Show(); "
-            "$f = [System.Windows.Forms.FolderBrowserDialog]::new(); "
-            "$f.Description = 'Choose project location'; "
-            "$f.SelectedPath = [System.Environment]::GetFolderPath('Desktop'); "
-            "if ($f.ShowDialog($owner) -eq [System.Windows.Forms.DialogResult]::OK) "
-            "{ Write-Output $f.SelectedPath }; "
-            "$owner.Dispose()"
-        )
+        import base64
+        ps_script = r"""
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+public static class ModernFolderPicker {
+    // IFileOpenDialog vtable: IUnknown (0-2) + IModalWindow.Show (3) +
+    // IFileDialog methods (4-26) + IFileOpenDialog methods (27-28).
+    [ComImport, Guid("D57C7288-D4AD-4768-BE02-9D969532D960"),
+     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface IFileOpenDialog {
+        [PreserveSig] int Show(IntPtr parent);
+        [PreserveSig] int SetFileTypes(uint c, IntPtr r);
+        [PreserveSig] int SetFileTypeIndex(uint i);
+        [PreserveSig] int GetFileTypeIndex(out uint pi);
+        [PreserveSig] int Advise(IntPtr pfde, out uint pdw);
+        [PreserveSig] int Unadvise(uint dw);
+        [PreserveSig] int SetOptions(uint fos);
+        [PreserveSig] int GetOptions(out uint pfos);
+        [PreserveSig] int SetDefaultFolder(IntPtr psi);
+        [PreserveSig] int SetFolder(IntPtr psi);
+        [PreserveSig] int GetFolder(out IntPtr ppsi);
+        [PreserveSig] int GetCurrentSelection(out IntPtr ppsi);
+        [PreserveSig] int SetFileName([MarshalAs(UnmanagedType.LPWStr)] string p);
+        [PreserveSig] int GetFileName(out IntPtr p);
+        [PreserveSig] int SetTitle([MarshalAs(UnmanagedType.LPWStr)] string p);
+        [PreserveSig] int SetOkButtonLabel([MarshalAs(UnmanagedType.LPWStr)] string p);
+        [PreserveSig] int SetFileNameLabel([MarshalAs(UnmanagedType.LPWStr)] string p);
+        [PreserveSig] int GetResult(out IShellItem ppsi);
+        [PreserveSig] int AddPlace(IntPtr psi, int fdap);
+        [PreserveSig] int SetDefaultExtension([MarshalAs(UnmanagedType.LPWStr)] string p);
+        [PreserveSig] int Close(int hr);
+        [PreserveSig] int SetClientGuid(ref Guid g);
+        [PreserveSig] int ClearClientData();
+        [PreserveSig] int SetFilter(IntPtr pf);
+        [PreserveSig] int GetResults(out IntPtr pp);
+        [PreserveSig] int GetSelectedItems(out IntPtr pp);
+    }
+    [ComImport, Guid("43826D1E-E718-42EE-BC55-A1E261C37BFE"),
+     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IShellItem {
+        [PreserveSig] int BindToHandler(IntPtr pbc, ref Guid bhid, ref Guid riid, out IntPtr ppv);
+        [PreserveSig] int GetParent(out IShellItem ppsi);
+        [PreserveSig] int GetDisplayName(uint sigdnName,
+            [MarshalAs(UnmanagedType.LPWStr)] out string ppszName);
+        [PreserveSig] int GetAttributes(uint sfgaoMask, out uint psfgaoAttribs);
+        [PreserveSig] int Compare(IntPtr psi, uint hint, out int piOrder);
+    }
+    [ComImport, Guid("DC1C5A9C-E88A-4dde-A5A1-60F82A20AEF7")]
+    class FileOpenDialogCoClass {}
+
+    public static string Pick() {
+        var d = (IFileOpenDialog) new FileOpenDialogCoClass();
+        d.SetOptions(0x20u);  // FOS_PICKFOLDERS
+        d.SetTitle("Choose project location");
+        if (d.Show(IntPtr.Zero) != 0) return null;  // cancelled
+        IShellItem item;
+        if (d.GetResult(out item) != 0) return null;
+        string path;
+        item.GetDisplayName(0x80058000u, out path);  // SIGDN_FILESYSPATH
+        return path;
+    }
+}
+"@
+
+$path = [ModernFolderPicker]::Pick()
+if ($path) { Write-Output $path }
+"""
+        encoded_cmd = base64.b64encode(ps_script.encode("utf-16-le")).decode("ascii")
         try:
             result = subprocess.run(
-                ["powershell", "-NoProfile", "-NonInteractive", "-STA", "-Command", ps_script],
+                ["powershell", "-NoProfile", "-NonInteractive", "-STA",
+                 "-EncodedCommand", encoded_cmd],
                 capture_output=True, text=True, timeout=300,
             )
             if result.returncode == 0 and result.stdout.strip():
