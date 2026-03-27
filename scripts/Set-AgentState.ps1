@@ -15,7 +15,7 @@ $root = Split-Path $PSScriptRoot
 Set-Location $root
 
 # Auto-start animation window if not already running (safe — duplicate guard is in Start-Animation.ps1)
-Start-Process powershell -ArgumentList "-WindowStyle Hidden -NonInteractive -File `"$PSScriptRoot\Start-Animation.ps1`"" -NoNewWindow
+Start-Process powershell -ArgumentList "-ExecutionPolicy Bypass -WindowStyle Hidden -NonInteractive -File `"$PSScriptRoot\Start-Animation.ps1`"" -NoNewWindow
 
 python -c @"
 from agent_animation.state import write

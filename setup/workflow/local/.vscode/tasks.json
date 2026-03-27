@@ -6,7 +6,7 @@
       "type": "shell",
       "command": "bash scripts/start-animation.sh",
       "windows": {
-        "command": "powershell -WindowStyle Hidden -NonInteractive -File scripts\\Start-Animation.ps1"
+        "command": "powershell -ExecutionPolicy Bypass -WindowStyle Hidden -NonInteractive -File scripts\\Start-Animation.ps1"
       },
       "runOptions": {
         "runOn": "folderOpen"
