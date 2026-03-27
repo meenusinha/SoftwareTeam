@@ -130,7 +130,7 @@ def browse_folder():
         )
         try:
             result = subprocess.run(
-                ["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_script],
+                ["powershell", "-NoProfile", "-NonInteractive", "-STA", "-Command", ps_script],
                 capture_output=True, text=True, timeout=300,
             )
             if result.returncode == 0 and result.stdout.strip():
