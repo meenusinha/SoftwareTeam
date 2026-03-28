@@ -3,8 +3,30 @@
 # Usage: bash scripts/start-animation.sh [--demo]
 cd "$(dirname "$0")/.."
 
-# Only one instance at a time
+# Only one instance at a time.
+# Primary check: pgrep (Linux/macOS). Fallback: lock file written by agent_window.py
+# on startup — used on Windows where pgrep is often unavailable.
 if pgrep -f "agent_animation.agent_window" > /dev/null 2>&1; then
+  exit 0
+fi
+if python -c "
+import sys, os
+from pathlib import Path
+import tempfile
+lock = Path(os.environ.get('AGENT_STATE_FILE', str(Path(tempfile.gettempdir()) / 'agent-state.json'))).with_name('agent-animation.lock')
+if not lock.exists():
+    sys.exit(1)
+pid = lock.read_text().strip()
+if not pid:
+    sys.exit(1)
+try:
+    import signal
+    os.kill(int(pid), 0)   # signal 0 = existence check, raises OSError if dead
+    sys.exit(0)            # process alive — window is running
+except (OSError, ValueError):
+    lock.unlink(missing_ok=True)
+    sys.exit(1)
+" 2>/dev/null; then
   exit 0
 fi
 

@@ -512,10 +512,24 @@ def _ensure_display():
 
 
 def main():
+    import atexit
+    import tempfile
+
     parser = argparse.ArgumentParser(description='Agent animation floating window')
     parser.add_argument('--demo', action='store_true',
                         help='Cycle through all agents and states automatically')
     args = parser.parse_args()
+
+    # Write a PID lock file so start-animation.sh can detect us on Windows,
+    # where pgrep is often unavailable and the duplicate guard would otherwise fail.
+    # Place the lock file next to the state file so both use the same directory.
+    from .state import STATE_FILE
+    _lock_file = STATE_FILE.with_name('agent-animation.lock')
+    try:
+        _lock_file.write_text(str(os.getpid()))
+        atexit.register(lambda: _lock_file.unlink(missing_ok=True))
+    except Exception:
+        pass  # non-fatal — animation still works without lock file
 
     # Ensure DISPLAY is set before Tkinter tries to open it (needed on Wayland)
     _ensure_display()

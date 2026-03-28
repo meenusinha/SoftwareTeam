@@ -67,9 +67,11 @@ Complete the BEFORE HANDING OFF checklist in that file, then come back here.
 
 **MANDATORY HANDOVER step before moving on:**
 1. Present the tool verification results to the user
-2. Ask the user: "Tools are verified. Shall I hand over to Product Owner Agent for Requirements?"
+2. ⛔ SINGLE RESPONSE — run this AND the handover question in the same message (do NOT make this a standalone tool call):
+   Run: `bash scripts/set-agent-state.sh it handingoff "Handing off to Product Owner..."`
+3. Ask the user: "Tools are verified. Shall I hand over to Product Owner Agent for Requirements?"
    ⛔ STOP. Output nothing else and make no further tool calls until the user replies. The animation command above and this question MUST have been in the same response — never run set-agent-state handingoff as a standalone tool call without also outputting the question text. Proceeding without a reply is a CRITICAL WORKFLOW VIOLATION.
-3. Proceed to next step[Step 2](#step-2-product-owner--requirements) when user asks or confirms to do so.
+4. Proceed to next step[Step 2](#step-2-product-owner--requirements) when user asks or confirms to do so.
 ---
 
 ## Step 2: Product Owner — Requirements
