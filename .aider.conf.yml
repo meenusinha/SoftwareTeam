@@ -9,6 +9,3 @@ read:
   - ai-assistants/agents/tester-agent.md
   - ai-assistants/agents/it-agent.md
   - ai-assistants/agents/cost-analyst-agent.md
-
-# Convention file with workflow instructions
-conventions: .aider.conventions.md
