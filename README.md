@@ -3,7 +3,7 @@
 
 - **Give it a task** - Your agentic team plans, designs, and builds it automatically in your AI tool.
 
-- **Works two ways**: agents run with full GitHub integration (auto branches, PRs, and multi-agent review) — or entirely locally with no GitHub needed.
+- **Works two ways**: Agents run with full GitHub integration (auto branches, PRs, and multi-agent review) — or entirely locally with no GitHub needed.
 
 - **Predefined AI agents** work out-of-the-box, or **use this as a template** to customize your workflows.
 [Pixel based animation makes AI collaboration feel alive and tangible.]
