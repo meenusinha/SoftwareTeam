@@ -571,6 +571,17 @@ def api_github_fork_clone(body):
         # Add upstream for pulling template updates
         run(f'git -C "{dest}" remote add upstream https://github.com/{REPO_OWNER}/{REPO_NAME}.git', timeout=10)
 
+    # Squash all template commits into one fresh "Initial commit" on the user's
+    # fork so their repo starts with a clean history. The upstream remote is
+    # kept so they can still pull future SoftwareTeam updates.
+    if gh_user and gh_user.lower() != REPO_OWNER.lower():
+        run(f'git -C "{dest}" checkout --orphan fresh-start', timeout=15)
+        run(f'git -C "{dest}" add -A', timeout=30)
+        run(f'git -C "{dest}" commit -m "Initial commit"', timeout=30)
+        run(f'git -C "{dest}" branch -D {REPO_BRANCH}', timeout=10)
+        run(f'git -C "{dest}" branch -m {REPO_BRANCH}', timeout=10)
+        run(f'git -C "{dest}" push -f origin {REPO_BRANCH}', timeout=60)
+
     # Set gh repo default so agents can create PRs without --repo flag
     repo_owner = gh_user if gh_user else REPO_OWNER
     run(f'gh repo set-default {repo_owner}/{REPO_NAME}', timeout=15, cwd=dest)
