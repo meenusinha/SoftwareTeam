@@ -575,12 +575,12 @@ def api_github_fork_clone(body):
     # fork so their repo starts with a clean history. The upstream remote is
     # kept so they can still pull future SoftwareTeam updates.
     if gh_user and gh_user.lower() != REPO_OWNER.lower():
-        run(f'git -C "{dest}" checkout --orphan fresh-start', timeout=15)
-        run(f'git -C "{dest}" add -A', timeout=30)
-        run(f'git -C "{dest}" commit -m "Initial commit"', timeout=30)
-        run(f'git -C "{dest}" branch -D {REPO_BRANCH}', timeout=10)
-        run(f'git -C "{dest}" branch -m {REPO_BRANCH}', timeout=10)
-        run(f'git -C "{dest}" push -f origin {REPO_BRANCH}', timeout=60)
+        run('git checkout --orphan fresh-start', timeout=15, cwd=dest)
+        run('git add -A', timeout=30, cwd=dest)
+        run('git commit -m "Initial commit"', timeout=30, cwd=dest)
+        run(f'git branch -D {REPO_BRANCH}', timeout=10, cwd=dest)
+        run(f'git branch -m {REPO_BRANCH}', timeout=10, cwd=dest)
+        run(f'git push -f origin {REPO_BRANCH}', timeout=60, cwd=dest)
 
     # Set gh repo default so agents can create PRs without --repo flag
     repo_owner = gh_user if gh_user else REPO_OWNER
