@@ -257,13 +257,16 @@ irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.p
 ## How You Can Use It?
 **SoftwareTeam** supports different ways of working:
 
-**1. With Git** (recommended for developers)
-- **Full workflow** with branches, PRs, and collaboration
+**1. With GitHub** (recommended for developers)
+- Agents automatically create a task branch and their own feature branches
+- Each agent opens a PR when their work is done
+- **Multi-agent PR review launches automatically** — other agents review the PR, flag issues, and the author agent reworks until approved
+- PR is then closed and work merges into the task branch
 - Ideal for teams and structured projects
 
-**2. Without Git** (simple usage)
-- **Just use your AI tool** and generate outputs
-- No version control required
+**2. Without GitHub** (local-only)
+- Agents do all the same work but skip branches and PRs
+- Everything stays on your machine
 - **Great for beginners and quick experiments**
 
 **3. Optional: Use as a Template**
