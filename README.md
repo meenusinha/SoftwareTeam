@@ -3,6 +3,8 @@
 
 - **Give it a task** - Your agentic team plans, designs, and builds it automatically in your AI tool.
 
+- **Works two ways**: agents run with full GitHub integration (auto branches, PRs, and multi-agent review) — or entirely locally with no GitHub needed.
+
 - **Predefined AI agents** work out-of-the-box, or **use this as a template** to customize your workflows.
 [Pixel based animation makes AI collaboration feel alive and tangible.]
 
@@ -261,7 +263,7 @@ irm https://raw.githubusercontent.com/meenusinha/SoftwareTeam/main/setup/setup.p
 - Agents automatically create a task branch and their own feature branches
 - Each agent opens a PR when their work is done
 - **Multi-agent PR review launches automatically** — other agents review the PR, flag issues, and the author agent reworks until approved
-- PR is then closed and work merges into the task branch
+- You merge with a click or by commenting `/merge` — keeping you in control
 - Ideal for teams and structured projects
 
 **2. Without GitHub** (local-only)
