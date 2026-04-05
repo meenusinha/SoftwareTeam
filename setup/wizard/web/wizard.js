@@ -662,6 +662,8 @@ async function selectTool(id) {
     installBtn.textContent = 'Already Installed';
     installBtn.disabled = true;
     launchBtn.style.display = '';
+    launchBtn.disabled = false;
+    launchBtn.textContent = 'Launch';
     nextBtn.disabled = false;
   } else {
     showAlert('tool-alerts', '', 'info');
