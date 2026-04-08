@@ -23,9 +23,21 @@ brew install python3
 `brew install python3` always installs the latest Python 3 (currently 3.12), so it's always 3.6+.
 Or download from https://python.org
 
-**Ubuntu / Linux / WSL:**
+**(Debian-based distributions) Ubuntu:**
 ```bash
 sudo apt-get update && sudo apt-get install -y python3
+```
+
+**(RPM-based distributions) Red Hat / CentOS / Fedora:**
+```bash
+sudo dnf install -y python3
+
+or, for older systems: sudo yum install -y python3
+```
+
+**Arch Linux / Manjaro:**
+```bash
+sudo pacman -Syu python
 ```
 
 **Windows (PowerShell):**
