@@ -19,7 +19,9 @@
 
 **Your team collaborates automatically. You simply open your AI tool (Claude, Cursor, vscode-Copilot, etc.) and provide your task prompt.**
 
-### Quick Installation - [One-Command Setup Recommended)](#one-command-setup-recommended)
+## Quick Installation 
+Go to [One-Command Setup Recommended)](#one-command-setup-recommended)
+
 ### [Attribution (optional but appreciated)]:
 If you use this project, please consider linking back to:
 https://github.com/meenusinha/SoftwareTeam
