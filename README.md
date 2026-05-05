@@ -1,7 +1,7 @@
 # SoftwareTeam - Turn any AI tool into a structured software team—using simple markdown files.
 ### An AI-powered software team that turns your idea into a working system.
 
-Demo nd usage youtube link: https://youtube.com/playlist?list=PL9pyH9gllMkrA0EhM40H-duz9qwhVVqh9&si=9lE_S8cR7zQUVMs2
+Demo and usage youtube link: https://youtube.com/playlist?list=PL9pyH9gllMkrA0EhM40H-duz9qwhVVqh9&si=9lE_S8cR7zQUVMs2
 
 - **Give it a task** - Your agentic team plans, designs, and builds it automatically in your AI tool.
 
