@@ -53,9 +53,9 @@ class RepoRAG:
         docs, ids = [], []
 
         patterns = [
-            ("thrift", self.repo_root.glob("interfaces/*.thrift")),
-            ("header", self.repo_root.glob("src/**/*.h")),
-            ("impl",   self.repo_root.glob("src/**/*.cpp")),
+            ("thrift", self.repo_root.glob("**/*.thrift")),
+            ("header", self.repo_root.glob("**/*.h")),
+            ("impl",   self.repo_root.glob("**/*.cpp")),
         ]
         for kind, files in patterns:
             for src_file in sorted(files):

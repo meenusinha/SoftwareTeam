@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parents[4]))
+sys.path.insert(0, str(Path(__file__).parents[5]))
 
 from orchestrator.config_loader import load_config, get_repo_config
 from orchestrator.rag.repo_rag import RepoRAG
