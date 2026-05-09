@@ -148,7 +148,8 @@ go.sum
 # VS Code (ignore all except settings.json which configures Copilot)
 .vscode/*
 !.vscode/settings.json
-*.code-workspace
+!.vscode/mcp.json
+# *.code-workspace intentionally tracked — each file opens a repo as its own VS Code session
 
 # JetBrains
 .idea/
