@@ -203,3 +203,4 @@ htmlcov/
 test-results/
 .pytest_cache/
 pr_details.json
+.chroma_db/

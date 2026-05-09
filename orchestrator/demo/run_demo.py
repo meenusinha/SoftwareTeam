@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Entry point for the multi-repo agentic orchestration demo."""
-import os
+"""Demo: Distributed Independent Repo Agents with RAG + MCP."""
 import sys
+from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -10,10 +10,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from orchestrator.config_loader import load_config, get_repo_config
-from orchestrator.rag.repo_rag import RepoRAG
-from orchestrator.repo_agent import RepoAgent
+from orchestrator.independent_repo_agent import IndependentRepoAgent
 
-WIDTH = 67
+WIDTH = 70
 
 
 def banner(text: str) -> str:
@@ -28,29 +27,30 @@ def main():
     repo_cfg = get_repo_config(config, requesting_repo)
 
     print("\n" + banner(
-        f"MULTI-REPO AGENTIC ORCHESTRATION DEMO\n"
-        f" Requesting Repo : {repo_cfg['display_name']}\n"
-        f" Feature Request : {feature_request}"
+        f"DISTRIBUTED REPO AGENT DEMO\n"
+        f" Requesting Repo  : {repo_cfg['display_name']}\n"
+        f" Feature Request  : {feature_request}\n"
+        f" Architecture     : Each repo has its own RAG + MCP + Agent\n"
+        f"                    Orchestrator is router-only (no RAG)"
     ))
 
-    # Build RAG indexes
-    print("\nBuilding / loading RAG knowledge indexes...")
-    for repo in config["repos"]:
-        print(f"  · {repo['display_name']}...", end=" ", flush=True)
-        rag = RepoRAG(
-            repo_name=repo["name"],
-            config={"knowledge_path": repo["knowledge_path"], "rag": config["rag"]},
-        )
-        rag.build_or_load_index()
-        print("ready")
+    print(f"\nInitialising {repo_cfg['display_name']} independent agent...")
+    print(f"  · Building own RAG index ({requesting_repo})...")
+    agent = IndependentRepoAgent(requesting_repo, config)
+    print(f"  · Agent ready.\n")
 
-    # Run the agent
-    agent = RepoAgent(config)
-    summary = agent.run(requesting_repo, feature_request)
+    document = agent.handle_feature_request(feature_request)
 
-    print("\n" + banner("CONSULTATION SUMMARY"))
-    print(summary)
+    print("\n" + banner("FEATURE ANALYSIS DOCUMENT"))
+    print(document)
     print("═" * WIDTH + "\n")
+
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+    out_path = output_dir / f"feature-analysis-{ts}.md"
+    out_path.write_text(document, encoding="utf-8")
+    print(f"Document saved to: {out_path}\n")
 
 
 if __name__ == "__main__":
