@@ -269,9 +269,20 @@ def api_github_auth_status():
         return {"authenticated": False, "reason": "gh not installed"}
 
     result = run("gh auth status")
+    # gh auth status exits 1 even when some accounts succeed (e.g. if GITHUB_TOKEN
+    # env var is invalid). Parse the output text directly instead of trusting the
+    # exit code so a bad token in the environment doesn't hide a valid keyring login.
+    output = result["stdout"] + result["stderr"]
+    import re
+    for line in output.split("\n"):
+        # Matches "✓ Logged in to github.com account USERNAME (keyring)"
+        m = re.search(r'Logged in to github\.com account (\S+)', line)
+        if m and "✓" in line:  # ✓
+            username = m.group(1).strip("()")
+            return {"authenticated": True, "username": username, "output": output}
+
     if result["success"]:
-        # Extract username from output
-        output = result["stdout"] + result["stderr"]  # gh prints to stderr
+        # Fallback: exit 0 but username not found via regex
         username = ""
         for line in output.split("\n"):
             if "Logged in to" in line and "account" in line.lower():
@@ -280,17 +291,12 @@ def api_github_auth_status():
                     if p == "as":
                         username = parts[i + 1].strip("()")
                         break
-            elif "Logged in to" in line:
-                # Try to extract username
-                for part in line.split():
-                    if part.startswith("@") or (not part.startswith("-") and "." not in part and len(part) > 1):
-                        pass
         return {"authenticated": True, "username": username, "output": output}
 
     return {
         "authenticated": False,
         "reason": "Not authenticated",
-        "output": result["stderr"],
+        "output": output,
     }
 
 
@@ -342,6 +348,11 @@ def api_github_login(body=None):
     import sys
     from setup.wizard.utils.shell import _get_env
     env = _get_env()
+
+    # A GITHUB_TOKEN env var (even an invalid one) prevents gh from starting the
+    # device-code flow — it either exits early or produces no output with the code.
+    # Strip it so gh falls back to its keyring/config authentication properly.
+    env.pop("GITHUB_TOKEN", None)
 
     # Suppress gh's own browser-open: we open it ourselves below via
     # webbrowser.open() so it works reliably on Windows, macOS, and Linux.
@@ -435,10 +446,26 @@ def api_github_login(body=None):
         except Exception:
             pass  # Non-fatal — the clickable link in the UI is the fallback
 
+    if not code_match:
+        # gh started but didn't print a device code — could be a network hiccup,
+        # an environment issue, or gh timing out. Return a clear failure so the UI
+        # can show a useful message rather than displaying an empty code box.
+        return {
+            "success": False,
+            "status": "no_code",
+            "device_code": "",
+            "verification_url": verification_url,
+            "message": (
+                "GitHub did not return a sign-in code. "
+                "Try again, or use the 'Use a token instead' option on the next screen."
+            ),
+            "raw_output": output,
+        }
+
     return {
         "success": True,
         "status": "started",
-        "device_code": code_match.group(1) if code_match else "",
+        "device_code": code_match.group(1),
         "verification_url": verification_url,
         "message": "Enter the code at the URL below to sign in.",
         "raw_output": output,

@@ -373,7 +373,15 @@ async function githubLogin() {
     btn.disabled = false;
     btn.onclick = githubLogin;
   } else {
-    showAlert('gh-account-alerts', result.message || 'Login failed. Try using a token instead (next screen).', 'warning');
+    // Show a clear error with the reason. If the backend captured a verification
+    // URL, show it as a fallback link so the user isn't left with a blank message.
+    const url = result.verification_url || 'https://github.com/login/device';
+    const urlLine = result.status === 'no_code'
+      ? `<br><small>If the problem persists, go to <a href="${url}" target="_blank">${url}</a> and sign in manually, then use the token option on the next screen.</small>`
+      : '';
+    showAlert('gh-account-alerts',
+      (result.message || 'Login failed. Try using a token instead (next screen).') + urlLine,
+      'warning');
     btn.textContent = 'Sign In with Browser';
     btn.disabled = false;
     btn.onclick = githubLogin;
