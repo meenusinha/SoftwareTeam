@@ -85,18 +85,25 @@ class RepoAgent:
         self._orchestrator = OrchestratorAgent(config)
 
     def _node_ask_orchestrator(self, state: AgentState) -> AgentState:
+        candidates = [r for r in self._config["repos"] if r["name"] != state["requesting_repo"]]
+
         print(f"\n[STEP 1] {state['requesting_repo']} Agent → Orchestrator")
-        print(f"  Question: Which repos should I consult for this feature?")
-        targets = self._orchestrator.decide_consultations(
+        print(f"  Feature request: \"{state['feature_request'][:70]}...\"")
+        print(f"  Orchestrator querying all {len(candidates)} candidate repos...")
+        for r in candidates:
+            print(f"    · Querying {r['display_name']} knowledge base...")
+
+        targets, responses = self._orchestrator.decide_consultations(
             state["requesting_repo"], state["feature_request"]
         )
-        repo_cfg = get_repo_config(self._config, state["requesting_repo"])
-        candidates = [r for r in self._config["repos"] if r["name"] != state["requesting_repo"]]
-        reasons = {r["name"]: r["description"] for r in candidates}
+
         print(f"\n[STEP 2] Orchestrator → {state['requesting_repo']} Agent")
-        print(f"  Consult: {targets}")
-        for t in targets:
-            print(f"  · {t}: {reasons.get(t, '')[:80]}")
+        print(f"  Queried all repos. Relevance ranking:")
+        for r in candidates:
+            marker = "★" if r["name"] in targets else "·"
+            snippet = responses.get(r["name"], "")[:80].replace("\n", " ")
+            print(f"    {marker} {r['display_name']}: \"{snippet}...\"")
+        print(f"  Selected for consultation: {[r for r in targets]}")
         return {**state, "targets": targets}
 
     def _node_consult_repo_1(self, state: AgentState) -> AgentState:
