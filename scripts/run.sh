@@ -1,23 +1,17 @@
 #!/bin/bash
-# =============================================================================
-# Run Script
-# =============================================================================
-# Always run the latest release artifact if present.
-# =============================================================================
-
 set -e
 
 ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
-RELEASE_RUN="$ROOT_DIR/output/release/run.sh"
+cd "$ROOT_DIR"
 
-echo "=========================================="
-echo "Starting application from latest release..."
-echo "=========================================="
-
-if [ -x "$RELEASE_RUN" ]; then
-	exec "$RELEASE_RUN"
+if [ -f .env ]; then
+  set -a; source .env; set +a
 fi
 
-echo "ERROR: Latest release run script not found."
-echo "Please build a release first (e.g., ./scripts/release-sudoku.sh <version>)."
-exit 1
+if [ -f "$ROOT_DIR/.venv/bin/activate" ]; then
+  source "$ROOT_DIR/.venv/bin/activate"
+fi
+
+export PYTHONPATH="$ROOT_DIR"
+
+python orchestrator/demo/run_demo.py

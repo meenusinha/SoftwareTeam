@@ -1,0 +1,6 @@
+{
+  "folders": [{ "path": "orchestrator" }],
+  "settings": {
+    "github.copilot.chat.welcomeMessage": "never"
+  }
+}

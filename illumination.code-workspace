@@ -1,0 +1,6 @@
+{
+  "folders": [{ "path": "repos/illumination" }],
+  "settings": {
+    "github.copilot.chat.welcomeMessage": "never"
+  }
+}

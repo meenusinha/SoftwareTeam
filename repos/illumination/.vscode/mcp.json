@@ -1,0 +1,24 @@
+{
+  "servers": {
+    "orchestrator": {
+      "type": "stdio",
+      "command": "${workspaceFolder}/../../.venv/bin/python",
+      "args": ["orchestrator/mcp/orchestrator_mcp_server.py"],
+      "cwd": "${workspaceFolder}/../.."
+    },
+    "scan_manager_knowledge": {
+      "type": "stdio",
+      "command": "${workspaceFolder}/../../.venv/bin/python",
+      "args": ["orchestrator/mcp/repo_mcp_server.py", "--repo", "scan_manager"],
+      "cwd": "${workspaceFolder}/../..",
+      "env": { "PYTHONPATH": "${workspaceFolder}/../.." }
+    },
+    "expose_sequence_knowledge": {
+      "type": "stdio",
+      "command": "${workspaceFolder}/../../.venv/bin/python",
+      "args": ["orchestrator/mcp/repo_mcp_server.py", "--repo", "expose_sequence"],
+      "cwd": "${workspaceFolder}/../..",
+      "env": { "PYTHONPATH": "${workspaceFolder}/../.." }
+    }
+  }
+}

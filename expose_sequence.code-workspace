@@ -1,0 +1,6 @@
+{
+  "folders": [{ "path": "repos/expose_sequence" }],
+  "settings": {
+    "github.copilot.chat.welcomeMessage": "never"
+  }
+}

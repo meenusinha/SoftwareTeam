@@ -1,0 +1,6 @@
+{
+  "folders": [{ "path": "repos/scan_manager" }],
+  "settings": {
+    "github.copilot.chat.welcomeMessage": "never"
+  }
+}
