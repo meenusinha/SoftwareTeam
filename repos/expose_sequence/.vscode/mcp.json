@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "illumination_knowledge": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["../../orchestrator/mcp/repo_mcp_server.py", "--repo", "illumination"],
+      "cwd": "${workspaceFolder}/../..",
+      "env": { "PYTHONPATH": "${workspaceFolder}/../.." }
+    },
+    "scan_manager_knowledge": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["../../orchestrator/mcp/repo_mcp_server.py", "--repo", "scan_manager"],
+      "cwd": "${workspaceFolder}/../..",
+      "env": { "PYTHONPATH": "${workspaceFolder}/../.." }
+    }
+  }
+}

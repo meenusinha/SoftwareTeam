@@ -225,12 +225,13 @@ END → print to console
 | Interfaces | Thrift IDL | User requirement |
 | Implementation | C++ (stub) | User requirement |
 | Agent framework | LangGraph (Python) | Best for multi-agent flow visualization |
-| LLM | Claude Haiku 4.5 (Anthropic) | Cost-efficient, fast for demo |
+| LLM | GitHub Models via OpenAI SDK (gpt-4o-mini) | Uses existing GitHub Copilot token; no separate API billing |
+| IDE integration | VS Code + GitHub Copilot (`.vscode/mcp.json` per repo) | Each repo opened as its own workspace; Copilot can query other repos via MCP |
 | RAG vector store | ChromaDB (local) | No server needed, simple |
 | Embeddings | sentence-transformers all-MiniLM-L6-v2 | Local, no API key |
 | MCP transport | stdio | Simplest, no network config |
 | Config | JSON | Single file, human-readable |
-| Tests | C++ (catch2) + Python (pytest) | User requirement |
+| Tests | C++ (clang++) + Python (pytest) | User requirement |
 
 ## Data Flow
 
@@ -250,7 +251,8 @@ END → print to console
 ```
 Python packages (orchestrator):
   langgraph >= 0.2
-  anthropic >= 0.40
+  langchain-openai >= 0.3
+  openai >= 1.50
   chromadb >= 0.5
   sentence-transformers >= 3.0
   mcp >= 1.0
@@ -266,7 +268,8 @@ Python testing:
 
 ## Constraints
 
-- LLM API key: Anthropic API key required (set in `.env` as `ANTHROPIC_API_KEY`)
+- LLM API key: GitHub personal access token with `models:read` scope (set in `.env` as `GITHUB_TOKEN`)
+- VS Code workspaces: four `.code-workspace` files at project root, each pointing to one repo/orchestrator folder; each folder has `.vscode/mcp.json` pre-configured so GitHub Copilot can call MCP tools on the other repos
 - All repos are local folders (not actual remote git repos) for demo simplicity
 - C++ stubs compile but contain no real logic (stub bodies return default values)
 - ChromaDB persisted locally, re-indexed if `.chroma_db/` is missing

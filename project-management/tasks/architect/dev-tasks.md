@@ -90,8 +90,16 @@ class OrchestratorAgent:
     def decide_consultations(self, requesting_repo: str, feature_request: str) -> list[str]:
         """Returns list of 2 repo names to consult."""
 ```
-- Uses Claude Haiku via Anthropic SDK
-- Prompt: given the list of repo descriptions from config + the feature request, pick the 2 most relevant repos to consult (excluding the requesting repo)
+- Uses `langchain_openai.ChatOpenAI` with GitHub Models endpoint:
+  ```python
+  from langchain_openai import ChatOpenAI
+  llm = ChatOpenAI(
+      model="gpt-4o-mini",
+      base_url="https://models.inference.ai.azure.com",
+      api_key=os.environ["GITHUB_TOKEN"]
+  )
+  ```
+- Prompt: given repo descriptions from config + the feature request, pick the 2 most relevant repos to consult (excluding the requesting repo)
 - Returns repo names as a list
 
 **Acceptance Criteria**:
@@ -109,7 +117,7 @@ Nodes:
 1. `ask_orchestrator` — calls `OrchestratorAgent.decide_consultations()`
 2. `consult_repo_1` — launches MCP server subprocess for target 1, calls `query_knowledge`, captures result, shuts down
 3. `consult_repo_2` — same for target 2
-4. `generate_summary` — calls Claude Haiku with feature request + both knowledge snippets, generates structured summary
+4. `generate_summary` — calls GitHub Models (gpt-4o-mini via `langchain_openai`) with feature request + both knowledge snippets, generates structured summary
 
 State: `{ requesting_repo, feature_request, targets, knowledge_1, knowledge_2, summary }`
 
