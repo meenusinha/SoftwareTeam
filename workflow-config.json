@@ -1,0 +1,43 @@
+{
+  "repos": [
+    {
+      "name": "illumination",
+      "display_name": "Illumination",
+      "path": "repos/illumination",
+      "knowledge_path": "repos/illumination/.knowledge",
+      "description": "Manages light source, lens system, and illumination optics for the lithography scanner. Controls laser power, numerical aperture, and beam conditioning.",
+      "components": ["LightSource", "LensSystem"]
+    },
+    {
+      "name": "scan_manager",
+      "display_name": "ScanManager",
+      "path": "repos/scan_manager",
+      "knowledge_path": "repos/scan_manager/.knowledge",
+      "description": "Controls wafer stage motion, scan sequencing, and real-time position feedback. Responsible for precise XYZ positioning during slit scans.",
+      "components": ["StageController", "ScanSequencer"]
+    },
+    {
+      "name": "expose_sequence",
+      "display_name": "ExposeSequence",
+      "path": "repos/expose_sequence",
+      "knowledge_path": "repos/expose_sequence/.knowledge",
+      "description": "Manages exposure sequences, dose control, and shot coordination for each wafer field. Triggers exposures and monitors cumulative dose per shot.",
+      "components": ["ExposureController", "DoseManager"]
+    }
+  ],
+  "llm": {
+    "provider": "github_models",
+    "model": "gpt-4o-mini",
+    "base_url": "https://models.inference.ai.azure.com",
+    "api_key_env": "GITHUB_TOKEN"
+  },
+  "rag": {
+    "embedding_model": "all-MiniLM-L6-v2",
+    "chroma_persist_dir": ".chroma_db",
+    "top_k": 3
+  },
+  "demo": {
+    "requesting_repo": "expose_sequence",
+    "feature_request": "Add adaptive dose correction based on real-time stage position feedback during scan"
+  }
+}
