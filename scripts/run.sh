@@ -9,14 +9,6 @@ if [ -f .env ]; then
   set -a; source .env; set +a
 fi
 
-# Check GitHub token
-if [ -z "$GITHUB_TOKEN" ]; then
-  echo "ERROR: GITHUB_TOKEN is not set."
-  echo "Create a .env file with: GITHUB_TOKEN=your-github-token"
-  echo "Generate a token (models:read scope) at: https://github.com/settings/tokens"
-  exit 1
-fi
-
 # Create and activate venv if missing
 if [ ! -d ".venv" ]; then
   echo "Setting up Python virtual environment..."
@@ -26,7 +18,15 @@ if [ ! -d ".venv" ]; then
   echo "Dependencies installed."
 fi
 
-echo ""
+if [ -z "$GITHUB_TOKEN" ]; then
+  echo ""
+  echo "NOTE: GITHUB_TOKEN not set — running in RAG-only mode (no LLM summary)."
+  echo "The orchestrator and knowledge retrieval steps will still run fully."
+  echo "For LLM synthesis: add GITHUB_TOKEN to .env (github.com/settings/tokens)"
+  echo "For VS Code Copilot mode (full experience, zero tokens): open the .code-workspace files."
+  echo ""
+fi
+
 echo "Starting Multi-Repo Agentic Orchestration Demo..."
 echo ""
 .venv/bin/python orchestrator/demo/run_demo.py

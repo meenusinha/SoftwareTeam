@@ -1,23 +1,29 @@
 {
   "servers": {
+    "orchestrator": {
+      "type": "stdio",
+      "command": "${workspaceFolder}/../.venv/bin/python",
+      "args": ["orchestrator/mcp/orchestrator_mcp_server.py"],
+      "cwd": "${workspaceFolder}/.."
+    },
     "illumination_knowledge": {
       "type": "stdio",
-      "command": "python",
-      "args": ["../orchestrator/mcp/repo_mcp_server.py", "--repo", "illumination"],
+      "command": "${workspaceFolder}/../.venv/bin/python",
+      "args": ["orchestrator/mcp/repo_mcp_server.py", "--repo", "illumination"],
       "cwd": "${workspaceFolder}/..",
       "env": { "PYTHONPATH": "${workspaceFolder}/.." }
     },
     "scan_manager_knowledge": {
       "type": "stdio",
-      "command": "python",
-      "args": ["../orchestrator/mcp/repo_mcp_server.py", "--repo", "scan_manager"],
+      "command": "${workspaceFolder}/../.venv/bin/python",
+      "args": ["orchestrator/mcp/repo_mcp_server.py", "--repo", "scan_manager"],
       "cwd": "${workspaceFolder}/..",
       "env": { "PYTHONPATH": "${workspaceFolder}/.." }
     },
     "expose_sequence_knowledge": {
       "type": "stdio",
-      "command": "python",
-      "args": ["../orchestrator/mcp/repo_mcp_server.py", "--repo", "expose_sequence"],
+      "command": "${workspaceFolder}/../.venv/bin/python",
+      "args": ["orchestrator/mcp/repo_mcp_server.py", "--repo", "expose_sequence"],
       "cwd": "${workspaceFolder}/..",
       "env": { "PYTHONPATH": "${workspaceFolder}/.." }
     }

@@ -4,7 +4,6 @@ import sys
 from pathlib import Path
 from typing import TypedDict
 
-from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, END
 
 from orchestrator.config_loader import load_config, get_repo_config
@@ -73,12 +72,16 @@ def _query_repo_via_mcp(repo_name: str, question: str, config: dict) -> str:
 class RepoAgent:
     def __init__(self, config: dict):
         self._config = config
+        self._llm = None
         llm_cfg = config["llm"]
-        self._llm = ChatOpenAI(
-            model=llm_cfg["model"],
-            base_url=llm_cfg["base_url"],
-            api_key=os.environ[llm_cfg["api_key_env"]],
-        )
+        token = os.environ.get(llm_cfg["api_key_env"])
+        if token:
+            from langchain_openai import ChatOpenAI
+            self._llm = ChatOpenAI(
+                model=llm_cfg["model"],
+                base_url=llm_cfg["base_url"],
+                api_key=token,
+            )
         self._orchestrator = OrchestratorAgent(config)
 
     def _node_ask_orchestrator(self, state: AgentState) -> AgentState:
@@ -116,6 +119,17 @@ class RepoAgent:
 
     def _node_generate_summary(self, state: AgentState) -> AgentState:
         print(f"\n[STEP 5] {state['requesting_repo']} Agent → Generating Consultation Summary...")
+        if self._llm is None:
+            summary = (
+                "LLM summary skipped — GITHUB_TOKEN not set.\n\n"
+                "RAW KNOWLEDGE GATHERED:\n\n"
+                f"{state['knowledge_1']}\n\n"
+                f"{state['knowledge_2']}\n\n"
+                "To get a synthesised summary, set GITHUB_TOKEN in .env and re-run.\n"
+                "For the full interactive experience with synthesis, use VS Code Copilot\n"
+                "by opening the .code-workspace files — no token needed there."
+            )
+            return {**state, "summary": summary}
         prompt = (
             f"You are a senior software architect for a lithography scanner system.\n\n"
             f"The '{state['requesting_repo']}' team has a feature request:\n"

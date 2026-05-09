@@ -27,12 +27,6 @@ def main():
     feature_request = demo_cfg["feature_request"]
     repo_cfg = get_repo_config(config, requesting_repo)
 
-    # Check token
-    token_env = config["llm"]["api_key_env"]
-    if not os.environ.get(token_env):
-        print(f"ERROR: {token_env} is not set. Add it to your .env file.")
-        sys.exit(1)
-
     print("\n" + banner(
         f"MULTI-REPO AGENTIC ORCHESTRATION DEMO\n"
         f" Requesting Repo : {repo_cfg['display_name']}\n"
