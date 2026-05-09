@@ -43,3 +43,7 @@ You can add more questions if needed or relevant.
 ### 2026-03-15
 **Preference**: Always enforce all steps and requirements in your workflow instruction file, including running mandatory scripts, prompting for user permission, and never skipping any workflow step. If direct execution is not possible, always notify the user and request explicit permission. Always run the agentic animation mentioned in your workflow instructios.
 **User said**: "Why did you not run the agentic animation as explicitly mandated in your workflow guide instructions?"
+
+### 2026-05-09
+**Preference**: For the task `rag-mcp-orchestration-demo`, skip PR creation at every handover step for all agents. Always hand over directly to the next agent without creating a PR. This applies to ALL agents for the full duration of this task until completion.
+**User said**: "for this project, until its completion, keep handing over, no need to create pr"
