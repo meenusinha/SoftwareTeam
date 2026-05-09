@@ -443,6 +443,29 @@ function useCustomPath() {
   const input = document.getElementById('custom-path-input') || document.getElementById('local-custom-path');
   if (input && input.value.trim()) {
     state.projectPath = input.value.trim();
+    _resetCopyButton();
+  }
+}
+
+// Re-enable the clone/copy button when the user changes path or project name
+// after a previously successful operation, so they can clone to the new location.
+function _resetCopyButton() {
+  if (state.workflowMode === 'local') {
+    const btn = document.getElementById('local-copy-btn');
+    if (btn && btn.disabled) {
+      btn.textContent = 'Copy Project Files';
+      btn.disabled = false;
+      const next = document.getElementById('local-next');
+      if (next) next.disabled = true;
+    }
+  } else {
+    const btn = document.getElementById('fork-clone-btn');
+    if (btn && btn.disabled) {
+      btn.textContent = 'Fork & Clone';
+      btn.disabled = false;
+      const next = document.getElementById('clone-next');
+      if (next) next.disabled = true;
+    }
   }
 }
 
@@ -455,6 +478,7 @@ async function browsePath(targetInputId) {
       state.projectPath = result.path;
       const input = document.getElementById(targetInputId);
       if (input) input.value = result.path;
+      _resetCopyButton();
     } else if (result.message) {
       showAlert('clone-alerts', result.message, 'warning');
       showAlert('local-alerts', result.message, 'warning');
