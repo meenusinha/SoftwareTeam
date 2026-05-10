@@ -21,10 +21,10 @@ The existing orchestrator code lives on `master_rag-mcp-orchestration-demo`. Bri
 
 ---
 
-## Task 2: Implement OrchestratorRouter (router-only)
+## Task 2: Implement OrchestratorRouter (RAG-based MCP routing)
 
 ### Objective
-Replace `OrchestratorAgent` (which does RAG internally) with `OrchestratorRouter` that uses only repo description embeddings for routing.
+Replace `OrchestratorAgent` (which does RAG internally) with `OrchestratorRouter` that routes by querying each peer repo's RAG via MCP and ranking by actual content relevance.
 
 ### File
 `orchestrator/router.py`
@@ -32,25 +32,23 @@ Replace `OrchestratorAgent` (which does RAG internally) with `OrchestratorRouter
 ### Implementation Details
 ```python
 class OrchestratorRouter:
-    def __init__(self, config: dict):
-        # Load repo descriptions from config["repos"]
-        # Embed each: f"{repo['description']} Components: {', '.join(repo['components'])}"
-        # Cache embeddings in dict {repo_name: ndarray}
-        # Use SentenceTransformer(config["rag"]["embedding_model"])
+    def __init__(self, config: dict, root: Path = None):
+        # Build repo_name → MCP script path from config["repos"][].path + root
+        # No embedding model — routing uses subprocess MCP calls
 
     def get_relevant_repos(
         self, requesting_repo: str, feature_description: str, top_k: int = 2
-    ) -> list[str]:
-        # Embed feature_description
-        # Cosine similarity against all repo embeddings except requesting_repo
-        # Return top_k repo names sorted by score descending
+    ) -> tuple[list[str], dict[str, float]]:
+        # For each peer repo: call query_repo via _mcp_call() stdio subprocess
+        # Score: 0.0 if "no relevant knowledge found", else min(content_len/800, 1.0)
+        # Return top_k repos sorted by score; fallback to highest even if score=0.0
 ```
 
 ### Acceptance Criteria
-- [ ] `OrchestratorRouter` never instantiates `RepoRAG`
-- [ ] Returns correct repos for sample feature requests (verified by unit test)
-- [ ] Excludes `requesting_repo` from results
-- [ ] Startup time < 3s (embedding model load + description embeddings)
+- [x] `OrchestratorRouter` never instantiates `RepoRAG`
+- [x] Excludes `requesting_repo` from results
+- [x] Routes based on actual RAG content returned, not description embeddings
+- [x] Falls back gracefully when no repo returns relevant content
 
 ---
 

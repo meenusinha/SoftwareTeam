@@ -42,9 +42,11 @@
 - Input: top_k=2, 3 repos available (excluding requesting)
 - Expected: exactly 2 repos returned
 
-### T-03: Router semantic relevance
-- Input: "stage position velocity scan motion" feature
-- Expected: scan_manager scores highest (motion/stage domain)
+### T-03: Router score range and fallback
+- Input: mock _mcp_call returning rich content for all peers
+- Expected: scores are floats in [0.0, 1.0]
+- Input: mock _mcp_call returning "No relevant knowledge found." for all peers
+- Expected: still returns top_k repos (fallback behavior), all scores 0.0
 
 ### T-04: RAG isolation — scan_manager
 - Expected: scan_manager RAG returns content only from scan_manager files

@@ -48,25 +48,24 @@
 
 **Location**: `orchestrator/router.py`
 
-**Responsibility**: Route a feature request to relevant repo names using embedding similarity on repo descriptions. Does NOT index or query repo content.
+**Responsibility**: Route a feature request to relevant repo names by querying each peer repo's RAG via MCP and ranking by how much relevant content is returned. Routing is based on actual knowledge found across docs, interfaces, and source — not description embeddings.
 
 **Design**:
 ```python
 class OrchestratorRouter:
-    def __init__(self, config: dict):
-        # Loads repo descriptions from config
-        # Embeds each description once at startup
-        # Uses all-MiniLM-L6-v2 (same model as RepoRAG — no new dependency)
+    def __init__(self, config: dict, root: Path = None):
+        # Builds repo_name → MCP script path mapping from config["repos"][].path
+        # No embedding model loaded — uses subprocess MCP calls for routing
 
     def get_relevant_repos(
         self, requesting_repo: str, feature_description: str, top_k: int = 2
-    ) -> list[str]:
-        # Encodes feature_description
-        # Cosine-scores against each repo's description embedding
-        # Returns top_k repo names (excluding requesting_repo)
+    ) -> tuple[list[str], dict[str, float]]:
+        # For each peer repo: calls its query_repo MCP tool via stdio subprocess
+        # Scores response: 0.0 if "no relevant knowledge found", else min(content_len/800, 1.0)
+        # Returns top_k repos sorted by score descending
 ```
 
-**Why embedding-based routing**: Semantic, no LLM API call required, fast (description embeddings cached at startup), same model already loaded by RepoRAG.
+**Why RAG-based routing**: Description embeddings can miss relevance that only appears in interfaces or implementation. Querying each repo's actual knowledge base ensures routing decisions are grounded in real content, not just description text.
 
 ---
 
@@ -156,7 +155,7 @@ Returns a plain list of repo names plus brief rationale:
 Routing result for: "Add adaptive dose correction..."
 Requesting repo: expose_sequence
 
-Relevant repos (by description similarity):
+Relevant repos (by RAG content relevance):
   1. scan_manager  — score: 0.87
   2. illumination  — score: 0.74
 

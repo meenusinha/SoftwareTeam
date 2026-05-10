@@ -11,19 +11,21 @@
 ```
 Tool name:   get_relevant_repos
 Description: Given a feature description, return the names of the repos most
-             relevant to consult. Uses embedding similarity on repo descriptions.
-             Does NOT query repo content — routing only.
+             relevant to consult. Queries each peer repo's RAG via MCP and ranks
+             by how much relevant content is returned across docs, interfaces,
+             and source code. Score = 0.0 if no relevant content found, else
+             min(content_length / 800, 1.0).
 
 Arguments:
   requesting_repo    (str, required)  — name of the repo making the request
                                         (excluded from results)
   feature_description (str, required) — natural-language feature request
 
-Returns: (str) — plaintext listing repo names and similarity scores, e.g.:
+Returns: (str) — plaintext listing repo names and relevance scores, e.g.:
   "Routing result for: '...'
-   Relevant repos:
-     1. scan_manager  — score: 0.87
-     2. illumination  — score: 0.74"
+   Relevant repos (by RAG content relevance):
+     ★ scan_manager        — score: 0.850
+     · illumination        — score: 0.200"
 
 Errors: Returns error string if config cannot be loaded.
 ```
@@ -31,8 +33,8 @@ Errors: Returns error string if config cannot be loaded.
 **Contract guarantees**:
 - Never returns the `requesting_repo` itself
 - Returns at most `top_k` repos (default 2, configurable in workflow-config.json)
-- Does not call any repo's RAG or MCP
-- Response time < 100ms (embedding cached at startup)
+- Calls each peer repo's `query_repo` MCP tool via stdio subprocess for routing
+- Falls back to highest-scored repos even if all scores are 0.0 (ensures top_k always returned)
 
 ---
 
