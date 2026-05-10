@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import chromadb
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from orchestrator.demo_logger import log
 
 _THIN_THRESHOLD = 100  # chars — if docs result is shorter, also search code
 
@@ -28,9 +29,11 @@ class RepoRAG:
         name = self._collection_name("docs")
         existing = [c.name for c in self._client.list_collections()]
         if name in existing:
+            log(self.repo_name, "INDEX", f"Docs collection '{name}' loaded from cache")
             self._docs_collection = self._client.get_collection(name=name, embedding_function=self._ef)
             return
 
+        log(self.repo_name, "INDEX", f"Building docs index from {self.knowledge_path}")
         self._docs_collection = self._client.create_collection(name=name, embedding_function=self._ef)
         docs, ids = [], []
         for md_file in sorted(self.knowledge_path.glob("*.md")):
@@ -39,16 +42,20 @@ class RepoRAG:
             for i, chunk in enumerate(chunks):
                 docs.append(chunk)
                 ids.append(f"doc_{md_file.stem}_{i}")
+            log(self.repo_name, "INDEX", f"  {md_file.name}: {len(chunks)} chunks")
         if docs:
             self._docs_collection.add(documents=docs, ids=ids)
+        log(self.repo_name, "INDEX", f"Docs index ready: {len(docs)} chunks total")
 
     def _index_code(self) -> None:
         name = self._collection_name("code")
         existing = [c.name for c in self._client.list_collections()]
         if name in existing:
+            log(self.repo_name, "INDEX", f"Code collection '{name}' loaded from cache")
             self._code_collection = self._client.get_collection(name=name, embedding_function=self._ef)
             return
 
+        log(self.repo_name, "INDEX", f"Building code index from {self.repo_root}")
         self._code_collection = self._client.create_collection(name=name, embedding_function=self._ef)
         docs, ids = [], []
 
@@ -67,32 +74,41 @@ class RepoRAG:
 
         if docs:
             self._code_collection.add(documents=docs, ids=ids)
+        log(self.repo_name, "INDEX", f"Code index ready: {len(docs)} chunks total")
 
     def build_or_load_index(self) -> None:
+        log(self.repo_name, "INDEX", "Building/loading RAG index...")
         self._index_docs()
         self._index_code()
+        log(self.repo_name, "INDEX", "RAG index ready")
 
     def query(self, question: str) -> str:
         if self._docs_collection is None:
             raise RuntimeError("Call build_or_load_index() before query()")
 
-        # Search docs first
+        log(self.repo_name, "RAG", f"Searching docs collection (top_k={self.top_k})...")
         doc_results = self._docs_collection.query(query_texts=[question], n_results=self.top_k)
         doc_snippets = doc_results["documents"][0] if doc_results["documents"] else []
         doc_text = "\n---\n".join(doc_snippets) if doc_snippets else ""
+        log(self.repo_name, "RAG", f"Docs: {len(doc_snippets)} results, {len(doc_text)} chars")
 
         if len(doc_text) >= _THIN_THRESHOLD:
+            log(self.repo_name, "RESULT", f"Docs sufficient — returning {len(doc_text)} chars")
             return f"[Found in documentation]\n{doc_text}"
 
-        # Docs were thin — also search code (interfaces, headers, implementations)
+        log(self.repo_name, "RAG", "Docs thin — searching code collection...")
         if self._code_collection is None:
-            return doc_text if doc_text else "(no relevant knowledge found)"
+            result = doc_text if doc_text else "(no relevant knowledge found)"
+            log(self.repo_name, "RESULT", f"No code collection — returning {len(result)} chars")
+            return result
 
         code_results = self._code_collection.query(query_texts=[question], n_results=self.top_k)
         code_snippets = code_results["documents"][0] if code_results["documents"] else []
         code_text = "\n---\n".join(code_snippets) if code_snippets else ""
+        log(self.repo_name, "RAG", f"Code: {len(code_snippets)} results, {len(code_text)} chars")
 
         if not doc_text and not code_text:
+            log(self.repo_name, "RESULT", "No relevant knowledge found")
             return "(no relevant knowledge found)"
 
         parts = []
@@ -100,4 +116,6 @@ class RepoRAG:
             parts.append(f"[Found in documentation]\n{doc_text}")
         if code_text:
             parts.append(f"[Found in source code]\n{code_text}")
-        return "\n\n".join(parts)
+        result = "\n\n".join(parts)
+        log(self.repo_name, "RESULT", f"Returning docs+code: {len(result)} chars")
+        return result

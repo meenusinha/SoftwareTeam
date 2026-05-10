@@ -15,9 +15,11 @@ sys.path.insert(0, str(ROOT))
 from mcp.server.fastmcp import FastMCP
 from orchestrator.config_loader import load_config, get_repo_config
 from orchestrator.rag.repo_rag import RepoRAG
+from orchestrator.demo_logger import log
 
 REPO_NAME = "illumination"
 
+log(REPO_NAME, "INFO", "Starting Illumination MCP server")
 config = load_config()
 repo_cfg = get_repo_config(config, REPO_NAME)
 
@@ -37,17 +39,21 @@ def query_repo(feature_request: str) -> str:
     Returns relevant components, interfaces, source files, and current behavior.
     Only searches this repo's own content.
     """
+    log(REPO_NAME, "TOOL_CALL", f"query_repo: {feature_request[:80]}")
     raw = rag.query(feature_request)
 
     if raw.strip() == "(no relevant knowledge found)":
+        log(REPO_NAME, "RESULT", "No relevant knowledge found")
         return f"[{repo_cfg['display_name']}] No relevant knowledge found for this request."
 
-    return (
+    result = (
         f"[{repo_cfg['display_name']} Knowledge]\n\n"
         f"REPO: {REPO_NAME}\n"
         f"COMPONENTS: {', '.join(repo_cfg['components'])}\n\n"
         f"RELEVANT KNOWLEDGE:\n{raw}"
     )
+    log(REPO_NAME, "RESULT", f"Returning {len(result)} chars to Copilot")
+    return result
 
 
 if __name__ == "__main__":
